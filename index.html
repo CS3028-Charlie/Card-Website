@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Draggable Editable Text on Canvas</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="canvas-container">
+        <canvas id="imageCanvas" width="500" height="400"></canvas>
+        <div class="text-box" id="text-box"></div>
+        <div class="cursor" id="cursor"></div>
+    </div>
+    
+    <br>
+    <button id="addTextBtn">Add Text</button>
+    <button id="deleteTextBtn">Delete Text</button>
+    <button id="savePngBtn">Save as PNG</button>
+
+    <div id="hotbar">
+        <!-- Color Selector -->
+        <select id="colorSelect">
+            <option selected disabled>Colour</option>
+            <option value="black">Black</option>
+            <option value="red">Red</option>
+            <option value="green">Green</option>
+            <option value="blue">Blue</option>
+            <option value="white">White</option>
+        </select>
+
+        <!-- Font Size Selector -->
+        <select id="fontSizeSelect">
+            <option selected disabled>Text Size</option>
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large</option>
+        </select>
+
+        <!-- Font Style Selector -->
+        <select id="fontStyleSelect">
+            <option selected disabled>Style</option>
+            <option value="regular">Regular</option>
+            <option value="simple">Simple</option>
+            <option value="fancy">Fancy</option>
+        </select>
+
+        <!-- Bold Button -->
+        <div class="circular-btn" id="boldBtn">B</div>
+
+        <!-- Italic Button -->
+        <div class="circular-btn" id="italicBtn">I</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

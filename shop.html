@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Shop - The Sustainables Academy</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Shop Grid Section -->
+    <div class="container my-5">
+        <div class="row">
+        </div>
+    </div>
+
+    <!-- Card Modal with Carousel (Front and Inside Right only for eCard) -->
+    <div class="modal fade" id="cardModal" tabindex="-1" role="dialog" aria-labelledby="cardModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cardModalLabel">View and Customize Card</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Carousel showing only front and inside right -->
+                    <div id="cardCarousel" class="carousel slide" data-ride="carousel">
+                        <div id="cardCarousel" class="carousel slide" data-ride="carousel">
+                            <div class="carousel-inner" id="carouselImages">
+                                <!-- Carousel items will be dynamically added based on card type -->
+                            </div>
+                            <!-- Carousel Controls -->
+                            <a class="carousel-control-prev" href="#cardCarousel" role="button" data-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                            <a class="carousel-control-next" href="#cardCarousel" role="button" data-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="sr-only">Next</span>
+                            </a>
+
+                            <!-- Carousel Indicators -->
+                            <ol class="carousel-indicators" id="carouselIndicators">
+                                <!-- Indicators will be dynamically added based on card type -->
+                            </ol>
+                        </div>
+
+
+                        <!-- Card Options Section -->
+                        <div class="mt-4">
+                            <h5>Choose Card Type</h5>
+                            <button class="btn btn-outline-primary mb-3" onclick="selectCardType('eCard')">eCard
+                                (99p)</button>
+                            <button class="btn btn-outline-primary mb-3" onclick="selectCardType('printable')">Printable
+                                (£2)</button>
+                            <h5 id="priceDisplay">Price: £0.99</h5>
+                            <button class="btn btn-success" onclick="openCustomizeModal()">Personalize</button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customize Card Modal -->
+        <div class="modal fade" id="customizeModal" tabindex="-1" role="dialog" aria-labelledby="customizeModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="customizeModalLabel">Customize Your Card</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <canvas id="image-canvas" width="567" height="794"></canvas>
+                        <div class="text-box" id="text-box"></div>
+                        <div class="cursor" id="cursor"></div>
+                    </div>
+
+                    <br>
+                    <button id="addTextBtn">Add Text</button>
+                    <button id="deleteTextBtn">Delete Text</button>
+                    <button id="savePngBtn">Save as PNG</button>
+
+                    <div id="hotbar">
+                        <!-- Color Selector -->
+                        <select id="colorSelect">
+                            <option selected disabled>Colour</option>
+                            <option value="black">Black</option>
+                            <option value="red">Red</option>
+                            <option value="green">Green</option>
+                            <option value="blue">Blue</option>
+                            <option value="white">White</option>
+                        </select>
+
+                        <!-- Font Size Selector -->
+                        <select id="fontSizeSelect">
+                            <option selected disabled>Text Size</option>
+                            <option value="small">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="large">Large</option>
+                        </select>
+
+                        <!-- Font Style Selector -->
+                        <select id="fontStyleSelect">
+                            <option selected disabled>Style</option>
+                            <option value="regular">Regular</option>
+                            <option value="simple">Simple</option>
+                            <option value="fancy">Fancy</option>
+                        </select>
+
+                        <!-- Bold Button -->
+                        <div class="circular-btn" id="boldBtn">B</div>
+
+                        <!-- Italic Button -->
+                        <div class="circular-btn" id="italicBtn">I</div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="saveCustomization()">Save & Add to
+                            Basket</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Include jQuery, Bootstrap, and JavaScript -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+        <script src="script.js"></script>
+</body>
+
+</html>
