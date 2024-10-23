@@ -439,6 +439,18 @@ document.getElementById('italicBtn').addEventListener('click', () => {
     }
 });
 
+// Underline
+document.getElementById('underlineBtn').addEventListener('click', () => {
+    currentFontUnderline = !currentFontUnderline; // Underline text
+    document.getElementById('underlineBtn').classList.toggle('active', currentFontUnderline);
+    if (selectedText) {
+        selectedText.isUnderline = currentFontUnderline; // Update selected text color
+        redrawCanvas(); // Redraw canvas to reflect changes
+        updateTextBoxPosition(); // Update textbox position
+    }
+});
+
+
 // Save as PNG button
 document.getElementById('savePngBtn').addEventListener('click', () => {
     const link = document.createElement('a');
