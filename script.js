@@ -160,10 +160,11 @@ img.onload = () => {
 
 // Default text properties
 let currentFontColor = 'black';
-let currentFontSize = '30px';
-let currentFontStyle = 'Arial';
+let currentFontSize = '20px';
+let currentFontStyle = 'Calibri';
 let currentFontBold = false;
 let currentFontItalic = false;
+let currentFontUnderline = false;
 
 // Function to add text
 function addText(text, x, y) {
@@ -265,7 +266,7 @@ function setHotbarValues(text) {
 
     // Set font style
     const styleMapping = {
-        'Arial': 'regular',
+        'Calibri': 'regular',
         'Courier New': 'simple',
         'Times New Roman': 'fancy'
     };
@@ -279,6 +280,9 @@ function setHotbarValues(text) {
 
     currentFontItalic = text.isItalic;
     document.getElementById('italicBtn').classList.toggle('active', currentFontItalic);
+
+    currentFontUnderline = text.isUnderline
+    document.getElementById('underlineBtn').classList.toggle('active', currentFontUnderline);
 }
 
 // Canvas mouse move event
@@ -403,12 +407,13 @@ document.getElementById('fontSizeSelect').addEventListener('change', (e) => {
 // Handle font style selection
 document.getElementById('fontStyleSelect').addEventListener('change', (e) => {
     const styleMapping = {
-        regular: 'Arial',
+        regular: 'Calibri',
         simple: 'Courier New',
         fancy: 'Times New Roman'
+
     };
 
-    currentFontStyle = styleMapping[e.target.value] || 'Arial';
+    currentFontStyle = styleMapping[e.target.value] || 'Calibri';
     if (selectedText) {
         selectedText.fontStyle = currentFontStyle
         redrawCanvas(); // Redraw canvas
@@ -438,6 +443,18 @@ document.getElementById('italicBtn').addEventListener('click', () => {
         updateTextBoxPosition(); // Update textbox position
     }
 });
+
+// Underline
+document.getElementById('underlineBtn').addEventListener('click', () => {
+    currentFontUnderline = !currentFontUnderline; // Underline text
+    document.getElementById('underlineBtn').classList.toggle('active', currentFontUnderline);
+    if (selectedText) {
+        selectedText.isUnderline = currentFontUnderline; // Update selected text color
+        redrawCanvas(); // Redraw canvas to reflect changes
+        updateTextBoxPosition(); // Update textbox position
+    }
+});
+
 
 // Save as PNG button
 document.getElementById('savePngBtn').addEventListener('click', () => {

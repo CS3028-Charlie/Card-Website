@@ -1,7 +1,8 @@
 /* Enlarge card on hover */
 .card:hover {
-    transform: scale(1.1);
-    transition: transform 0.3s ease;
+    transform: scale(1);
+    transition: transform 0.4s ease;
+    opacity: 0.3;
 }
 
 #canvas-container {
@@ -15,6 +16,7 @@ canvas {
 
 .text-box {
     border: 1px dashed black;
+    border-radius: 3px;
     position: absolute;
     display: none;
     pointer-events: none;
@@ -42,15 +44,15 @@ canvas {
 #hotbar {
     display: flex;
     justify-content: center;
-    margin-bottom: 10px;
+    margin-bottom: 30px;
 }
 
 .circular-btn {
     width: 40px;
     height: 40px;
-    border-radius: 5%;
+    border-radius: 20%;
     border: 1px solid #ccc;
-    background-color: #f0f0f0;
+    background-color: #ccc;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -60,12 +62,12 @@ canvas {
 }
 
 .circular-btn.active {
-    background-color: #ccc; /* Change background color when active */
+    background-color: #0fbd3a; /* Change background color when active */
     color: white;           /* Change text color when active */
 }
 
 .selected {
-    color: blue;
+    color: green;
     background-color: white;
 }
 
