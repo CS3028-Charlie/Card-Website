@@ -1,45 +1,94 @@
-const numCards = 8; // Number of cards you want to generate
+// PULL IMAGES AND GEN CARDS
 
-// Function to generate unique random images
-function generateRandomImages(numImages) {
-    const images = [];
-    for (let i = 0; i < numImages; i++) {
-        // Generate a random image URL
-        images.push(`https://picsum.photos/567/794?random=${Math.floor(Math.random() * 1000)}`);
+const numCards = 4; // Number of cards you want to generate
+
+// // Function to generate unique random images
+// function generateRandomImages(numImages) {
+//     const images = [];
+//     for (let i = 0; i < numImages; i++) {
+//         // Generate a random image URL
+//         images.push(`https://picsum.photos/567/794?random=${Math.floor(Math.random() * 1000)}`);
+//     }
+//     return images;
+// }
+
+// Function to pull all images for each card
+function pullTemplateImages(numCards) {
+    const API_URL = "http://localhost:3000";
+    const positions = ["Front", "Inner-left", "Inner-Right", "Back"];
+    let cards = [];
+
+    for (let i = 0; i < numCards; i++) {
+        let images = [];
+        const folderIndex = `card-${i + 1}`;
+
+        positions.forEach(position => {
+            images.push(`${API_URL}/assets/templates/${folderIndex}/${position}.png`);
+        });
+
+        cards.push(images); // Each card contains an array of images for each position
     }
-    return images;
+
+    return cards;
 }
 
 // Function to generate cards
 function generateCards() {
     const row = document.querySelector('.row');
-    for (let i = 0; i < numCards; i++) {
-        const images = generateRandomImages(4); // Get four random images for each card
+    const allCardsImages = pullTemplateImages(numCards);
+
+    allCardsImages.forEach((cardImages, index) => {
         const col = document.createElement('div');
         col.className = 'col-md-3 col-sm-6';
+
         col.innerHTML = `
             <div class="card mb-4">
-                <img src="${images[0]}" class="card-img-top" alt="Card ${i + 1} Image">
+                <img src="${cardImages[0]}" class="card-img-top" alt="Card ${index + 1} Image">
                 <div class="card-body text-center">
-                    <h5 class="card-title">Card ${i + 1}</h5>
+                    <h5 class="card-title">Card ${index + 1}</h5>
                 </div>
             </div>
         `;
 
-        // Create the View button
         const viewButton = document.createElement('button');
         viewButton.className = 'btn btn-primary';
         viewButton.textContent = 'View';
-        viewButton.onclick = () => openCardModal(i, images); // Attach event handler here
+        viewButton.onclick = () => openCardModal(index, cardImages);
 
-        // Append the button to the card body
         col.querySelector('.card-body').appendChild(viewButton);
         row.appendChild(col);
-    }
+    });
 }
 
-// Call the function to generate cards on page load
+// Function to open the card modal
+function openCardModal(cardIndex, images) {
+    loadCarouselImages(images); // Display all images in the modal for the selected card
+
+    document.querySelectorAll('.btn-outline-primary.mb-3').forEach((button, index, allButtons) => {
+        button.onclick = () => {
+            allButtons.forEach(btn => btn.classList.remove('bg-primary', 'text-white'));
+            button.classList.add('bg-primary', 'text-white');
+            selectCardType(index === 0 ? 'eCard' : 'printable', images);
+        };
+    });
+
+    img.src = images[2];
+    $('#cardModal').modal('show');
+}
+
+// Function to handle card type selection
+function selectCardType(cardType, images) {
+    let imagesToShow = cardType === 'eCard' ? [images[0], images[2]] : images;
+    document.getElementById('priceDisplay').innerText = cardType === 'eCard' ? 'Price: £0.99' : 'Price: £2.00';
+    loadCarouselImages(imagesToShow);
+
+    img.onload = () => {
+        redrawCanvas();
+    };
+}
+
 window.onload = generateCards;
+
 
 // Function to open the card modal
 function openCardModal(cardIndex, images) {
@@ -127,7 +176,7 @@ function openCustomizeModal() {
 
 
 
-
+// CANVAS EDITOR
 
 const canvas = document.getElementById('image-canvas');
 const ctx = canvas.getContext('2d');
@@ -160,11 +209,10 @@ img.onload = () => {
 
 // Default text properties
 let currentFontColor = 'black';
-let currentFontSize = '20px';
-let currentFontStyle = 'Calibri';
+let currentFontSize = '30px';
+let currentFontStyle = 'Arial';
 let currentFontBold = false;
 let currentFontItalic = false;
-let currentFontUnderline = false;
 
 // Function to add text
 function addText(text, x, y) {
@@ -266,7 +314,7 @@ function setHotbarValues(text) {
 
     // Set font style
     const styleMapping = {
-        'Calibri': 'regular',
+        'Arial': 'regular',
         'Courier New': 'simple',
         'Times New Roman': 'fancy'
     };
@@ -280,9 +328,6 @@ function setHotbarValues(text) {
 
     currentFontItalic = text.isItalic;
     document.getElementById('italicBtn').classList.toggle('active', currentFontItalic);
-
-    currentFontUnderline = text.isUnderline
-    document.getElementById('underlineBtn').classList.toggle('active', currentFontUnderline);
 }
 
 // Canvas mouse move event
@@ -407,13 +452,12 @@ document.getElementById('fontSizeSelect').addEventListener('change', (e) => {
 // Handle font style selection
 document.getElementById('fontStyleSelect').addEventListener('change', (e) => {
     const styleMapping = {
-        regular: 'Calibri',
+        regular: 'Arial',
         simple: 'Courier New',
         fancy: 'Times New Roman'
-
     };
 
-    currentFontStyle = styleMapping[e.target.value] || 'Calibri';
+    currentFontStyle = styleMapping[e.target.value] || 'Arial';
     if (selectedText) {
         selectedText.fontStyle = currentFontStyle
         redrawCanvas(); // Redraw canvas
@@ -443,18 +487,6 @@ document.getElementById('italicBtn').addEventListener('click', () => {
         updateTextBoxPosition(); // Update textbox position
     }
 });
-
-// Underline
-document.getElementById('underlineBtn').addEventListener('click', () => {
-    currentFontUnderline = !currentFontUnderline; // Underline text
-    document.getElementById('underlineBtn').classList.toggle('active', currentFontUnderline);
-    if (selectedText) {
-        selectedText.isUnderline = currentFontUnderline; // Update selected text color
-        redrawCanvas(); // Redraw canvas to reflect changes
-        updateTextBoxPosition(); // Update textbox position
-    }
-});
-
 
 // Save as PNG button
 document.getElementById('savePngBtn').addEventListener('click', () => {
