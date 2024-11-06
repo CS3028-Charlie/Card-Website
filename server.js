@@ -23,3 +23,15 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Frontend server running on port ${PORT}`);
 });
+
+// Example: Replace with your actual backend Heroku URL
+const backendURL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/register";
+
+const response = await fetch(backendURL, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ username, email, password }),
+});
+
