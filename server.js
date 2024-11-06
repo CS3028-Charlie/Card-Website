@@ -7,7 +7,7 @@ app.use(express.static(path.join(__dirname, 'public'))); // Adjust folder if nee
 
 // Route to serve index.html or any other pages
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'shop.html'));
 });
 
 app.get('/login', (req, res) => {
