@@ -15,7 +15,8 @@ const numCards = 4; // Number of cards you want to generate
 // Function to pull all images for each card
 function pullTemplateImages(numCards) {
     // http://localhost:3000 for local
-    const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com"; 
+    // https://charlie-card-backend-fbbe5a6118ba.herokuapp.com for heroku
+    const API_URL = "http://localhost:3000";
     const positions = ["Front", "Inner-Left", "Inner-Right", "Back"];
     let cards = [];
 
@@ -271,6 +272,16 @@ function getTextAtPosition(x, y) {
     return null;
 }
 
+// Create a hidden input field
+const hiddenInput = document.createElement('input');
+hiddenInput.type = 'text';
+hiddenInput.style.position = 'absolute';
+hiddenInput.style.opacity = '0';
+hiddenInput.style.height = '0';
+hiddenInput.style.width = '0';
+hiddenInput.style.border = 'none';
+document.body.appendChild(hiddenInput);
+
 // Canvas mouse down event
 canvas.addEventListener('mousedown', (e) => {
     const rect = canvas.getBoundingClientRect();
@@ -290,11 +301,26 @@ canvas.addEventListener('mousedown', (e) => {
 
         // Set hotbar values to the selected text properties
         setHotbarValues(selectedText);
+        // Position the input and focus to show the keyboard on mobile
+        hiddenInput.style.left = `${e.clientX}px`; // Adjust for exact text position if needed
+        hiddenInput.style.top = `${e.clientY}px`;
+        hiddenInput.value = selectedText.text;
+        hiddenInput.focus();
+
+        // Sync input value with selected text on input change
+        hiddenInput.oninput = () => {
+            selectedText.text = hiddenInput.value;
+            drawTextOnCanvas(); // Redraw canvas with updated text
+        };
+
     } else {
         selectedText = null;
         textBox.style.display = 'none';
         cursor.style.display = 'none';
         clearInterval(cursorBlinkInterval);
+
+        // Hide keyboard when tapping outside text
+        hiddenInput.blur();
     }
 });
 
