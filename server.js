@@ -4,7 +4,7 @@ const path = require('path');
 const app = express();
 
 app.use(cors({
-  origin: 'https://charlie-card-frontend-4e147d877237.herokuapp.com', // Allow requests from frontend
+  origin: 'https://charlie-card-backend-fbbe5a6118ba.herokuapp.com', // Allow requests from frontend
   credentials: true
 }));
 
