@@ -1,5 +1,5 @@
 import express from 'express';
-const path = require('path');
+import path from 'path';
 const app = express();
 
 // Serve static files
@@ -34,4 +34,3 @@ const response = await fetch(backendURL, {
   },
   body: JSON.stringify({ username, email, password }),
 });
-
