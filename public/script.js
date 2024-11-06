@@ -16,7 +16,7 @@ const numCards = 4; // Number of cards you want to generate
 function pullTemplateImages(numCards) {
     // http://localhost:3000 for local
     // https://charlie-card-backend-fbbe5a6118ba.herokuapp.com for heroku
-    const API_URL = "http://localhost:3000";
+    const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
     const positions = ["Front", "Inner-Left", "Inner-Right", "Back"];
     let cards = [];
 
