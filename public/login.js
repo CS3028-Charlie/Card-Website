@@ -40,7 +40,7 @@ async function handleLogin() {
     const password = document.getElementById('loginPassword').value;
 
     try {
-        const response = await fetch('/api/auth/login', { 
+        const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/login', { 
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json' 
