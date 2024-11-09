@@ -34,6 +34,7 @@ function showUserAccountModal() {
     document.getElementById('usernameDisplay').textContent = localStorage.getItem('username');
 }
 
+// Handle Login
 async function handleLogin() {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
@@ -41,7 +42,9 @@ async function handleLogin() {
     try {
         const response = await fetch('/api/auth/login', { 
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json' 
+            },
             body: JSON.stringify({ email, password })
         });
 
@@ -52,8 +55,8 @@ async function handleLogin() {
         }
 
         const data = await response.json();
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('username', data.username);
+        localStorage.setItem('authToken', data.token); // Store token in localStorage
+        localStorage.setItem('username', data.username); // Store username in localStorage
 
         $('#accountModal').modal('hide');
         document.getElementById('accountText').textContent = data.username;
