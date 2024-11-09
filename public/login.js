@@ -1,8 +1,30 @@
 // Check login status
 document.addEventListener('DOMContentLoaded', () => {
-    const isLoggedIn = localStorage.getItem('authToken');
-    document.getElementById('accountText').textContent = isLoggedIn ? 'Account' : 'Login';
+    const authToken = localStorage.getItem('authToken');
+    const accountText = document.getElementById('accountText');
+    const accountModalBody = document.getElementById('accountModalBody');
+    const username = localStorage.getItem('username');
+
+    if (authToken) {
+        // User is logged in, display username
+        accountText.textContent = username || 'Account'; // Use stored username
+        accountText.addEventListener('click', () => showAccountInfo(username));
+    } else {
+        // User is not logged in
+        accountText.textContent = 'Login';
+    }
 });
+
+// Show account info (display username and options)
+function showAccountInfo(username) {
+    const accountModalBody = document.getElementById('accountModalBody');
+    accountModalBody.innerHTML = `
+        <h4>Hi ${username}</h4>
+        <p>There's not much to do here right now...</p>
+        <button onclick="handleSignOut()">Sign Out</button>
+    `;
+    $('#accountModal').modal('show');
+}
 
 // Function to handle login
 async function handleLogin() {
@@ -63,4 +85,13 @@ async function handleSignup() {
         console.error('Error during signup:', error);
         alert('An error occurred during signup.');
     }
+}
+
+// Sign out the user
+function handleSignOut() {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('username');
+    document.getElementById('accountText').textContent = 'Login';
+    $('#accountModal').modal('hide');
+    alert('You have been logged out.');
 }
