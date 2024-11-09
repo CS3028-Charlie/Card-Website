@@ -32,8 +32,8 @@
                     <a class="nav-link" href="shop.html"><i class="fas fa-store"></i> Shop</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" data-toggle="modal" data-target="#accountModal">
-                        <i class="fas fa-user"></i> <span id="accountText">Login</span>
+                    <a class="nav-link" href="#" id="accountText" data-toggle="modal" data-target="#accountModal">
+                        <i class="fas fa-user"></i> Login
                     </a>
                 </li>
             </ul>
@@ -46,27 +46,51 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="accountModalLabel">Account</h5>
+                    <h5 class="modal-title" id="accountModalLabel">Login / Sign Up</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body" id="accountModalBody">
-                    <!-- Content will be dynamically updated -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <div class="modal-body">
+                    <!-- Login Form -->
+                    <form id="loginForm" style="display: none;">
+                        <div class="form-group">
+                            <label for="loginEmail">Email address</label>
+                            <input type="email" class="form-control" id="loginEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" class="form-control" id="loginPassword" required>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="handleLogin()">Login</button>
+                    </form>
+                    <!-- Signup Form -->
+                    <form id="signupForm" style="display: none;">
+                        <h5>Don't have an account? Sign Up!</h5>
+                        <div class="form-group">
+                            <label for="signupUsername">Username</label>
+                            <input type="text" class="form-control" id="signupUsername" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupEmail">Email address</label>
+                            <input type="email" class="form-control" id="signupEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupPassword">Password</label>
+                            <input type="password" class="form-control" id="signupPassword" required>
+                        </div>
+                        <button type="button" class="btn btn-success" onclick="handleSignup()">Sign Up</button>
+                    </form>
+
+                    <!-- User Account Section (after login) -->
+                    <div id="userAccountSection" style="display: none;">
+                        <h5>Welcome, <span id="usernameDisplay"></span>!</h5>
+                        <button type="button" class="btn btn-danger" onclick="handleSignOut()">Sign Out</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Account Section -->
-    <div>
-        <span id="accountText">Login</span>
-    </div>
-
-
 
     <!-- Hero Banner -->
     <section class="hero-banner text-center text-light d-flex align-items-center justify-content-center">
