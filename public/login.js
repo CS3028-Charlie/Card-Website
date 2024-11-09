@@ -7,17 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // If logged in, show username and update icon
     if (authToken) {
         accountText.textContent = username || 'Account';
-        accountIcon.classList.remove('fa-user-circle'); // Default icon
-        accountIcon.classList.add('fa-sign-out-alt');  // Log out icon
         accountIcon.title = 'Sign Out'; // Change title to reflect action
-        
-        accountText.addEventListener('click', () => {
-            showUserAccountModal();
-        });
+        updateNavBarForLogin(); // Update the navbar to reflect the login state
     } else {
         accountText.textContent = 'Login';
-        accountIcon.classList.remove('fa-sign-out-alt');
-        accountIcon.classList.add('fa-user-circle');
         accountIcon.title = 'Login';
         
         accountText.addEventListener('click', showLoginSignupModal);
@@ -41,20 +34,32 @@ function showUserAccountModal() {
     document.getElementById('usernameDisplay').textContent = localStorage.getItem('username');
 }
 
-// Handle Login
 async function handleLogin() {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
 
-    // Simulate a successful login
-    const response = { token: 'fake-jwt-token', username: 'JohnDoe' };
+    try {
+        const response = await fetch('/api/login', { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
 
-    if (response.token) {
-        localStorage.setItem('authToken', response.token);
-        localStorage.setItem('username', response.username);
+        if (!response.ok) {
+            const errorData = await response.json();
+            alert(errorData.message); // Show error from backend
+            return;
+        }
+
+        const data = await response.json();
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('username', data.username);
+
         $('#accountModal').modal('hide');
-        document.getElementById('accountText').textContent = response.username;
-        showLoginSignupModal();
+        document.getElementById('accountText').textContent = data.username;
+        updateNavBarForLogin();
+    } catch (error) {
+        alert('Login failed: ' + error.message);
     }
 }
 
@@ -73,7 +78,19 @@ function updateNavBarForSignOut() {
     const accountIcon = document.getElementById('accountIcon');
     
     accountText.textContent = 'Login';
-    accountIcon.classList.remove('fa-sign-out-alt');
-    accountIcon.classList.add('fa-user-circle');
     accountIcon.title = 'Login';
+}
+
+// Update Nav Bar for Login
+function updateNavBarForLogin() {
+    const accountText = document.getElementById('accountText');
+    const accountIcon = document.getElementById('accountIcon');
+    
+    const username = localStorage.getItem('username');
+    accountText.textContent = username || 'Account';
+    accountIcon.title = 'Sign Out'; // Change title to reflect action
+
+    accountText.addEventListener('click', () => {
+        showUserAccountModal();
+    });
 }
