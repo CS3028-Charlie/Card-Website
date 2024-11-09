@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<header>
+    <h1>Admin Panel</h1>
+</header>
+
+<div class="container">
+    <h2>Upload a New Card</h2>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Card Title:</label>
+            <input type="text" id="cardTitle" name="cardTitle" required>
+        </div>
+
+        <div class="form-group">
+            <label>Select All Images:</label>
+            <small class="inputFeedback" id=countFeedback>You must select 4 images for a card</small>
+            <div></div>
+            <small class="inputFeedback" id=filetypeFeedback>Your images must be .jpg .jpeg or .png filetypes</small>
+            <div></div>
+            <small class="inputFeedback" id=labelFeedback>Your images must use the following filenames: "Front" "Back" "Inner-Left" "Inner-Right"</small>
+            <input type="file" id="cardImages" accept="image/*" required multiple>
+        </div>
+
+        <button type="submit" class="button">Upload Card</button>
+    </form>
+
+    <div class="card-list">
+        <h2>Uploaded Cards</h2>
+        <!-- Card items would be dynamically added here -->
+        <div class="card-item">
+            <strong>Card Title</strong>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</div>
+
+</body>
+</html>
