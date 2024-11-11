@@ -75,3 +75,7 @@ select {
     margin-right: 10px;
     padding: 5px;
 }
+
+#accountIcon {
+    margin-right: 5px;
+}

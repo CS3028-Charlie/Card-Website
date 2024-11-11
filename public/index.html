@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Home - The Sustainables Academy</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="Css/styles.css">
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-seedling"></i> The Sustainables Academy
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html"><i class="fas fa-home"></i> Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="shop.html"><i class="fas fa-store"></i> Shop</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="accountLink" data-toggle="modal" data-target="#accountModal">
+                        <i class="fas fa-user-circle" id="accountIcon"></i> <span id="accountText">Login</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Account Modal -->
+    <div class="modal fade" id="accountModal" tabindex="-1" role="dialog" aria-labelledby="accountModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="accountModalLabel">Login / Sign Up</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Login Form -->
+                    <form id="loginForm" style="display: none;">
+                        <div class="form-group">
+                            <label for="loginEmail">Email address</label>
+                            <input type="email" class="form-control" id="loginEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" class="form-control" id="loginPassword" required>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="handleLogin()">Login</button>
+                    </form>
+                    <!-- Signup Form -->
+                    <form id="signupForm" style="display: none;">
+                        <h5>Don't have an account? Sign Up!</h5>
+                        <div class="form-group">
+                            <label for="signupUsername">Username</label>
+                            <input type="text" class="form-control" id="signupUsername" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupEmail">Email address</label>
+                            <input type="email" class="form-control" id="signupEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupPassword">Password</label>
+                            <input type="password" class="form-control" id="signupPassword" required>
+                        </div>
+                        <button type="button" class="btn btn-success" onclick="handleSignup()">Sign Up</button>
+                    </form>
+
+                    <!-- User Account Section (after login) -->
+                    <div id="userAccountSection" style="display: none;">
+                        <h5>Welcome, <span id="usernameDisplay"></span>!</h5>
+                        <button type="button" class="btn btn-danger" onclick="handleSignOut()">Sign Out</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Banner -->
+    <section class="hero-banner text-center text-light d-flex align-items-center justify-content-center">
+        <div class="container">
+            <h1>Welcome to The Sustainables Academy</h1>
+            <p class="lead">Eco-Friendly Greetings for a Sustainable Future</p>
+            <a href="shop.html" class="btn btn-primary btn-lg mt-3">Explore Our Cards</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section py-5 text-center">
+        <div class="container">
+            <h2>Our Mission</h2>
+            <p class="lead">Empowering communities with eco-conscious cards that promote sustainability and support
+                non-profit education initiatives.</p>
+        </div>
+    </section>
+
+    <!-- Featured Cards Section -->
+    <section class="featured-cards py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Featured Cards</h2>
+            <div class="row">
+                <!-- Card 1 -->
+                <div class="col-md-4">
+                    <div class="card shadow">
+                        <img src="path/to/featured-card1.jpg" class="card-img-top" alt="Card Image">
+                        <div class="card-body">
+                            <h5 class="card-title">Eco Birthday Card</h5>
+                            <p class="card-text">Made from recycled materials and embedded with wildflower seeds. Just
+                                plant and water!</p>
+                            <a href="shop.html" class="btn btn-outline-primary">Shop Now</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="col-md-4">
+                    <div class="card shadow">
+                        <img src="path/to/featured-card2.jpg" class="card-img-top" alt="Card Image">
+                        <div class="card-body">
+                            <h5 class="card-title">Holiday Greetings</h5>
+                            <p class="card-text">Celebrate the season with an eco-friendly twist. 10% of sales go to
+                                environmental charities.</p>
+                            <a href="shop.html" class="btn btn-outline-primary">Shop Now</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="col-md-4">
+                    <div class="card shadow">
+                        <img src="path/to/featured-card3.jpg" class="card-img-top" alt="Card Image">
+                        <div class="card-body">
+                            <h5 class="card-title">Thank You Card</h5>
+                            <p class="card-text">Perfect for any occasion, made with sustainable materials and minimal
+                                packaging.</p>
+                            <a href="shop.html" class="btn btn-outline-primary">Shop Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-4">What Our Customers Say</h2>
+            <div class="row">
+                <!-- Testimonial 1 -->
+                <div class="col-md-4">
+                    <blockquote class="blockquote text-center">
+                        <p class="mb-0">"These cards are beautiful and eco-friendly. Love the sustainable approach!"</p>
+                        <footer class="blockquote-footer">Emily R.</footer>
+                    </blockquote>
+                </div>
+                <!-- Testimonial 2 -->
+                <div class="col-md-4">
+                    <blockquote class="blockquote text-center">
+                        <p class="mb-0">"A perfect choice for meaningful celebrations. Highly recommend!"</p>
+                        <footer class="blockquote-footer">Michael T.</footer>
+                    </blockquote>
+                </div>
+                <!-- Testimonial 3 -->
+                <div class="col-md-4">
+                    <blockquote class="blockquote text-center">
+                        <p class="mb-0">"Supporting a great cause with high-quality cards!"</p>
+                        <footer class="blockquote-footer">Sarah L.</footer>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-4 bg-dark text-light text-center">
+        <p>&copy; 2024 The Sustainables Academy. All Rights Reserved.</p>
+        <div>
+            <a href="#" class="text-light mx-2"><i class="fab fa-facebook"></i></a>
+            <a href="#" class="text-light mx-2"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="text-light mx-2"><i class="fab fa-instagram"></i></a>
+        </div>
+    </footer>
+
+    <!-- jQuery, Bootstrap, and Font Awesome JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <script src="Scripts/login.js"></script>
+</body>
+
+</html>
