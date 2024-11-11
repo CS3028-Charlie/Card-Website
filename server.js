@@ -11,21 +11,12 @@ app.use(cors({
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public'))); // Adjust folder if needed
 
-// Route to serve index.html or any other pages
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
-});
-
-// Handle all routes and send back shop.html (for SPA)
-app.get('*', (req, res) => {
+// Serve homepage
+app.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Frontend server running on port ${PORT}`);
 });
