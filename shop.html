@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Basic Meta Tags -->
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <title>Shop - The Sustainables Academy</title>
+
+  <!-- Link Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+  <!-- Link to stylesheet CSS -->
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <link rel="shortcut icon" href="images/TSA-Logo.png" type="image/x-icon">
+
+</head>
+
+<body>
+  <!-- Hero Section -->
+  <div class="hero_area">
+    <!-- Header Section -->
+    <header class="header_section">
+      <nav class="navbar navbar-expand-lg custom_nav-container container">
+        <a class="navbar-brand" href="index.html">
+          <span>
+            <img src="images/TSA-Logo.png" alt="The Sustainables Academy Logo" style="max-width: 100px;">
+            The Sustainables Academy
+          </span>
+        </a>
+        <div class="collapse navbar-collapse innerpage_navbar" id="navbarSupportedContent">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="index.html">Home</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="shop.html">Shop</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="wholesale.html">Wholesale</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="about.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="contact.html">Contact Us</a>
+            </li>
+          </ul>
+          <div class="user_option">
+            <a href="">
+              <i class="fa fa-user" aria-hidden="true"></i>
+              <span>
+                Login
+              </span>
+            </a>
+            <a href="">
+              <i class="fa fa-shopping-bag" aria-hidden="true"></i>
+            </a>
+            <form class="form-inline ">
+              <button class="btn nav_search-btn" type="submit">
+                <i class="fa fa-search" aria-hidden="true"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <!-- End Header Section -->
+
+  </div>
+  <!-- End Hero Section -->
+
+  <!-- Shop Grid Section -->
+  <div class="container my-5">
+    <div class="row">
+    </div>
+  </div>
+
+    <!-- Card Modal with Carousel (Front and Inside Right only for eCard) -->
+  <div class="modal fade" id="cardModal" tabindex="-1" role="dialog" aria-labelledby="cardModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cardModalLabel">View and Customize Card</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Carousel showing only front and inside right -->
+                <div id="cardCarousel" class="carousel slide" data-ride="carousel">
+                    <div id="cardCarousel" class="carousel slide" data-ride="carousel">
+                        <div class="carousel-inner" id="carouselImages">
+                            <!-- Carousel items will be dynamically added based on card type -->
+                        </div>
+                        <!-- Carousel Controls -->
+                        <a class="carousel-control-prev" href="#cardCarousel" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#cardCarousel" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+
+                        <!-- Carousel Indicators -->
+                        <ol class="carousel-indicators" id="carouselIndicators">
+                            <!-- Indicators will be dynamically added based on card type -->
+                        </ol>
+                    </div>
+
+
+                    <!-- Card Options Section -->
+                    <div class="mt-4">
+                        <h5>Choose Card Type</h5>
+                        <button class="btn btn-outline-primary mb-3" onclick="selectCardType('eCard')">eCard
+                            (99p)</button>
+                        <button class="btn btn-outline-primary mb-3" onclick="selectCardType('printable')">Printable
+                            (£2)</button>
+                        <h5 id="priceDisplay">Price: £0.99</h5>
+                        <button class="btn btn-success" onclick="openCustomizeModal()">Personalize</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customize Card Modal -->
+    <div class="modal fade" id="customizeModal" tabindex="-1" role="dialog" aria-labelledby="customizeModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="customizeModalLabel">Customize Your Card</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <canvas id="image-canvas" width="600" height="450"></canvas>
+                    <div class="text-box" id="text-box"></div>
+                    <div class="cursor" id="cursor"></div>
+                </div>
+
+                <br>
+                <button id="addTextBtn">Add Text</button>
+                <button id="deleteTextBtn">Delete Text</button>
+                <button id="savePngBtn">Save as PNG</button>
+
+                <div id="hotbar">
+                    <!-- Color Selector -->
+                    <select id="colorSelect">
+                        <option selected disabled>Colour</option>
+                        <option value="black">Black</option>
+                        <option value="red">Red</option>
+                        <option value="green">Green</option>
+                        <option value="blue">Blue</option>
+                        <option value="white">White</option>
+                    </select>
+
+                    <!-- Font Size Selector -->
+                    <select id="fontSizeSelect">
+                        <option selected disabled>Text Size</option>
+                        <option value="small">Small</option>
+                        <option value="medium">Medium</option>
+                        <option value="large">Large</option>
+                    </select>
+
+                    <!-- Font Style Selector -->
+                    <select id="fontStyleSelect">
+                        <option selected disabled>Style</option>
+                        <option value="regular">Regular</option>
+                        <option value="simple">Simple</option>
+                        <option value="fancy">Fancy</option>
+                    </select>
+
+                    <!-- Bold Button -->
+                    <div class="circular-btn" id="boldBtn">B</div>
+
+                    <!-- Italic Button -->
+                    <div class="circular-btn" id="italicBtn">I</div>
+
+                    <!-- Underline Button -->
+                    <div class="circular-btn" id="underlineBtn">U</div>
+                    
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="saveCustomization()">Save & Add to Basket</button>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+
+      <!-- footer section -->
+  <footer class="footer_section py-5">
+    <div class="container">
+      <div class="row align-items-center" id="footer_border">
+        <!-- Logo Section -->
+        <div class="col-md-4 text-center text-md-left mb-3 mb-md-0">
+          <img src="images/TSA-Logo.png" alt="The Sustainables Academy Logo" class="footer-logo"
+            style="max-width: 150px;">
+        </div>
+
+        <!-- Newsletter Section -->
+        <div class="col-md-4 text-center mb-3 mb-md-0">
+          <h2>Subscribe to Our Newsletter</h2>
+          <form class="form-inline justify-content-center">
+            <input type="email" class="form-control mb-2 mr-sm-2" placeholder="Enter your email" required>
+            <button type="submit" class="btn mb-2">Subscribe</button>
+          </form>
+        </div>
+
+        <!-- Contact Us Section -->
+        <div class="col-md-4 text-center text-md-right">
+          <h2>Contact Us</h2>
+          <i class="fa-brands fa-instagram fa-lg mx-2" aria-hidden="true"></i>
+          <i class="fa-brands fa-facebook fa-lg mx-2" aria-hidden="true"></i>
+          <i class="fa-brands fa-twitter fa-lg mx-2" aria-hidden="true"></i>
+          <br><br>
+          <a href="mailto: name@email.com">info@thesustainablesacademy.com</a>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <!-- Copyright Section -->
+        <div class="col-md-6 text-center text-md-left">
+          <p>
+            &copy; 2024 The Sustainables Academy
+          </p>
+        </div>
+        <!-- Privacy Policy Section -->
+        <div class="col-md-6 text-center text-md-right">
+          <p>
+            <a href="https://thesustainablesacademy.com/privacy-policy-2/"> Privacy Policy </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Link icons JS -->
+  <script src="https://kit.fontawesome.com/fd4c78af1d.js" crossorigin="anonymous"></script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+  <script src="script.js"></script>
+
+</body>
+</html>
