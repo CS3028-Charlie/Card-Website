@@ -118,7 +118,6 @@
     background: #008E86;
 }
 
-/* 响应式调整 */
 @media (max-width: 768px) {
     .container form {
         padding: 20px;
