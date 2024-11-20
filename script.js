@@ -5,7 +5,7 @@ function generateRandomImages(numImages) {
     const images = [];
     for (let i = 0; i < numImages; i++) {
         // Generate a random image URL
-        images.push(`https://picsum.photos/567/794?random=${Math.floor(Math.random() * 1000)}`);
+        images.push(`Photo by Joseph A from Pexels: https://www.pexels.com/photo/sweet-cupcakes-with-cream-and-marshmallows-20052095/')}`);
     }
     return images;
 }
@@ -464,19 +464,16 @@ document.getElementById('savePngBtn').addEventListener('click', () => {
     link.click();
 });
 
-// Initialize cart from localStorage or create empty
+// shopping basket
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-// Function to add item to the cart
 function addToCart(item) {
     // Check if the item already exists in the cart
     const existingItem = cart.find(cartItem => cartItem.id === item.id);
 
     if (existingItem) {
-        // If it exists, increase the quantity
         existingItem.quantity += 1;
     } else {
-        // If it doesn't exist, add a new item with quantity 1
         cart.push({ ...item, quantity: 1 });
     }
 
@@ -492,7 +489,7 @@ function updateCart() {
 // Show cart items in the modal
 function showCart() {
     const cartItemsContainer = document.getElementById('cart-items');
-    cartItemsContainer.innerHTML = ''; // Clear current items
+    cartItemsContainer.innerHTML = ''
 
     let total = 0;
     cart.forEach(item => {
@@ -527,7 +524,7 @@ function removeFromCart(itemId) {
 // Checkout function
 function checkout() {
     if (cart.length === 0) {
-        alert("Your cart is empty.");
+        alert("Your basket is empty.");
         return;
     }
 }
