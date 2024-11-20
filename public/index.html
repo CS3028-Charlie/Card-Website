@@ -65,21 +65,22 @@
                         <button type="button" class="btn btn-primary" onclick="handleLogin()">Login</button>
                     </form>
                     <!-- Signup Form -->
-                    <form id="signupForm" style="display: none;">
-                        <h5>Don't have an account? Sign Up!</h5>
-                        <div class="form-group">
+                    <form id="signupForm">
+                        <div>
                             <label for="signupUsername">Username</label>
-                            <input type="text" class="form-control" id="signupUsername" required>
+                            <input type="text" id="signupUsername" required pattern="[a-zA-Z0-9_]{3,20}"
+                                title="Username must be 3-20 characters and contain only letters, numbers, and underscores.">
                         </div>
-                        <div class="form-group">
-                            <label for="signupEmail">Email address</label>
-                            <input type="email" class="form-control" id="signupEmail" required>
+                        <div>
+                            <label for="signupEmail">Email</label>
+                            <input type="email" id="signupEmail" required>
                         </div>
-                        <div class="form-group">
+                        <div>
                             <label for="signupPassword">Password</label>
-                            <input type="password" class="form-control" id="signupPassword" required>
+                            <input type="password" id="signupPassword" required minlength="8"
+                                title="Password must be at least 8 characters long.">
                         </div>
-                        <button type="button" class="btn btn-success" onclick="handleSignup()">Sign Up</button>
+                        <button type="button" onclick="handleSignup()">Sign Up</button>
                     </form>
 
                     <!-- User Account Section (after login) -->

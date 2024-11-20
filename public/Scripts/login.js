@@ -66,14 +66,18 @@ async function handleLogin() {
     }
 }
 
-// Handle Signup
 async function handleSignup() {
     const username = document.getElementById('signupUsername').value;
     const email = document.getElementById('signupEmail').value;
     const password = document.getElementById('signupPassword').value;
 
+    if (!username || !email || !password) {
+        alert('All fields are required.');
+        return;
+    }
+
     try {
-        const response = await fetch('/api/auth/register', {
+        const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, email, password }),
@@ -81,16 +85,16 @@ async function handleSignup() {
 
         if (!response.ok) {
             const errorData = await response.json();
-            alert(errorData.message); // Show error message from the server
+            alert(errorData.message); // Show error from the backend
             return;
         }
 
         const data = await response.json();
-        localStorage.setItem('authToken', data.token); // Store token
-        localStorage.setItem('username', username); // Store username
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('username', username);
 
-        alert('Signup successful! You are now logged in.');
-        location.reload(); // Refresh page or navigate to the dashboard
+        alert('Signup successful!');
+        location.reload();
     } catch (error) {
         alert('Signup failed: ' + error.message);
     }
