@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const accountIcon = document.getElementById('accountIcon');
     const authToken = localStorage.getItem('authToken');
     const username = localStorage.getItem('username');
-    
+
     // If logged in, show username and update icon
     if (authToken) {
         accountText.textContent = username || 'Account';
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         accountText.textContent = 'Login';
         accountIcon.title = 'Login';
-        
+
         accountText.addEventListener('click', showLoginSignupModal);
     }
 });
@@ -40,10 +40,10 @@ async function handleLogin() {
     const password = document.getElementById('loginPassword').value;
 
     try {
-        const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/login', { 
+        const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/login', {
             method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json' 
+            headers: {
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({ email, password })
         });
@@ -66,6 +66,36 @@ async function handleLogin() {
     }
 }
 
+// Handle Signup
+async function handleSignup() {
+    const username = document.getElementById('signupUsername').value;
+    const email = document.getElementById('signupEmail').value;
+    const password = document.getElementById('signupPassword').value;
+
+    try {
+        const response = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            alert(errorData.message); // Show error message from the server
+            return;
+        }
+
+        const data = await response.json();
+        localStorage.setItem('authToken', data.token); // Store token
+        localStorage.setItem('username', username); // Store username
+
+        alert('Signup successful! You are now logged in.');
+        location.reload(); // Refresh page or navigate to the dashboard
+    } catch (error) {
+        alert('Signup failed: ' + error.message);
+    }
+}
+
 // Handle Sign Out
 function handleSignOut() {
     localStorage.removeItem('authToken');
@@ -79,7 +109,7 @@ function handleSignOut() {
 function updateNavBarForSignOut() {
     const accountText = document.getElementById('accountText');
     const accountIcon = document.getElementById('accountIcon');
-    
+
     accountText.textContent = 'Login';
     accountIcon.title = 'Login';
 }
@@ -88,7 +118,7 @@ function updateNavBarForSignOut() {
 function updateNavBarForLogin() {
     const accountText = document.getElementById('accountText');
     const accountIcon = document.getElementById('accountIcon');
-    
+
     const username = localStorage.getItem('username');
     accountText.textContent = username || 'Account';
     accountIcon.title = 'Sign Out'; // Change title to reflect action
