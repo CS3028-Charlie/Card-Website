@@ -5,7 +5,7 @@ function generateRandomImages(numImages) {
     const images = [];
     for (let i = 0; i < numImages; i++) {
         // Generate a random image URL
-        images.push(`https://picsum.photos/567/794?random=${Math.floor(Math.random() * 1000)}`);
+        images.push(`Photo by Joseph A from Pexels: https://www.pexels.com/photo/sweet-cupcakes-with-cream-and-marshmallows-20052095/')}`);
     }
     return images;
 }
@@ -463,6 +463,72 @@ document.getElementById('savePngBtn').addEventListener('click', () => {
     link.href = canvas.toDataURL('image/png');
     link.click();
 });
+
+// shopping basket
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+function addToCart(item) {
+    // Check if the item already exists in the cart
+    const existingItem = cart.find(cartItem => cartItem.id === item.id);
+
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.push({ ...item, quantity: 1 });
+    }
+
+    updateCart();
+}
+
+// Update cart display and localStorage
+function updateCart() {
+    localStorage.setItem('cart', JSON.stringify(cart));
+    document.getElementById('cart-count').innerText = cart.reduce((sum, item) => sum + item.quantity, 0);
+}
+
+// Show cart items in the modal
+function showCart() {
+    const cartItemsContainer = document.getElementById('cart-items');
+    cartItemsContainer.innerHTML = ''
+
+    let total = 0;
+    cart.forEach(item => {
+        total += item.price * item.quantity;
+        
+        // Create list item for each cart item
+        const listItem = document.createElement('li');
+        listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+        listItem.innerHTML = `
+            ${item.name} - £${item.price} x ${item.quantity}
+            <div>
+                <button class="btn btn-sm btn-danger" onclick="removeFromCart(${item.id})">Remove</button>
+            </div>
+        `;
+        cartItemsContainer.appendChild(listItem);
+    });
+
+    // Update total
+    document.getElementById('cart-total').innerText = total.toFixed(2);
+
+    // Show modal
+    $('#cartModal').modal('show');
+}
+
+// Function to remove item from cart
+function removeFromCart(itemId) {
+    cart = cart.filter(item => item.id !== itemId);
+    updateCart();
+    showCart(); // Refresh cart view
+}
+
+// Checkout function
+function checkout() {
+    if (cart.length === 0) {
+        alert("Your basket is empty.");
+        return;
+    }
+}
+
 
 // Save the customized card (for example, to basket)
 function saveCustomization() {

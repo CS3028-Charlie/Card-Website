@@ -16,6 +16,38 @@
         </div>
     </div>
 
+    <header>
+        <div class="container">
+            <button class="btn btn-primary" onclick="showCart()">Shopping Basket (<span id="cart-count">0</span>)</button>
+        </div>
+    </header>
+
+    <!-- Cart Modal -->
+<div class="modal fade" id="cartModal" tabindex="-1" role="dialog" aria-labelledby="cartModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cartModalLabel">Your Shopping Cart</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul id="cart-items" class="list-group">
+                    <!-- Cart items will be dynamically inserted here -->
+                </ul>
+                <h5>Total: £<span id="cart-total">0.00</span></h5>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" onclick="checkout()">Checkout</button>
+    </div>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
+
     <!-- Card Modal with Carousel (Front and Inside Right only for eCard) -->
     <div class="modal fade" id="cardModal" tabindex="-1" role="dialog" aria-labelledby="cardModalLabel"
         aria-hidden="true">
@@ -131,8 +163,9 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="saveCustomization()">Save & Add to
-                            Basket</button>
+                        <button type="button" class="btn btn-primary" onclick="addToCart({ id: 1, name: 'Eco-friendly Card', price: 0.99 })"></button>
+                Add to Basket
+        </button>
                     </div>
                 </div>
             </div>
@@ -141,6 +174,8 @@
         <!-- Include jQuery, Bootstrap, and JavaScript -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/cart.js"></script>
+
 
         <script src="script.js"></script>
 </body>
