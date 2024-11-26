@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;600&display=swap');
+
+* {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    outline: none;
+    border: none;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 25px;
+    min-height: 100vh;
+    background: #f8f9fa;
+}
+
+.container form {
+    padding: 30px;
+    width: 800px;
+    background: #fff;
+    box-shadow: 0 5px 10px rgba(0,0,0,.1);
+    border-radius: 8px;
+}
+
+.container form .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.container form .row .col {
+    flex: 1 1 350px;
+}
+
+.container form .row .col .title {
+    font-size: 20px;
+    color: #1a1a1a;
+    padding-bottom: 15px;
+    text-transform: none;
+    font-weight: 600;
+    border-bottom: 1px solid #e5e5e5;
+    margin-bottom: 20px;
+}
+
+.container form .row .col .inputBox {
+    margin-bottom: 20px;
+}
+
+.container form .row .col .inputBox label {
+    display: block;
+    margin-bottom: 8px;
+    color: #4a4a4a;
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.required {
+    color: #dc3545;
+    margin-left: 4px;
+}
+
+.container form .row .col .inputBox input,
+.container form .row .col .inputBox select {
+    width: 100%;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    padding: 10px 15px;
+    font-size: 15px;
+    background-color: #fff;
+}
+
+.container form .row .col .inputBox input:focus,
+.container form .row .col .inputBox select:focus {
+    border: 1px solid #00A69C;
+    box-shadow: 0 0 0 3px rgba(0, 166, 156, 0.1);
+}
+
+.card-details {
+    display: flex;
+    gap: 20px;
+}
+
+.expiry-container {
+    flex: 2;
+}
+
+.cvv-container {
+    flex: 1;
+}
+
+.expiry-selects {
+    display: flex;
+    gap: 10px;
+}
+
+.expiry-selects select {
+    flex: 1;
+}
+
+.submit-btn {
+    width: auto;
+    padding: 12px 30px;
+    font-size: 16px;
+    background: #00A69C;
+    color: #fff;
+    margin-top: 20px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: 500;
+    float: right;
+}
+
+.submit-btn:hover {
+    background: #008E86;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .container form {
+        padding: 20px;
+    }
+    
+    .card-details {
+        flex-direction: column;
+    }
+    
+    .cvv-container {
+        width: 100%;
+    }
+}
