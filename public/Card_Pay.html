@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/CardPay's%20css.css">
+</head>
+<body>
+
+<div class="container">
+    <form action="">
+        <div class="row">
+            <!-- left side -->
+            <div class="col">
+                <h3 class="title">Billing Address</h3>
+
+                <div class="inputBox">
+                    <label>Country or Region <span class="required">*</span></label>
+                    <select required>
+                        <option value="UK">United Kingdom</option>
+                    </select>
+                </div>
+
+                <div class="inputBox">
+                    <label>Address 1 <span class="required">*</span></label>
+                    <input type="text" required>
+                </div>
+
+                <div class="inputBox">
+                    <label>Address 2</label>
+                    <input type="text">
+                </div>
+
+                <div class="inputBox">
+                    <label>Town / City <span class="required">*</span></label>
+                    <input type="text" required>
+                </div>
+
+                <div class="inputBox">
+                    <label>County / State</label>
+                    <input type="text">
+                </div>
+
+                <div class="inputBox">
+                    <label>Postcode / Zipcode <span class="required">*</span></label>
+                    <input type="text" required>
+                </div>
+            </div>
+
+            <!-- right side -->
+            <div class="col">
+                <h3 class="title">Payment Details</h3>
+
+                <div class="inputBox">
+                    <label>Name On Card <span class="required">*</span></label>
+                    <input type="text" required>
+                </div>
+
+                <div class="inputBox">
+                    <label>Card Number <span class="required">*</span></label>
+                    <input type="text" required pattern="\d*" maxlength="19" placeholder="XXXX XXXX XXXX XXXX">
+                </div>
+
+                <div class="card-details">
+                    <div class="expiry-container">
+                        <div class="inputBox">
+                            <label>Expiry Date <span class="required">*</span></label>
+                            <div class="expiry-selects">
+                                <select required>
+                                    <option value="">Month</option>
+                                    <option value="01">01</option>
+                                    <option value="02">02</option>
+                                    <option value="03">03</option>
+                                    <option value="04">04</option>
+                                    <option value="05">05</option>
+                                    <option value="06">06</option>
+                                    <option value="07">07</option>
+                                    <option value="08">08</option>
+                                    <option value="09">09</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                </select>
+                                <select required>
+                                    <option value="">Year</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2026">2026</option>
+                                    <option value="2027">2027</option>
+                                    <option value="2028">2028</option>
+                                    <option value="2029">2029</option>
+                                    <option value="2030">2030</option>
+                                    <option value="2031">2031</option>
+                                    <option value="2032">2032</option>
+                                    <option value="2033">2033</option>
+                                    <option value="2034">2034</option>
+                                    <option value="2035">2035</option>
+                                    <option value="2036">2036</option>
+                                    <option value="2037">2037</option>
+                                    <option value="2038">2038</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cvv-container">
+                        <div class="inputBox">
+                            <label>CVV <span class="required">*</span></label>
+                            <input type="text" required pattern="\d*" maxlength="4" placeholder="XXX">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">Checkout</button>
+    </form>
+</div>
+
+</body>
+</html>
