@@ -5,10 +5,10 @@
     opacity: 0.3;
 }
 
-#canvas-container {
+/* #canvas-container {
     position: relative;
     display: inline-block;
-}
+} */
 
 canvas {
     border: 1px solid black;
@@ -41,29 +41,39 @@ canvas {
     }
 }
 
-#hotbar {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 30px;
+/* Sidebar Styles */
+.customize-sidebar {
+    width: 250px;
+    border-right: 1px solid #ddd;
+    background: #f9f9f9;
 }
 
-.circular-btn {
+.customize-sidebar h6 {
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+#increaseSizeBtn, #decreaseSizeBtn, #boldBtn, #italicBtn, #underlineBtn, #addTextBtn, #deleteTextBtn {
     width: 40px;
     height: 40px;
-    border-radius: 20%;
-    border: 1px solid #ccc;
-    background-color: #ccc;
-    display: flex;
+    font-weight: bold;
+    border-radius: 50%;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    margin-right: 10px;
-    font-weight: bold;
+    transition: background-color 0.3s ease;
 }
 
-.circular-btn.active {
-    background-color: #0fbd3a; /* Change background color when active */
-    color: white;           /* Change text color when active */
+/* Canvas Styles */
+.canvas-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .selected {
@@ -76,6 +86,9 @@ select {
     padding: 5px;
 }
 
-#accountIcon {
-    margin-right: 5px;
+.canvas-container {
+    background-image: URL('../Images/Elipse-Group.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
 }

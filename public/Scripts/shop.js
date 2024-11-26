@@ -2,16 +2,6 @@
 
 const numCards = 4; // Number of cards you want to generate
 
-// // Function to generate unique random images
-// function generateRandomImages(numImages) {
-//     const images = [];
-//     for (let i = 0; i < numImages; i++) {
-//         // Generate a random image URL
-//         images.push(`https://picsum.photos/567/794?random=${Math.floor(Math.random() * 1000)}`);
-//     }
-//     return images;
-// }
-
 // Function to pull all images for each card
 function pullTemplateImages(numCards) {
     // http://localhost:3000 for local
@@ -53,7 +43,7 @@ function generateCards() {
         `;
 
         const viewButton = document.createElement('button');
-        viewButton.className = 'btn btn-primary';
+        viewButton.className = 'btn btn-success';
         viewButton.textContent = 'View';
         viewButton.onclick = () => openCardModal(index, cardImages);
 
@@ -66,10 +56,10 @@ function generateCards() {
 function openCardModal(cardIndex, images) {
     loadCarouselImages(images); // Display all images in the modal for the selected card
 
-    document.querySelectorAll('.btn-outline-primary.mb-3').forEach((button, index, allButtons) => {
+    document.querySelectorAll('.btn-outline-success.mb-3').forEach((button, index, allButtons) => {
         button.onclick = () => {
-            allButtons.forEach(btn => btn.classList.remove('bg-primary', 'text-white'));
-            button.classList.add('bg-primary', 'text-white');
+            allButtons.forEach(btn => btn.classList.remove('bg-success', 'text-white'));
+            button.classList.add('bg-success', 'text-white');
             selectCardType(index === 0 ? 'eCard' : 'printable', images);
         };
     });
@@ -97,13 +87,13 @@ function openCardModal(cardIndex, images) {
     loadCarouselImages(images); // Load all images initially
 
     // Set up click events for the card type buttons
-    document.querySelectorAll('.btn-outline-primary.mb-3').forEach((button, index, allButtons) => {
+    document.querySelectorAll('.btn-outline-success.mb-3').forEach((button, index, allButtons) => {
         button.onclick = () => {
             // Remove 'selected' class from all buttons
-            allButtons.forEach(btn => btn.classList.remove('bg-primary', 'text-white'));
+            allButtons.forEach(btn => btn.classList.remove('bg-success', 'text-white'));
 
             // Add 'selected' class only to the clicked button
-            button.classList.add('bg-primary', 'text-white');
+            button.classList.add('bg-success', 'text-white');
 
             // Call the selectCardType function based on the button clicked
             selectCardType(index === 0 ? 'eCard' : 'printable', images);
@@ -329,15 +319,15 @@ function setHotbarValues(text) {
     // Set color
     document.getElementById('colorSelect').value = text.fontColor;
 
-    // Set font size
-    const sizeMapping = {
-        '20px': 'small',
-        '30px': 'medium',
-        '40px': 'large'
-    };
-    // Reverse mapping to find the corresponding size option
-    const selectedSize = Object.entries(sizeMapping).find(([key, value]) => key === text.fontSize);
-    document.getElementById('fontSizeSelect').value = selectedSize ? selectedSize[1] : 'medium'; // Default to 'medium'
+    // // Set font size
+    // const sizeMapping = {
+    //     '20px': 'small',
+    //     '30px': 'medium',
+    //     '40px': 'large'
+    // };
+    // // Reverse mapping to find the corresponding size option
+    // const selectedSize = Object.entries(sizeMapping).find(([key, value]) => key === text.fontSize);
+    // document.getElementById('fontSizeSelect').value = selectedSize ? selectedSize[1] : 'medium'; // Default to 'medium'
 
     // Set font style
     const styleMapping = {
@@ -460,21 +450,46 @@ document.getElementById('colorSelect').addEventListener('change', (e) => {
     }
 });
 
-// Handle font size selection
-document.getElementById('fontSizeSelect').addEventListener('change', (e) => {
-    const sizeMapping = {
-        small: '20px',
-        medium: '30px',
-        large: '40px'
-    };
-    currentFontSize = sizeMapping[e.target.value] || '30px'; // Update current font size
+// // Handle font size selection
+// document.getElementById('fontSizeSelect').addEventListener('change', (e) => {
+//     const sizeMapping = {
+//         small: '20px',
+//         medium: '30px',
+//         large: '40px'
+//     };
+//     currentFontSize = sizeMapping[e.target.value] || '30px'; // Update current font size
+//     if (selectedText) {
+//         selectedText.fontSize = currentFontSize; // Update selected text color
+//         redrawCanvas(); // Redraw canvas to reflect changes
+//         updateTextBoxPosition(); // Update textbox position
+//         updateCursorPosition(); // Update cursor position
+//     }
+// });
+
+// Increase font size
+document.getElementById('increaseSizeBtn').addEventListener('click', () => {
     if (selectedText) {
-        selectedText.fontSize = currentFontSize; // Update selected text color
-        redrawCanvas(); // Redraw canvas to reflect changes
-        updateTextBoxPosition(); // Update textbox position
-        updateCursorPosition(); // Update cursor position
+        const currentSize = parseInt(selectedText.fontSize, 10);
+        selectedText.fontSize = `${currentSize + 5}px`; // Increase font size by 5px
+        redrawCanvas();
+        updateTextBoxPosition();
+        updateCursorPosition();
     }
 });
+
+// Decrease font size
+document.getElementById('decreaseSizeBtn').addEventListener('click', () => {
+    if (selectedText) {
+        const currentSize = parseInt(selectedText.fontSize, 10);
+        if (currentSize > 5) { // Ensure font size stays above a minimum value
+            selectedText.fontSize = `${currentSize - 5}px`; // Decrease font size by 5px
+            redrawCanvas();
+            updateTextBoxPosition();
+            updateCursorPosition();
+        }
+    }
+});
+
 
 // Handle font style selection
 document.getElementById('fontStyleSelect').addEventListener('change', (e) => {

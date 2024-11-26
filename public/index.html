@@ -10,14 +10,14 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg custom-navbar">
         <a class="navbar-brand" href="#">
-            <i class="fas fa-seedling"></i> The Sustainables Academy
+            <img class="nav-logo" src="Images/TSA-Logo.png"> The Sustainables Academy
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,6 +30,9 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="shop.html"><i class="fas fa-store"></i> Shop</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="about.html"><i class="fa-solid fa-circle-info"></i> About</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#" id="accountLink" data-toggle="modal" data-target="#accountModal">
@@ -62,25 +65,24 @@
                             <label for="loginPassword">Password</label>
                             <input type="password" class="form-control" id="loginPassword" required>
                         </div>
-                        <button type="button" class="btn btn-primary" onclick="handleLogin()">Login</button>
-                    </form>
+                        <button type="button" class="btn btn-success" onclick="handleLogin()">Login</button>
+                    </form><br>
                     <!-- Signup Form -->
-                    <form id="signupForm">
-                        <div>
+                    <form id="signupForm" style="display: none;">
+                        <h5>Don't have an account? Sign Up!</h5>
+                        <div class="form-group">
                             <label for="signupUsername">Username</label>
-                            <input type="text" id="signupUsername" required pattern="[a-zA-Z0-9_]{3,20}"
-                                title="Username must be 3-20 characters and contain only letters, numbers, and underscores.">
+                            <input type="text" class="form-control" id="signupUsername" required>
                         </div>
-                        <div>
-                            <label for="signupEmail">Email</label>
-                            <input type="email" id="signupEmail" required>
+                        <div class="form-group">
+                            <label for="signupEmail">Email address</label>
+                            <input type="email" class="form-control" id="signupEmail" required>
                         </div>
-                        <div>
+                        <div class="form-group">
                             <label for="signupPassword">Password</label>
-                            <input type="password" id="signupPassword" required minlength="8"
-                                title="Password must be at least 8 characters long.">
+                            <input type="password" class="form-control" id="signupPassword" required>
                         </div>
-                        <button type="button" onclick="handleSignup()">Sign Up</button>
+                        <button type="button" class="btn btn-success" onclick="handleSignup()">Sign Up</button>
                     </form>
 
                     <!-- User Account Section (after login) -->
@@ -98,7 +100,10 @@
         <div class="container">
             <h1>Welcome to The Sustainables Academy</h1>
             <p class="lead">Eco-Friendly Greetings for a Sustainable Future</p>
-            <a href="shop.html" class="btn btn-primary btn-lg mt-3">Explore Our Cards</a>
+            <a href="shop.html" class="btn btn-success btn-lg mt-3">Explore Our Cards</a>
+        </div>
+        <div class="container">
+            <img style="height: 400px;" src="Images/Sustainables-team.webp">
         </div>
     </section>
 
@@ -119,36 +124,35 @@
                 <!-- Card 1 -->
                 <div class="col-md-4">
                     <div class="card shadow">
-                        <img src="path/to/featured-card1.jpg" class="card-img-top" alt="Card Image">
+                        <img src="https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/assets/templates/card-1/Front.png" class="card-img-top" alt="Card Image">
                         <div class="card-body">
                             <h5 class="card-title">Eco Birthday Card</h5>
-                            <p class="card-text">Made from recycled materials and embedded with wildflower seeds. Just
-                                plant and water!</p>
-                            <a href="shop.html" class="btn btn-outline-primary">Shop Now</a>
+                            <p class="card-text">Celebrate without the waste. Send the perfect personalised card via email or print it out at home.</p>
+                            <a href="shop.html" class="btn btn-outline-success">Shop Now</a>
                         </div>
                     </div>
                 </div>
                 <!-- Card 2 -->
                 <div class="col-md-4">
                     <div class="card shadow">
-                        <img src="path/to/featured-card2.jpg" class="card-img-top" alt="Card Image">
+                        <img src="https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/assets/templates/card-2/Front.png" class="card-img-top" alt="Card Image">
                         <div class="card-body">
                             <h5 class="card-title">Holiday Greetings</h5>
                             <p class="card-text">Celebrate the season with an eco-friendly twist. 10% of sales go to
                                 environmental charities.</p>
-                            <a href="shop.html" class="btn btn-outline-primary">Shop Now</a>
+                            <a href="shop.html" class="btn btn-outline-success">Shop Now</a>
                         </div>
                     </div>
                 </div>
                 <!-- Card 3 -->
                 <div class="col-md-4">
                     <div class="card shadow">
-                        <img src="path/to/featured-card3.jpg" class="card-img-top" alt="Card Image">
+                        <img src="https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/assets/templates/card-3/Front.png" class="card-img-top" alt="Card Image">
                         <div class="card-body">
                             <h5 class="card-title">Thank You Card</h5>
                             <p class="card-text">Perfect for any occasion, made with sustainable materials and minimal
                                 packaging.</p>
-                            <a href="shop.html" class="btn btn-outline-primary">Shop Now</a>
+                            <a href="shop.html" class="btn btn-outline-success">Shop Now</a>
                         </div>
                     </div>
                 </div>

@@ -10,14 +10,15 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="/css/shop.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/shop.css">
 </head>
 
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg custom-navbar">
         <a class="navbar-brand" href="#">
-            <i class="fas fa-seedling"></i> The Sustainables Academy
+            <img class="nav-logo" src="Images/TSA-Logo.png"> The Sustainables Academy
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,6 +31,9 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="shop.html"><i class="fas fa-store"></i> Shop</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="about.html"><i class="fa-solid fa-circle-info"></i> About</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#" id="accountLink" data-toggle="modal" data-target="#accountModal">
@@ -62,8 +66,8 @@
                             <label for="loginPassword">Password</label>
                             <input type="password" class="form-control" id="loginPassword" required>
                         </div>
-                        <button type="button" class="btn btn-primary" onclick="handleLogin()">Login</button>
-                    </form>
+                        <button type="button" class="btn btn-success" onclick="handleLogin()">Login</button>
+                    </form><br>
                     <!-- Signup Form -->
                     <form id="signupForm" style="display: none;">
                         <h5>Don't have an account? Sign Up!</h5>
@@ -91,6 +95,17 @@
             </div>
         </div>
     </div>
+
+    <!-- Hero Banner -->
+    <section class="hero-banner text-center text-light d-flex align-items-center justify-content-center">
+        <div class="container">
+            <h1>The Card Lab</h1>
+            <p class="lead">Find a template you like below and start personalising!</p>
+        </div>
+        <div class="container">
+            <img style="height: 400px;" src="Images/Sustainables-team.webp">
+        </div>
+    </section>
 
     <!-- Shop Grid Section -->
     <div class="container my-5">
@@ -136,12 +151,12 @@
                         <!-- Card Options Section -->
                         <div class="mt-4">
                             <h5>Choose Card Type</h5>
-                            <button class="btn btn-outline-primary mb-3" onclick="selectCardType('eCard')">eCard
+                            <button class="btn btn-outline-success mb-3" onclick="selectCardType('eCard')">eCard
                                 (99p)</button>
-                            <button class="btn btn-outline-primary mb-3" onclick="selectCardType('printable')">Printable
+                            <button class="btn btn-outline-success mb-3" onclick="selectCardType('printable')">Printable
                                 (£2)</button>
                             <h5 id="priceDisplay">Price: £0.99</h5>
-                            <button class="btn btn-success" onclick="openCustomizeModal()">Personalize</button>
+                            <button class="btn btn-success" onclick="openCustomizeModal()">Personalise</button>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -154,7 +169,7 @@
         <!-- Customize Card Modal -->
         <div class="modal fade" id="customizeModal" tabindex="-1" role="dialog" aria-labelledby="customizeModalLabel"
             aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-dialog modal-xl" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="customizeModalLabel">Customize Your Card</h5>
@@ -162,70 +177,93 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body">
-                        <canvas id="image-canvas" width="600" height="450"></canvas>
-                        <div class="text-box" id="text-box"></div>
-                        <div class="cursor" id="cursor"></div>
+                    <div class="modal-body d-flex">
+                        <!-- Sidebar -->
+                        <div class="customize-sidebar p-3 bg-light">
+                            <h6>Customisation Tools</h6>
+                            <div class="form-group">
+                                <label for="colorSelect">Text Color</label>
+                                <select id="colorSelect" class="form-control">
+                                    <option selected disabled>Choose</option>
+                                    <option value="black">Black</option>
+                                    <option value="red">Red</option>
+                                    <option value="green">Green</option>
+                                    <option value="blue">Blue</option>
+                                    <option value="white">White</option>
+                                </select>                                                             
+                            </div>
+                            <div class="form-group">
+                                <label for="fontSizeSelect">Font Size</label><br>
+                                <!-- <select id="fontSizeSelect" class="form-control">
+                                    <option selected disabled>Choose</option>
+                                    <option value="small">Small</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="large">Large</option>
+                                </select> -->
+                                <button id="increaseSizeBtn" class="btn btn-outline-success btn-sm"><i
+                                        class="fa-solid fa-plus"></i></button>
+                                <button id="decreaseSizeBtn" class="btn btn-outline-success btn-sm"><i
+                                        class="fa-solid fa-minus"></i></button>
+                            </div>
+                            <div class="form-group">
+                                <label for="fontStyleSelect">Font Style</label>
+                                <select id="fontStyleSelect" class="form-control">
+                                    <option selected disabled>Choose</option>
+                                    <option value="regular">Regular</option>
+                                    <option value="simple">Simple</option>
+                                    <option value="fancy">Fancy</option>
+                                </select>
+                            </div>
+                            <div>
+                                <button id="boldBtn" class="btn btn-outline-success btn-sm"><i
+                                        class="fa-solid fa-bold"></i></button>
+                                <button id="italicBtn" class="btn btn-outline-success btn-sm"><i
+                                        class="fa-solid fa-italic"></i></button>
+                                <button id="underlineBtn" class="btn btn-outline-success btn-sm"><i
+                                        class="fa-solid fa-underline"></i></button>
+                            </div><br>
+                            <div>
+                                <label for="fontSizeSelect">Text Options</label><br>
+                                <button id="addTextBtn" class="btn btn-outline-success btn-sm"><i
+                                    class="fa-solid fa-plus"></i>T</button>
+                                <button id="deleteTextBtn" class="btn btn-outline-success btn-sm"><i
+                                    class="fa-solid fa-minus"></i>T</button>
+                            </div>
+                        </div>
+                        <!-- Canvas Area -->
+                        <div class="canvas-container ml-4">
+                            <canvas id="image-canvas" width="600" height="450" class="border"></canvas>
+                            <div class="text-box" id="text-box"></div>
+                            <div class="cursor" id="cursor"></div>
+                        </div>
                     </div>
-
-                    <br>
-                    <button id="addTextBtn">Add Text</button>
-                    <button id="deleteTextBtn">Delete Text</button>
-                    <button id="savePngBtn">Save as PNG</button>
-
-                    <div id="hotbar">
-                        <!-- Color Selector -->
-                        <select id="colorSelect">
-                            <option selected disabled>Colour</option>
-                            <option value="black">Black</option>
-                            <option value="red">Red</option>
-                            <option value="green">Green</option>
-                            <option value="blue">Blue</option>
-                            <option value="white">White</option>
-                        </select>
-
-                        <!-- Font Size Selector -->
-                        <select id="fontSizeSelect">
-                            <option selected disabled>Text Size</option>
-                            <option value="small">Small</option>
-                            <option value="medium">Medium</option>
-                            <option value="large">Large</option>
-                        </select>
-
-                        <!-- Font Style Selector -->
-                        <select id="fontStyleSelect">
-                            <option selected disabled>Style</option>
-                            <option value="regular">Regular</option>
-                            <option value="simple">Simple</option>
-                            <option value="fancy">Fancy</option>
-                        </select>
-
-                        <!-- Bold Button -->
-                        <div class="circular-btn" id="boldBtn">B</div>
-
-                        <!-- Italic Button -->
-                        <div class="circular-btn" id="italicBtn">I</div>
-
-                        <!-- Underline Button -->
-                        <div class="circular-btn" id="underlineBtn">U</div>
-
-                    </div>
-
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="saveCustomization()">Save & Add to
+                        <button type="button" class="btn btn-success" onclick="saveCustomization()">Save & Add to
                             Basket</button>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- jQuery, Bootstrap, and Font Awesome JavaScript -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
-        <script src="Scripts/shop.js"></script>
-        <script src="Scripts/login.js"></script>
+
+    <!-- Footer -->
+    <footer class="py-4 bg-dark text-light text-center">
+        <p>&copy; 2024 The Sustainables Academy. All Rights Reserved.</p>
+        <div>
+            <a href="#" class="text-light mx-2"><i class="fab fa-facebook"></i></a>
+            <a href="#" class="text-light mx-2"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="text-light mx-2"><i class="fab fa-instagram"></i></a>
+        </div>
+    </footer>
+
+    <!-- jQuery, Bootstrap, and Font Awesome JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <script src="Scripts/shop.js"></script>
+    <script src="Scripts/login.js"></script>
 </body>
 
 </html>
