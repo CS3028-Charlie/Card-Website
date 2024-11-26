@@ -1,53 +1,43 @@
-// PULL IMAGES AND GEN CARDS
-
 const numCards = 4; // Number of cards you want to generate
 
-// // Function to generate unique random images
-// function generateRandomImages(numImages) {
-//     const images = [];
-//     for (let i = 0; i < numImages; i++) {
-//         // Generate a random image URL
-//         images.push(`https://picsum.photos/567/794?random=${Math.floor(Math.random() * 1000)}`);
-//     }
-//     return images;
-// }
+
+let selectedIndex = 1;
+let cards = [];
 
 // Function to pull all images for each card
-function pullTemplateImages(numCards) {
+function initAllImages() {
     // http://localhost:3000 for local
     // https://charlie-card-backend-fbbe5a6118ba.herokuapp.com for heroku
-    const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
-    const positions = ["Front", "Inner-Left", "Inner-Right", "Back"];
-    let cards = [];
+    // const API_URL = 'https://charlie-card-backend-fbbe5a6118ba.herokuapp.com';
+    // const positions = ['Front', 'Inner-Left', 'Inner-Right', 'Back'];
+    let images = [];
 
     for (let i = 0; i < numCards; i++) {
-        let images = [];
-        const folderIndex = `card-${i + 1}`;
-
-        positions.forEach(position => {
-            images.push(`${API_URL}/assets/templates/${folderIndex}/${position}.png`);
-        });
-
-        cards.push(images); // Each card contains an array of images for each position
+        const folderIndex = `${i + 1}`;
+        images.push({
+            index: folderIndex,
+            src: `images/image${folderIndex}.jpg`
+        }); // Each card contains an array of images for each position
     }
 
-    return cards;
+    cards = images;
 }
 
 // Function to generate cards
 function generateCards() {
-    const row = document.querySelector('.row');
-    const allCardsImages = pullTemplateImages(numCards);
+    initAllImages();
 
-    allCardsImages.forEach((cardImages, index) => {
+    const row = document.querySelector('.row');
+
+    cards.forEach((card) => {
         const col = document.createElement('div');
         col.className = 'col-md-3 col-sm-6';
 
         col.innerHTML = `
             <div class="card mb-4">
-                <img src="${cardImages[0]}" class="card-img-top" alt="Card ${index + 1} Image">
+                <img src="${card.src}" class="card-img-top" alt="Card ${card.index} Image">
                 <div class="card-body text-center">
-                    <h5 class="card-title">Card ${index + 1}</h5>
+                    <h5 class="card-title">Card ${card.index}</h5>
                 </div>
             </div>
         `;
@@ -55,46 +45,25 @@ function generateCards() {
         const viewButton = document.createElement('button');
         viewButton.className = 'btn btn-primary';
         viewButton.textContent = 'View';
-        viewButton.onclick = () => openCardModal(index, cardImages);
+        viewButton.onclick = () => {
+
+            openCardModal(card.index, card.src);
+        };
 
         col.querySelector('.card-body').appendChild(viewButton);
         row.appendChild(col);
     });
 }
 
-// Function to open the card modal
-function openCardModal(cardIndex, images) {
-    loadCarouselImages(images); // Display all images in the modal for the selected card
-
-    document.querySelectorAll('.btn-outline-primary.mb-3').forEach((button, index, allButtons) => {
-        button.onclick = () => {
-            allButtons.forEach(btn => btn.classList.remove('bg-primary', 'text-white'));
-            button.classList.add('bg-primary', 'text-white');
-            selectCardType(index === 0 ? 'eCard' : 'printable', images);
-        };
-    });
-
-    img.src = images[2];
-    $('#cardModal').modal('show');
-}
-
-// Function to handle card type selection
-function selectCardType(cardType, images) {
-    let imagesToShow = cardType === 'eCard' ? [images[0], images[2]] : images;
-    document.getElementById('priceDisplay').innerText = cardType === 'eCard' ? 'Price: £0.99' : 'Price: £2.00';
-    loadCarouselImages(imagesToShow);
-
-    img.onload = () => {
-        redrawCanvas();
-    };
-}
 
 window.onload = generateCards;
 
 
 // Function to open the card modal
-function openCardModal(cardIndex, images) {
-    loadCarouselImages(images); // Load all images initially
+function openCardModal(cardIndex, src) {
+    loadCarouselImages(cardIndex, src); // Load all images initially
+
+    selectedIndex = cardIndex;
 
     // Set up click events for the card type buttons
     document.querySelectorAll('.btn-outline-primary.mb-3').forEach((button, index, allButtons) => {
@@ -105,34 +74,29 @@ function openCardModal(cardIndex, images) {
             // Add 'selected' class only to the clicked button
             button.classList.add('bg-primary', 'text-white');
 
-            // Call the selectCardType function based on the button clicked
-            selectCardType(index === 0 ? 'eCard' : 'printable', images);
+            selectCardType('eCard', cardIndex, src);
         };
     });
 
 
     // Store the third image for use in the canvas
-    img.src = images[2]; // Set the third image to the img variable for the canvas
+    img.src = src; // Set the third image to the img variable for the canvas
 
     $('#cardModal').modal('show');
 }
 
 // Function to handle card type selection
-function selectCardType(cardType, images) {
-    let imagesToShow;
+function selectCardType(cardType, index) {
+    const image = cards.find(item => item.index === index).src;
 
     if (cardType === 'eCard') {
-        imagesToShow = [images[0], images[2]]; // Show only the first and third images
         document.getElementById('priceDisplay').innerText = 'Price: £0.99';
-
-        // Set the third image as the one used in the canvas
-        img.src = images[2]; // Set the canvas image to the third image
+        img.src = image // Set the canvas image to the third image
     } else if (cardType === 'printable') {
-        imagesToShow = images; // Show all images
         document.getElementById('priceDisplay').innerText = 'Price: £2.00';
     }
 
-    loadCarouselImages(imagesToShow);
+    loadCarouselImages(index, image);
     img.onload = () => {
         redrawCanvas(); // Ensure the canvas is redrawn with the new image
     };
@@ -140,7 +104,7 @@ function selectCardType(cardType, images) {
 
 
 // Function to dynamically load carousel images
-function loadCarouselImages(images) {
+function loadCarouselImages(cardIndex, image) {
     const carouselImages = document.getElementById('carouselImages');
     const carouselIndicators = document.getElementById('carouselIndicators');
 
@@ -149,33 +113,25 @@ function loadCarouselImages(images) {
     carouselIndicators.innerHTML = '';
 
     // Add images to carousel
-    images.forEach((image, index) => {
-        const carouselItem = document.createElement('div');
-        carouselItem.classList.add('carousel-item');
-        if (index === 0) carouselItem.classList.add('active'); // First item active
+    const carouselItem = document.createElement('div');
+    carouselItem.classList.add('carousel-item');
+    carouselItem.classList.add('active'); // First item active
 
-        const imgElement = document.createElement('img');
-        imgElement.src = image;
-        imgElement.alt = `Carousel Image ${index + 1}`;
-        imgElement.classList.add('d-block', 'w-50', 'mx-auto'); // Use w-100 for full width
+    const imgElement = document.createElement('img');
+    imgElement.src = image;
+    imgElement.alt = `Carousel Image ${cardIndex + 1}`;
+    imgElement.classList.add('d-block', 'w-50', 'mx-auto'); // Use w-100 for full width
 
-        carouselItem.appendChild(imgElement);
-        carouselImages.appendChild(carouselItem);
+    carouselItem.appendChild(imgElement);
+    carouselImages.appendChild(carouselItem);
 
-        // Create carousel indicator
-        const indicator = document.createElement('li');
-        indicator.setAttribute('data-target', '#cardCarousel');
-        indicator.setAttribute('data-slide-to', index);
-        if (index === 0) indicator.classList.add('active');
-        carouselIndicators.appendChild(indicator);
-    });
+    // Create carousel indicator
+    const indicator = document.createElement('li');
+    indicator.setAttribute('data-target', '#cardCarousel');
+    indicator.setAttribute('data-slide-to', cardIndex);
+    indicator.classList.add('active');
+    carouselIndicators.appendChild(indicator);
 }
-
-// Open the customize modal for personalization
-function openCustomizeModal() {
-    $('#customizeModal').modal('show');
-}
-
 
 
 // CANVAS EDITOR
@@ -184,7 +140,7 @@ const canvas = document.getElementById('image-canvas');
 const ctx = canvas.getContext('2d');
 const textBox = document.getElementById('text-box');
 const cursor = document.getElementById('cursor');
-let texts = [];
+let texts = ['test'];
 let selectedText = null;
 let dragging = false;
 let dragOffsetX = 0;
@@ -204,10 +160,31 @@ canvas.height = newHeight;
 
 // Load the image
 const img = new Image();
-img.src = 'https://picsum.photos/567/794'; // Replace with your image source
+// img.crossOrigin = 'anonymous';
+
+const setCanvasImage = () => {
+
+    console.log("selectedIndex: ", selectedIndex);
+    console.log("cards: ", cards);
+
+    img.src = cards.find(item => item.index === selectedIndex).src;
+    // img.crossOrigin = 'anonymous';
+
+    // Replace with your image source
+    // img.src = 'https://picsum.photos/567/794'; // Replace with your image source
+}
+
 img.onload = () => {
     redrawCanvas();
 };
+
+
+// Open the customize modal for personalization
+function openCustomizeModal() {
+    setCanvasImage();
+    $('#customizeModal').modal('show');
+}
+
 
 // Default text properties
 let currentFontColor = 'black';
@@ -218,7 +195,16 @@ let currentFontItalic = false;
 
 // Function to add text
 function addText(text, x, y) {
-    texts.push({ text, x, y, fontColor: currentFontColor, fontSize: currentFontSize, fontStyle: currentFontStyle, isBold: currentFontBold, isItalic: currentFontItalic });
+    texts.push({
+        text,
+        x,
+        y,
+        fontColor: currentFontColor,
+        fontSize: currentFontSize,
+        fontStyle: currentFontStyle,
+        isBold: currentFontBold,
+        isItalic: currentFontItalic
+    });
     redrawCanvas();
 }
 
