@@ -161,9 +161,9 @@ function loadCarouselImages(images) {
     });
 }
 
-// Open the customize modal for personalization
-function openCustomizeModal() {
-    $('#customizeModal').modal('show');
+// Open the customise modal for personalization
+function opencustomiseModal() {
+    $('#customiseModal').modal('show');
 }
 
 
@@ -194,6 +194,7 @@ canvas.height = newHeight;
 
 // Load the image
 const img = new Image();
+img.crossOrigin = 'anonymous';
 img.src = 'https://picsum.photos/567/794'; // Replace with your image source
 img.onload = () => {
     redrawCanvas();
@@ -205,10 +206,20 @@ let currentFontSize = '30px';
 let currentFontStyle = 'Arial';
 let currentFontBold = false;
 let currentFontItalic = false;
+let currentFontUnderline = false;
 
 // Function to add text
 function addText(text, x, y) {
-    texts.push({ text, x, y, fontColor: currentFontColor, fontSize: currentFontSize, fontStyle: currentFontStyle, isBold: currentFontBold, isItalic: currentFontItalic });
+    texts.push({ text, 
+        x, 
+        y, 
+        fontColor: currentFontColor, 
+        fontSize: currentFontSize, 
+        fontStyle: currentFontStyle, 
+        isBold: currentFontBold, 
+        isItalic: currentFontItalic,
+        isUnderline: currentFontUnderline
+    });
     redrawCanvas();
 }
 
@@ -235,6 +246,18 @@ function redrawCanvas() {
         ctx.font = `${t.isBold ? 'bold' : 'normal'} ${t.isItalic ? 'italic' : 'normal'} ${t.fontSize} ${t.fontStyle}`;
         ctx.fillStyle = t.fontColor;
         ctx.fillText(t.text, t.x, t.y);
+
+                // Draw underline if enabled
+                if (t.isUnderline) {
+                    const textWidth = ctx.measureText(t.text).width;
+                    const textHeight = parseInt(t.fontSize, 10);
+                    ctx.beginPath();
+                    ctx.moveTo(t.x, t.y + 2); // Adjust underline position slightly below text
+                    ctx.lineTo(t.x + textWidth, t.y + 2);
+                    ctx.lineWidth = 2; // Underline thickness
+                    ctx.strokeStyle = t.fontColor; // Match underline color to font color
+                    ctx.stroke();
+                }
     });
 }
 
@@ -530,19 +553,24 @@ document.getElementById('italicBtn').addEventListener('click', () => {
     }
 });
 
+// Handle underline button
+document.getElementById('underlineBtn').addEventListener('click', () => {
+    currentFontUnderline = !currentFontUnderline; // Toggle underline
+    document.getElementById('underlineBtn').classList.toggle('active', currentFontUnderline);
+    if (selectedText) {
+        selectedText.isUnderline = currentFontUnderline; // Update selected text underline
+        redrawCanvas(); // Redraw canvas to reflect changes
+        updateTextBoxPosition(); // Update textbox position
+    }
+});
+
 // Save as PNG button
-document.getElementById('savePngBtn').addEventListener('click', () => {
+document.getElementById('downloadCanvasBtn').addEventListener('click', () => {
     const link = document.createElement('a');
     link.download = 'canvas-image.png';
     link.href = canvas.toDataURL('image/png');
     link.click();
 });
-
-// Save the customized card (for example, to basket)
-function saveCustomization() {
-    var customizedCard = canvas.toDataURL('image/png');
-    alert('Customization saved!');  // Replace with actual save logic
-}
 
 // Enable typing in the canvas when text is selected
 canvas.addEventListener('click', (e) => {

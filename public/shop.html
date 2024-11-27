@@ -119,7 +119,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="cardModalLabel">View and Customize Card</h5>
+                    <h5 class="modal-title" id="cardModalLabel">View and customise Card</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -156,7 +156,7 @@
                             <button class="btn btn-outline-success mb-3" onclick="selectCardType('printable')">Printable
                                 (£2)</button>
                             <h5 id="priceDisplay">Price: £0.99</h5>
-                            <button class="btn btn-success" onclick="openCustomizeModal()">Personalise</button>
+                            <button class="btn btn-success" onclick="opencustomiseModal()">Personalise</button>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -166,20 +166,20 @@
             </div>
         </div>
 
-        <!-- Customize Card Modal -->
-        <div class="modal fade" id="customizeModal" tabindex="-1" role="dialog" aria-labelledby="customizeModalLabel"
+        <!-- customise Card Modal -->
+        <div class="modal fade" id="customiseModal" tabindex="-1" role="dialog" aria-labelledby="customiseModalLabel"
             aria-hidden="true">
             <div class="modal-dialog modal-xl" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="customizeModalLabel">Customize Your Card</h5>
+                        <h5 class="modal-title" id="customiseModalLabel">customise Your Card</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body d-flex">
                         <!-- Sidebar -->
-                        <div class="customize-sidebar p-3 bg-light">
+                        <div class="customise-sidebar p-3 bg-light">
                             <h6>Customisation Tools</h6>
                             <div class="form-group">
                                 <label for="colorSelect">Text Color</label>
@@ -190,7 +190,7 @@
                                     <option value="green">Green</option>
                                     <option value="blue">Blue</option>
                                     <option value="white">White</option>
-                                </select>                                                             
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="fontSizeSelect">Font Size</label><br>
@@ -223,11 +223,16 @@
                                         class="fa-solid fa-underline"></i></button>
                             </div><br>
                             <div>
-                                <label for="fontSizeSelect">Text Options</label><br>
+                                <label for="textOptions">Text Options</label><br>
                                 <button id="addTextBtn" class="btn btn-outline-success btn-sm"><i
-                                    class="fa-solid fa-plus"></i>T</button>
+                                        class="fa-solid fa-plus"></i>T</button>
                                 <button id="deleteTextBtn" class="btn btn-outline-success btn-sm"><i
-                                    class="fa-solid fa-minus"></i>T</button>
+                                        class="fa-solid fa-minus"></i>T</button>
+                            </div><br>
+                            <div>
+                                <label for="downloadCard">Download Card</label><br>
+                                <button type="button" class="btn btn-outline-success" id="downloadCanvasBtn">Download as
+                                    PNG</button>
                             </div>
                         </div>
                         <!-- Canvas Area -->
