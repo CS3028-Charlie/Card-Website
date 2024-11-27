@@ -45,10 +45,6 @@ document.getElementById("uploadForm").addEventListener("submit", function (event
     }
 });
 
-document.getElementById("testbutton").onclick = (e) => {
-    displayCardPreviews()
-}
-
 // card upload
 function uploadCard(title, files) {
     const form = document.getElementById("uploadForm");
