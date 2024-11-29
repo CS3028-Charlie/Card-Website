@@ -9,13 +9,16 @@ function pullTemplateImages(numCards) {
     const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
     const positions = ["Front", "Inner-Left", "Inner-Right", "Back"];
     let cards = [];
-
+    const targetBackImage = "/Images/background.png"; // 目标路径的Back图片
     for (let i = 0; i < numCards; i++) {
         let images = [];
         const folderIndex = `card-${i + 1}`;
-
         positions.forEach(position => {
+            if (position === "Back") {
+                images.push(targetBackImage);
+            } else {
             images.push(`${API_URL}/assets/templates/${folderIndex}/${position}.png`);
+            }
         });
 
         cards.push(images); // Each card contains an array of images for each position
