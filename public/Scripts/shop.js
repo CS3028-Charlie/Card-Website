@@ -9,7 +9,8 @@ function pullTemplateImages(numCards) {
     const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
     const positions = ["Front", "Inner-Left", "Inner-Right", "Back"];
     let cards = [];
-    const targetBackImage = "/Images/background.png"; // 目标路径的Back图片
+    const targetBackImage = "Images/background.png";
+
     for (let i = 0; i < numCards; i++) {
         let images = [];
         const folderIndex = `card-${i + 1}`;
@@ -57,72 +58,99 @@ function generateCards() {
 
 // Function to open the card modal
 function openCardModal(cardIndex, images) {
-    loadCarouselImages(images); // Display all images in the modal for the selected card
+    loadCarouselImages(images);
 
-    document.querySelectorAll('.btn-outline-success.mb-3').forEach((button, index, allButtons) => {
-        button.onclick = () => {
-            allButtons.forEach(btn => btn.classList.remove('bg-success', 'text-white'));
-            button.classList.add('bg-success', 'text-white');
+    // Set up the card type selection buttons
+    // 修改选择器以匹配正确的按钮结构
+    const cardTypeButtons = document.querySelectorAll('.modal-body .mt-4 button:not(.btn-success)');
+
+    cardTypeButtons.forEach((button, index) => {
+        // Remove existing click handlers to prevent duplicates
+        const newButton = button.cloneNode(true);
+        button.parentNode.replaceChild(newButton, button);
+
+        // Add new click handler
+        newButton.addEventListener('click', () => {
+            cardTypeButtons.forEach(btn => btn.classList.remove('bg-success', 'text-white'));
+            newButton.classList.add('bg-success', 'text-white');
             selectCardType(index === 0 ? 'eCard' : 'printable', images);
-        };
+        });
     });
 
-    img.src = images[2];
+    // Select eCard by default
+    if (cardTypeButtons.length > 0) {
+        cardTypeButtons[0].classList.add('bg-success', 'text-white');
+        selectCardType('eCard', images);
+    }
+
+    // Set up the Get Your Card button
+    const getYourCardBtn = document.getElementById('getCardBtn');
+    if (getYourCardBtn) {
+        getYourCardBtn.onclick = () => {
+            const selectedButton = document.querySelector('.modal-body .mt-4 button.bg-success');
+
+            if (!selectedButton) {
+                alert('Please select a card type');
+                return;
+            }
+
+            // Check the text content for "ecard" in a case-insensitive way
+            const isECard = selectedButton.textContent.toLowerCase().includes('ecard');
+            const creditsRequired = isECard ? 100 : 200;
+
+            // Store the selection in sessionStorage with clear naming
+            sessionStorage.setItem('selectedCardType', isECard ? 'eCard' : 'Printable');
+            sessionStorage.setItem('creditsRequired', creditsRequired.toString());
+
+            console.log('Stored in session storage:', {
+                selectedCardType: sessionStorage.getItem('selectedCardType'),
+                creditsRequired: sessionStorage.getItem('creditsRequired')
+        });
+
+            // 延迟跳转，以确保数据存储完成
+            setTimeout(() => {
+                window.location.href = 'Credit_Pay.html';
+            }, 100);  // 延迟100ms以确保sessionStorage存储完成
+        };
+    }
+
+    // Show the modal
     $('#cardModal').modal('show');
 }
 
 // Function to handle card type selection
 function selectCardType(cardType, images) {
-    let imagesToShow = cardType === 'eCard' ? [images[0], images[2]] : images;
-    document.getElementById('priceDisplay').innerText = cardType === 'eCard' ? 'Price: £0.99' : 'Price: £2.00';
+    const isECard = cardType === 'eCard';
+    const imagesToShow = isECard ? [images[0], images[2]] : images;
+    document.getElementById('priceDisplay').innerText = `Credits Needed: ${isECard ? 100 : 200}`;
     loadCarouselImages(imagesToShow);
 
-    img.onload = () => {
-        redrawCanvas();
-    };
+    if (img) {
+        img.src = images[2];
+        img.onload = () => {
+            if (typeof redrawCanvas === 'function') {
+                redrawCanvas();
+            }
+        };
+    }
 }
 
 window.onload = generateCards;
 
 
-// Function to open the card modal
-function openCardModal(cardIndex, images) {
-    loadCarouselImages(images); // Load all images initially
-
-    // Set up click events for the card type buttons
-    document.querySelectorAll('.btn-outline-success.mb-3').forEach((button, index, allButtons) => {
-        button.onclick = () => {
-            // Remove 'selected' class from all buttons
-            allButtons.forEach(btn => btn.classList.remove('bg-success', 'text-white'));
-
-            // Add 'selected' class only to the clicked button
-            button.classList.add('bg-success', 'text-white');
-
-            // Call the selectCardType function based on the button clicked
-            selectCardType(index === 0 ? 'eCard' : 'printable', images);
-        };
-    });
-
-
-    // Store the third image for use in the canvas
-    img.src = images[2]; // Set the third image to the img variable for the canvas
-
-    $('#cardModal').modal('show');
-}
-
-// Function to handle card type selection
+/* Function to handle card type selection
 function selectCardType(cardType, images) {
     let imagesToShow;
 
     if (cardType === 'eCard') {
         imagesToShow = [images[0], images[2]]; // Show only the first and third images
-        document.getElementById('priceDisplay').innerText = 'Price: £0.99';
+        document.getElementById('priceDisplay').innerText = 'Credits Needed: 100';
 
         // Set the third image as the one used in the canvas
         img.src = images[2]; // Set the canvas image to the third image
     } else if (cardType === 'printable') {
         imagesToShow = images; // Show all images
-        document.getElementById('priceDisplay').innerText = 'Price: £2.00';
+        document.getElementById('priceDisplay').innerText = 'Credits Needed: 200';
     }
 
     loadCarouselImages(imagesToShow);
@@ -130,7 +158,7 @@ function selectCardType(cardType, images) {
         redrawCanvas(); // Ensure the canvas is redrawn with the new image
     };
 }
-
+*/
 
 // Function to dynamically load carousel images
 function loadCarouselImages(images) {
@@ -168,6 +196,7 @@ function loadCarouselImages(images) {
 function opencustomiseModal() {
     $('#customiseModal').modal('show');
 }
+
 
 
 
@@ -213,13 +242,13 @@ let currentFontUnderline = false;
 
 // Function to add text
 function addText(text, x, y) {
-    texts.push({ text, 
-        x, 
-        y, 
-        fontColor: currentFontColor, 
-        fontSize: currentFontSize, 
-        fontStyle: currentFontStyle, 
-        isBold: currentFontBold, 
+    texts.push({ text,
+        x,
+        y,
+        fontColor: currentFontColor,
+        fontSize: currentFontSize,
+        fontStyle: currentFontStyle,
+        isBold: currentFontBold,
         isItalic: currentFontItalic,
         isUnderline: currentFontUnderline
     });
