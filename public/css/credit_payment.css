@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
+
+* {
+    font-family: 'Quicksand', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, rgba(0, 206, 209, 0.3) 0%, rgba(255, 165, 0, 0.3) 100%);
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    color: #2EB971;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.payment-container {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+}
+
+.title {
+    color: #2EB971;
+    margin-bottom: 30px;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 10px;
+    color: #333;
+    font-weight: 500;
+}
+
+.required {
+    color: #2EB971;
+    margin-left: 4px;
+}
+
+.summary-item {
+    background: #F8F9FA;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    border: 1px solid #E7F3EF;
+}
+
+.form-select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #E7F3EF;
+    border-radius: 10px;
+    background-color: #F8F9FA;
+    color: #333;
+    font-size: 16px;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: #2EB971;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+    background: #249c5e;
+    transform: translateY(-2px);
+}
