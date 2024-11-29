@@ -597,11 +597,33 @@ document.getElementById('underlineBtn').addEventListener('click', () => {
 });
 
 // Save as PNG button
-document.getElementById('downloadCanvasBtn').addEventListener('click', () => {
-    const link = document.createElement('a');
-    link.download = 'canvas-image.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+document.getElementById("downloadCanvasBtn").addEventListener("click", () => {
+    const canvas = document.getElementById("image-canvas");
+    
+    if (!canvas) {
+        alert("Canvas not found.");
+        return;
+    }
+    
+    canvas.toBlob((blob) => {
+        if (!blob) {
+            alert("Failed to generate the image.");
+            return;
+        }
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "Sustainables Card.png";
+        
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Revoke the object URL after the download
+        URL.revokeObjectURL(url);
+    });
 });
 
 // Enable typing in the canvas when text is selected
