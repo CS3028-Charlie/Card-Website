@@ -33,6 +33,9 @@
                     <a class="nav-link" href="shop.html"><i class="fas fa-store"></i> Shop</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="Card_Pay.html"><i class="fas fa-star"></i> Top Up</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="about.html"><i class="fa-solid fa-circle-info"></i> About</a>
                 </li>
                 <li class="nav-item">
@@ -152,15 +155,17 @@
                         <div class="mt-4">
                             <h5>Choose Card Type</h5>
                             <button class="btn btn-outline-success mb-3" onclick="selectCardType('eCard')">eCard
-                                (99p)</button>
+                                (100credits)</button>
                             <button class="btn btn-outline-success mb-3" onclick="selectCardType('printable')">Printable
-                                (£2)</button>
-                            <h5 id="priceDisplay">Price: £0.99</h5>
+                                (200credits)</button>
+                            <h5 id="priceDisplay"></h5>
                             <button class="btn btn-success" onclick="opencustomiseModal()">Personalise</button>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="getCardBtn">Get Your Card</button>
+
                     </div>
                 </div>
             </div>
