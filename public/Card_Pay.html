@@ -4,12 +4,164 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/CardPay's%20css.css">
+    <link rel="stylesheet" href="css/card_payment.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(45deg,
+                rgba(144, 238, 144, 0.3),
+                rgba(255, 182, 193, 0.3)
+            );
+        }
+
+        .container {
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            margin: 2rem auto;
+            max-width: 1200px;
+            position: relative;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            margin-left: 0;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #444;
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+        }
+
+        .back-btn .arrow {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-right: 0.5rem;
+        }
+
+        .back-btn:hover {
+            background-color: #ebebeb;
+            color: #333;
+            transform: translateX(-3px);
+        }
+
+        .credit-selection {
+            margin-bottom: 2rem;
+        }
+
+        .title {
+            color: #333;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .inputBox {
+            margin-bottom: 1.5rem;
+        }
+
+        .inputBox label {
+            display: block;
+            color: #555;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .required {
+            color: #ff0000;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #999;
+        }
+
+        .card-details {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .expiry-selects {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .col {
+            flex: 1;
+            min-width: 300px;
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
-    <form action="">
+    <a href="index.html" class="back-btn"><span class="arrow">←</span>Back to Home</a>
+
+    <form action="" novalidate>
+        <!-- Credit Amount Selection -->
+        <h3 class="title">Select Credit Amount</h3>
+        <div class="inputBox">
+            <label>Credits to Purchase <span class="required">*</span></label>
+            <select required oninvalid="this.setCustomValidity('Please select an amount')" oninput="this.setCustomValidity('')">
+                <option value="">Select amount</option>
+                <option value="100">100 Credits</option>
+                <option value="200">200 Credits</option>
+                <option value="300">300 Credits</option>
+                <option value="400">400 Credits</option>
+                <option value="500">500 Credits</option>
+                <option value="600">600 Credits</option>
+                <option value="700">700 Credits</option>
+                <option value="800">800 Credits</option>
+                <option value="900">900 Credits</option>
+                <option value="1000">1000 Credits</option>
+            </select>
+        </div>
+
         <div class="row">
             <!-- left side -->
             <div class="col">
@@ -17,14 +169,14 @@
 
                 <div class="inputBox">
                     <label>Country or Region <span class="required">*</span></label>
-                    <select required>
+                    <select required oninvalid="this.setCustomValidity('Please select your country')" oninput="this.setCustomValidity('')">
                         <option value="UK">United Kingdom</option>
                     </select>
                 </div>
 
                 <div class="inputBox">
                     <label>Address 1 <span class="required">*</span></label>
-                    <input type="text" required>
+                    <input type="text" required oninvalid="this.setCustomValidity('Please fill in your address')" oninput="this.setCustomValidity('')">
                 </div>
 
                 <div class="inputBox">
@@ -34,7 +186,7 @@
 
                 <div class="inputBox">
                     <label>Town / City <span class="required">*</span></label>
-                    <input type="text" required>
+                    <input type="text" required oninvalid="this.setCustomValidity('Please fill in your town/city')" oninput="this.setCustomValidity('')">
                 </div>
 
                 <div class="inputBox">
@@ -44,7 +196,7 @@
 
                 <div class="inputBox">
                     <label>Postcode / Zipcode <span class="required">*</span></label>
-                    <input type="text" required>
+                    <input type="text" required oninvalid="this.setCustomValidity('Please fill in your postcode')" oninput="this.setCustomValidity('')">
                 </div>
             </div>
 
@@ -54,12 +206,14 @@
 
                 <div class="inputBox">
                     <label>Name On Card <span class="required">*</span></label>
-                    <input type="text" required>
+                    <input type="text" required oninvalid="this.setCustomValidity('Please enter the name on your card')" oninput="this.setCustomValidity('')">
                 </div>
 
                 <div class="inputBox">
                     <label>Card Number <span class="required">*</span></label>
-                    <input type="text" required pattern="\d*" maxlength="19" placeholder="XXXX XXXX XXXX XXXX">
+                    <input type="text" required pattern="\d*" maxlength="19" placeholder="XXXX XXXX XXXX XXXX"
+                           oninvalid="this.setCustomValidity('Please enter a valid card number')"
+                           oninput="this.setCustomValidity('')">
                 </div>
 
                 <div class="card-details">
@@ -67,7 +221,7 @@
                         <div class="inputBox">
                             <label>Expiry Date <span class="required">*</span></label>
                             <div class="expiry-selects">
-                                <select required>
+                                <select required oninvalid="this.setCustomValidity('Please select expiry month')" oninput="this.setCustomValidity('')">
                                     <option value="">Month</option>
                                     <option value="01">01</option>
                                     <option value="02">02</option>
@@ -82,7 +236,7 @@
                                     <option value="11">11</option>
                                     <option value="12">12</option>
                                 </select>
-                                <select required>
+                                <select required oninvalid="this.setCustomValidity('Please select expiry year')" oninput="this.setCustomValidity('')">
                                     <option value="">Year</option>
                                     <option value="2024">2024</option>
                                     <option value="2025">2025</option>
@@ -106,7 +260,9 @@
                     <div class="cvv-container">
                         <div class="inputBox">
                             <label>CVV <span class="required">*</span></label>
-                            <input type="text" required pattern="\d*" maxlength="4" placeholder="XXX">
+                            <input type="text" required pattern="\d*" maxlength="4" placeholder="XXX"
+                                   oninvalid="this.setCustomValidity('Please enter your CVV')"
+                                   oninput="this.setCustomValidity('')">
                         </div>
                     </div>
                 </div>
