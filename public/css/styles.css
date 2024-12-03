@@ -83,7 +83,3 @@ body {
     font-size: 1.5rem;
     text-decoration: none;
 }
-
-.custom-navbar .navbar-brand:hover {
-    color: rgb(254, 249, 169); /* Slightly lighter color on hover */
-}

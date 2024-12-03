@@ -46,57 +46,57 @@
         </div>
     </nav>
 
-     <!-- Account Modal -->
-     <div class="modal fade" id="accountModal" tabindex="-1" role="dialog" aria-labelledby="accountModalLabel"
-     aria-hidden="true">
-     <div class="modal-dialog" role="document">
-         <div class="modal-content">
-             <div class="modal-header">
-                 <h5 class="modal-title" id="accountModalLabel">Login / Sign Up</h5>
-                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                     <span aria-hidden="true">&times;</span>
-                 </button>
-             </div>
-             <div class="modal-body">
-                 <!-- Login Form -->
-                 <form id="loginForm" style="display: none;">
-                     <div class="form-group">
-                         <label for="loginEmail">Email address</label>
-                         <input type="email" class="form-control" id="loginEmail" required>
-                     </div>
-                     <div class="form-group">
-                         <label for="loginPassword">Password</label>
-                         <input type="password" class="form-control" id="loginPassword" required>
-                     </div>
-                     <button type="button" class="btn btn-success" onclick="handleLogin()">Login</button>
-                 </form><br>
-                 <!-- Signup Form -->
-                 <form id="signupForm" style="display: none;">
-                     <h5>Don't have an account? Sign Up!</h5>
-                     <div class="form-group">
-                         <label for="signupUsername">Username</label>
-                         <input type="text" class="form-control" id="signupUsername" required>
-                     </div>
-                     <div class="form-group">
-                         <label for="signupEmail">Email address</label>
-                         <input type="email" class="form-control" id="signupEmail" required>
-                     </div>
-                     <div class="form-group">
-                         <label for="signupPassword">Password</label>
-                         <input type="password" class="form-control" id="signupPassword" required>
-                     </div>
-                     <button type="button" class="btn btn-success" onclick="handleSignup()">Sign Up</button>
-                 </form>
+    <!-- Account Modal -->
+    <div class="modal fade" id="accountModal" tabindex="-1" role="dialog" aria-labelledby="accountModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="accountModalLabel">Login / Sign Up</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Login Form -->
+                    <form id="loginForm" style="display: none;">
+                        <div class="form-group">
+                            <label for="loginEmail">Email address</label>
+                            <input type="email" class="form-control" id="loginEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" class="form-control" id="loginPassword" required>
+                        </div>
+                        <button type="button" class="btn btn-success" onclick="handleLogin()">Login</button>
+                    </form><br>
+                    <!-- Signup Form -->
+                    <form id="signupForm" style="display: none;">
+                        <h5>Don't have an account? Sign Up!</h5>
+                        <div class="form-group">
+                            <label for="signupUsername">Username</label>
+                            <input type="text" class="form-control" id="signupUsername" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupEmail">Email address</label>
+                            <input type="email" class="form-control" id="signupEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupPassword">Password</label>
+                            <input type="password" class="form-control" id="signupPassword" required>
+                        </div>
+                        <button type="button" class="btn btn-success" onclick="handleSignup()">Sign Up</button>
+                    </form>
 
-                 <!-- User Account Section (after login) -->
-                 <div id="userAccountSection" style="display: none;">
-                     <h5>Welcome, <span id="usernameDisplay"></span>!</h5>
-                     <button type="button" class="btn btn-danger" onclick="handleSignOut()">Sign Out</button>
-                 </div>
-             </div>
-         </div>
-     </div>
- </div>
+                    <!-- User Account Section (after login) -->
+                    <div id="userAccountSection" style="display: none;">
+                        <h5>Welcome, <span id="usernameDisplay"></span>!</h5>
+                        <button type="button" class="btn btn-danger" onclick="handleSignOut()">Sign Out</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Hero Banner -->
     <section class="hero-banner text-center text-light d-flex align-items-center justify-content-center">
@@ -110,36 +110,55 @@
         </div>
     </section>
 
-    <header>
-        <h1>About The Sustainables</h1>
+    <header class="text-center py-4 bg-light">
+        <h1 class="display-4">About The Sustainables</h1>
     </header>
-    <main>
-        <h2>Who We Are</h2>
-        <p>
-            The Sustainables is a not-for-profit organization dedicated to providing free, high-quality educational
-            resources to primary and secondary school teachers.
-            Our mission is to promote accessibility to learning tools that empower students to make informed decisions
-            about environmental sustainability and climate change.
-        </p>
-
-        <h2>Our Goal</h2>
-        <p>
-            We believe that every child should have the opportunity to engage with meaningful and impactful educational
-            activities without financial barriers.
-            Our organization creates resources designed to inspire and educate, fostering a generation of
-            environmentally conscious and responsible individuals.
-        </p>
-
-        <div class="mission-section">
-            <h3>Why This Platform?</h3>
-            <p>
-                To support our mission, we’ve developed this e-card platform to raise funds for maintaining and
-                expanding our free educational tools.
-                This innovative approach aligns with our values by promoting sustainability while enabling teachers,
-                students, and families to celebrate special moments in an eco-friendly way.
-            </p>
+    <main class="container my-5">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h2>Who We Are</h2>
+                <p>
+                    The Sustainables is a not-for-profit organisation dedicated to providing free, high-quality
+                    educational resources to primary and secondary school teachers.
+                    Our mission is to promote accessibility to learning tools that empower students to make
+                    informed decisions about environmental sustainability and climate change.
+                </p>
+            </div>
+            <div class="col-md-6 text-center">
+                <img src="Images/scientists.webp" alt="Who We Are" class="img-fluid" style="width: 50%;">
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col-md-6 order-md-2">
+                <h2>Our Goal</h2>
+                <p>
+                    We believe that every child should have the opportunity to engage with meaningful and impactful
+                    educational activities without financial barriers.
+                    Our organisation creates resources designed to inspire and educate, fostering a generation of
+                    environmentally conscious and responsible individuals.
+                </p>
+            </div>
+            <div class="col-md-6 order-md-1 text-center">
+                <img src="Images/TSA-Logo.png" alt="Our Goal" class="img-fluid" style="width: 50%;">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card rounded shadow-sm">
+                    <div class="card-body">
+                        <h3 class="card-title">Why This Platform?</h3>
+                        <p class="card-text">
+                            To support our goal, we've developed this e-card platform to raise funds for maintaining
+                            and expanding our free educational tools. This aligns with our values
+                            by promoting sustainability while enabling teachers, students, and families to celebrate
+                            special moments in an eco-friendly way.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
+
 
     <!-- Footer -->
     <footer class="py-4 bg-dark text-light text-center">
