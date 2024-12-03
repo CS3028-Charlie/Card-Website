@@ -495,6 +495,15 @@ function startCursorBlink() {
     cursor.style.display = 'block'; // Show cursor
 }
 
+function getCurrentCardImages() {
+    const carouselImages = document.querySelectorAll('#carouselImages .carousel-item img');
+    let images = [];
+    carouselImages.forEach(img => {
+        images.push(img.src);
+    });
+    return images;
+}
+
 // Handle color selection
 document.getElementById('colorSelect').addEventListener('change', (e) => {
     currentFontColor = e.target.value; // Update the current font color
