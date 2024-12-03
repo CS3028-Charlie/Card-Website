@@ -122,163 +122,108 @@
     </div>
 
     <!-- Card Modal with Carousel (Front and Inside Right only for eCard) -->
-    <div class="modal fade" id="cardModal" tabindex="-1" role="dialog" aria-labelledby="cardModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="cardModalLabel">View and customise Card</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <!-- Carousel showing only front and inside right -->
-                    <div id="cardCarousel" class="carousel slide" data-ride="carousel">
-                        <div id="cardCarousel" class="carousel slide" data-ride="carousel">
-                            <div class="carousel-inner" id="carouselImages">
-                                <!-- Carousel items will be dynamically added based on card type -->
-                            </div>
-                            <!-- Carousel Controls -->
-                            <a class="carousel-control-prev" href="#cardCarousel" role="button" data-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="sr-only">Previous</span>
-                            </a>
-                            <a class="carousel-control-next" href="#cardCarousel" role="button" data-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="sr-only">Next</span>
-                            </a>
-
-                            <!-- Carousel Indicators -->
-                            <ol class="carousel-indicators" id="carouselIndicators">
-                                <!-- Indicators will be dynamically added based on card type -->
-                            </ol>
-                        </div>
-
-
-
-
-                        <div id="basketModal" class="modal">
-                            <div class="modal-content">
-                                <span class="close-btn" id="closeBtn">&times;</span>
-                                <h2>Your Basket</h2>
-                                <ul id="basketList"></ul>
-                                <p id="totalCredits">Total Credits: 0</p>
-                                <button id="checkoutBtn">Checkout</button>
-                            </div>
-                        </div>
-
-
-
-
-
-
-                        <!-- Card Options Section -->
-                        <div class="mt-4">
-                            <h5>Choose Card Type</h5>
-                            <button class="btn btn-outline-success mb-3" onclick="selectCardType('eCard')">eCard
-                                (100credits)</button>
-                            <button class="btn btn-outline-success mb-3" onclick="selectCardType('printable')">Printable
-                                (200credits)</button>
-                            <h5 id="priceDisplay"></h5>
-                            <button class="btn btn-success" onclick="opencustomiseModal()">Personalise</button>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="getCardBtn">Get Your Card</button>
-
-                    </div>
-                </div>
+    <div class="CardPreview">
+        <div class="CardHeader">
+          <h5 class="CardTitle">Card Preview</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+    
+        <div class="CardBody">    
+            <div id="cardCarousel" class="carousel slide" data-ride="carousel">
+              <div class="carousel-inner" id="carouselImages"></div>
+              <a class="carousel-control-prev" href="#cardCarousel" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon custom-arrow" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+              </a>
+              <a class="carousel-control-next" href="#cardCarousel" role="button" data-slide="next">
+                <span class="carousel-control-next-icon custom-arrow" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+              </a>
+              <ol class="carousel-indicators" id="carouselIndicators"></ol>
+            </div>
+    
+            <div class="CardButton"> 
+              <button class="btn btn-outline-primary mb-3" onclick="selectCardType('eCard')">eCard</button>
+              <button class="btn btn-outline-primary mb-3" onclick="selectCardType('printable')">Printable</button>
             </div>
         </div>
-
-        <!-- customise Card Modal -->
-        <div class="modal fade" id="customiseModal" tabindex="-1" role="dialog" aria-labelledby="customiseModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-xl" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="customiseModalLabel">customise Your Card</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body d-flex">
-                        <!-- Sidebar -->
-                        <div class="customise-sidebar p-3 bg-light">
-                            <h6>Customisation Tools</h6>
-                            <div class="form-group">
-                                <label for="colorSelect">Text Color</label>
-                                <select id="colorSelect" class="form-control">
-                                    <option selected disabled>Choose</option>
-                                    <option value="black">Black</option>
-                                    <option value="red">Red</option>
-                                    <option value="green">Green</option>
-                                    <option value="blue">Blue</option>
-                                    <option value="white">White</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="fontSizeSelect">Font Size</label><br>
-                                <!-- <select id="fontSizeSelect" class="form-control">
-                                    <option selected disabled>Choose</option>
-                                    <option value="small">Small</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="large">Large</option>
-                                </select> -->
-                                <button id="increaseSizeBtn" class="btn btn-outline-success btn-sm"><i
-                                        class="fa-solid fa-plus"></i></button>
-                                <button id="decreaseSizeBtn" class="btn btn-outline-success btn-sm"><i
-                                        class="fa-solid fa-minus"></i></button>
-                            </div>
-                            <div class="form-group">
-                                <label for="fontStyleSelect">Font Style</label>
-                                <select id="fontStyleSelect" class="form-control">
-                                    <option selected disabled>Choose</option>
-                                    <option value="regular">Regular</option>
-                                    <option value="simple">Simple</option>
-                                    <option value="fancy">Fancy</option>
-                                </select>
-                            </div>
-                            <div>
-                                <button id="boldBtn" class="btn btn-outline-success btn-sm"><i
-                                        class="fa-solid fa-bold"></i></button>
-                                <button id="italicBtn" class="btn btn-outline-success btn-sm"><i
-                                        class="fa-solid fa-italic"></i></button>
-                                <button id="underlineBtn" class="btn btn-outline-success btn-sm"><i
-                                        class="fa-solid fa-underline"></i></button>
-                            </div><br>
-                            <div>
-                                <label for="textOptions">Text Options</label><br>
-                                <button id="addTextBtn" class="btn btn-outline-success btn-sm"><i
-                                        class="fa-solid fa-plus"></i>T</button>
-                                <button id="deleteTextBtn" class="btn btn-outline-success btn-sm"><i
-                                        class="fa-solid fa-minus"></i>T</button>
-                            </div><br>
-                            <div>
-                                <label for="downloadCard">Download Card</label><br>
-                                <button type="button" class="btn btn-outline-success" id="downloadCanvasBtn">Download as
-                                    PNG</button>
-                            </div>
-                        </div>
-                        <!-- Canvas Area -->
-                        <div class="canvas-container ml-4">
-                            <canvas id="image-canvas" width="600" height="450" class="border"></canvas>
-                            <div class="text-box" id="text-box"></div>
-                            <div class="cursor" id="cursor"></div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-success" onclick="saveCustomization()">Save</button>
-                        <button id="addToBasketBtn" class="btn btn-primary">Add to Basket</button>
-                    </div>
-                </div>
-            </div>
+    
+        <div class="CardFooter">
+          <h5 id="priceDisplay">200 Credits</h5>
+          <button type="button" class="btn btn-primary" onclick="OpenPersonalisePreview()">Personalise</button>
+          <button type="button" class="btn btn-primary" id="getCardBtn">Get Your Card</button>
         </div>
     </div>
 
+    <div class = "PersonalisePreview">
+        <div class="CardHeader">
+          <h5 class="CardTitle">Card personalisation</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+    
+        <div class="PersonaliseBody">
+          <canvas id="image-canvas"></canvas>
+          <div class="text-box" id="text-box"></div>
+          <div class="cursor" id="cursor"></div>
+        </div>
+    
+        <div class = "Editor">
+            <!-- Sidebar -->
+            <div class="customise" id="EditTag">
+                <h6>Customisation Tools</h6>
+                <div>
+                    <label for="fontSizeSelect">Text Options</label><br>
+                    <button id="addTextBtn" class="btn btn-outline-success btn-sm"><i
+                        class="fa-solid fa-plus"></i>T</button>
+                    <button id="deleteTextBtn" class="btn btn-outline-success btn-sm"><i
+                        class="fa-solid fa-minus"></i>T</button>
+                </div><br>
+                <div>
+                    <label for="ColourSelect">Text Colour</label><br>
+                    <button id="whiteBtn" class="circle-btn white"></button>
+                    <button id="blackBtn" class="circle-btn black"></button>
+                    <button id="redBtn" class="circle-btn red"></button>
+                    <button id="blueBtn" class="circle-btn blue"></button>
+                    <button id="greenBtn" class="circle-btn green"></button>
+                </div><br>
+                <div class="form-group">
+                    <label for="fontSizeSelect">Font Size</label><br>
+                    <button id="increaseSizeBtn" class="btn btn-outline-success btn-sm"><i
+                            class="fa-solid fa-plus"></i></button>
+                    <button id="decreaseSizeBtn" class="btn btn-outline-success btn-sm"><i
+                            class="fa-solid fa-minus"></i></button>
+                </div>
+
+                <div class="form-group">
+                    <label for="fontStyleSelect">Font Style</label>
+                    <select id="fontStyleSelect" class="form-control">
+                        <option selected disabled>Choose</option>
+                        <option value="regular">Regular</option>
+                        <option value="simple">Simple</option>
+                        <option value="fancy">Fancy</option>
+                    </select>
+                </div>
+                <div>
+                    <button id="boldBtn" class="btn btn-outline-success btn-sm"><i
+                            class="fa-solid fa-bold"></i></button>
+                    <button id="italicBtn" class="btn btn-outline-success btn-sm"><i
+                            class="fa-solid fa-italic"></i></button>
+                    <button id="underlineBtn" class="btn btn-outline-success btn-sm"><i
+                            class="fa-solid fa-underline"></i></button>
+                </div><br>
+            </div>
+
+            <button type="button" class="btn btn-success" onclick="saveCustomization()">Save</button>
+            <button type="button" class="btn btn-outline-success" id="downloadCanvasBtn">Download as PNG</button>
+            <button id="addToBasketBtn" class="btn btn-primary">Add to Basket</button>
+        </div>
+        
+
+    </div>
 
     <!-- Footer -->
     <footer class="py-4 bg-dark text-light text-center">

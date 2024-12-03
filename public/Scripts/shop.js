@@ -1,6 +1,56 @@
 // PULL IMAGES AND GEN CARDS
-
 const numCards = 4; // Number of cards you want to generate
+let sharedBackdrop = null;
+let cardPreview = null;
+let personalisePreview = null;
+window.onload = generateCards;
+
+// HELPER FUNCTIONS
+function closeAllPreviews() {
+    closeCardPreview();
+    closePersonalisePreview();
+    closeBackdrop();
+}
+function closeBackdrop() {
+    if (sharedBackdrop) {
+        sharedBackdrop.style.display = 'none';
+    }
+}
+function showBackdrop() {
+    if (sharedBackdrop) {
+        sharedBackdrop.style.display = 'block';
+    } else {
+        createBackdrop();
+    }
+}
+function closePersonalisePreview() {
+    if (personalisePreview) {
+        personalisePreview.style.display = 'none';
+    }
+
+    document.body.style.overflow = ''; // Enable scrolling (restores to default)
+}
+function closeCardPreview() {
+    if (cardPreview) {
+        cardPreview.style.display = 'none';
+    }
+
+    document.body.style.overflow = ''; // Enable scrolling (restores to default)
+}
+function createBackdrop() {
+    if (!sharedBackdrop) {
+        sharedBackdrop = document.createElement('div');
+        sharedBackdrop.style.position = 'fixed';
+        sharedBackdrop.style.top = 0;
+        sharedBackdrop.style.left = 0;
+        sharedBackdrop.style.width = '100%';
+        sharedBackdrop.style.height = '100%';
+        sharedBackdrop.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        sharedBackdrop.style.zIndex = 1000;
+        sharedBackdrop.addEventListener('click', closeAllPreviews);
+        document.body.appendChild(sharedBackdrop);
+    }
+}
 
 // Function to pull all images for each card
 function pullTemplateImages(numCards) {
@@ -62,7 +112,7 @@ function openCardModal(cardIndex, images) {
 
     // Set up the card type selection buttons
     // 修改选择器以匹配正确的按钮结构
-    const cardTypeButtons = document.querySelectorAll('.modal-body .mt-4 button:not(.btn-success)');
+    const cardTypeButtons = document.querySelectorAll('.CardButton button:not(.btn-success)');
 
     cardTypeButtons.forEach((button, index) => {
         // Remove existing click handlers to prevent duplicates
@@ -87,7 +137,7 @@ function openCardModal(cardIndex, images) {
     const getYourCardBtn = document.getElementById('getCardBtn');
     if (getYourCardBtn) {
         getYourCardBtn.onclick = () => {
-            const selectedButton = document.querySelector('.modal-body .mt-4 button.bg-success');
+            const selectedButton = document.querySelector('.CardButton button.bg-success');
 
             if (!selectedButton) {
                 alert('Please select a card type');
@@ -115,14 +165,34 @@ function openCardModal(cardIndex, images) {
     }
 
     // Show the modal
-    $('#cardModal').modal('show');
+    //$('#cardModal').modal('show');   
+    cardPreview = document.querySelector('.CardPreview');
+    cardPreview.style.position = 'fixed';
+    cardPreview.style.zIndex = 1001;
+    cardPreview.style.transform = 'translate(-50%, -50%)';
+    cardPreview.style.left = '50%';
+    cardPreview.style.top = '50%';
+    cardPreview.style.display = 'block'; // Ensure it's visible
+
+    document.body.style.overflow = 'hidden'; //Disable Scrolling
+    showBackdrop();
+
+    // Close button functionality
+    const closeButton = cardPreview.querySelector('.close');
+    closeButton.removeEventListener('click', handleCloseCardPreview); // Avoid duplicate listeners
+    closeButton.addEventListener('click', handleCloseCardPreview);
+
+    function handleCloseCardPreview() {
+        closeCardPreview();
+        closeBackdrop();
+    }
 }
 
 // Function to handle card type selection
 function selectCardType(cardType, images) {
     const isECard = cardType === 'eCard';
     const imagesToShow = isECard ? [images[0], images[2]] : images;
-    document.getElementById('priceDisplay').innerText = `Credits Needed: ${isECard ? 100 : 200}`;
+    document.getElementById('priceDisplay').innerText = `Credits: ${isECard ? 100 : 200}`;
     loadCarouselImages(imagesToShow);
 
     if (img) {
@@ -134,9 +204,6 @@ function selectCardType(cardType, images) {
         };
     }
 }
-
-window.onload = generateCards;
-
 
 /* Function to handle card type selection
 function selectCardType(cardType, images) {
@@ -193,8 +260,28 @@ function loadCarouselImages(images) {
 }
 
 // Open the customise modal for personalization
-function opencustomiseModal() {
-    $('#customiseModal').modal('show');
+function OpenPersonalisePreview() {
+    if (cardPreview) cardPreview.style.display = 'none'; // Ensure CardPreview is hidden
+
+    personalisePreview = document.querySelector('.PersonalisePreview');
+    personalisePreview.style.display = 'block';
+    personalisePreview.style.position = 'fixed';
+    personalisePreview.style.zIndex = 1001;
+    personalisePreview.style.transform = 'translate(-50%, -50%)';
+    personalisePreview.style.left = '50%';
+    personalisePreview.style.top = '50%';
+
+    showBackdrop();
+
+    // Close button functionality
+    const closeButton = personalisePreview.querySelector('.close');
+    closeButton.removeEventListener('click', handleClosePersonalisePreview); // Avoid duplicate listeners
+    closeButton.addEventListener('click', handleClosePersonalisePreview);
+
+    function handleClosePersonalisePreview() {
+        closePersonalisePreview();
+        closeBackdrop();
+    }
 }
 
 
@@ -217,8 +304,8 @@ let cursorBlinkInterval;
 // Calculate dimensions
 const originalWidth = 567; // Normal card dimensions
 const originalHeight = 794;
-const newWidth = originalWidth * 0.75; // Scale factor
-const newHeight = originalHeight * 0.75;
+const newWidth = originalWidth * 0.63; // Scale factor
+const newHeight = originalHeight * 0.63;
 
 // Set canvas dimensions
 canvas.width = newWidth;
@@ -505,14 +592,19 @@ function getCurrentCardImages() {
 }
 
 // Handle color selection
-document.getElementById('colorSelect').addEventListener('change', (e) => {
-    currentFontColor = e.target.value; // Update the current font color
+const handleColorSelection = (color) => {
+    currentFontColor = color; // Update the current font color
     if (selectedText) {
         selectedText.fontColor = currentFontColor; // Update selected text color
         redrawCanvas(); // Redraw canvas to reflect changes
         updateTextBoxPosition(); // Update textbox position
     }
-});
+};
+document.getElementById('whiteBtn').addEventListener('click', () => handleColorSelection('white'));
+document.getElementById('blackBtn').addEventListener('click', () => handleColorSelection('black'));
+document.getElementById('redBtn').addEventListener('click', () => handleColorSelection('red'));
+document.getElementById('blueBtn').addEventListener('click', () => handleColorSelection('blue'));
+document.getElementById('greenBtn').addEventListener('click', () => handleColorSelection('green'));
 
 // // Handle font size selection
 // document.getElementById('fontSizeSelect').addEventListener('change', (e) => {
