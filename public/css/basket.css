@@ -61,12 +61,12 @@ header {
 }
 
 #basketContainer .col-md-3 {
-    width: 23%;
-    margin-bottom: 20px;
+    width: 20%;
+    margin-bottom: 16px;
 }
 
 #basketContainer .card {
-    border: 1px solid #e0e0e0;
+    border: 2px solid #e0e0e0;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
