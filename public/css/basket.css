@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
+
+* {
+    font-family: 'Quicksand', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #f7f7f7;
+    color: #333;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 8px;
+    padding: 30px;
+    width: 80%;
+    max-width: 1000px;
+    position: relative;
+}
+
+.modal-content h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #f44336;
+}
+
+.close-btn:hover {
+    color: #d32f2f;
+}
+
+#basketContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+#basketContainer .col-md-3 {
+    width: 23%;
+    margin-bottom: 20px;
+}
+
+#basketContainer .card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#basketContainer .card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+#basketContainer .card-body {
+    padding: 10px;
+    text-align: center;
+}
+
+#basketContainer .card-body h5 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+#basketContainer .card-body p {
+    font-size: 1rem;
+    color: #555;
+}
+
+#checkoutBtn {
+    background-color: #f44336;
+    color: white;
+    font-size: 1.2rem;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    width: 100%;
+    transition: background-color 0.3s;
+}
+
+#checkoutBtn:hover {
+    background-color: #d32f2f;
+}
+
+footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 0.9rem;
+    color: #888;
+}
+
+footer a {
+    color: #f44336;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}

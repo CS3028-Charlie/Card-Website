@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="shop.css">
+    <title>Basket - The Sustainables Academy</title>
+    <link rel="stylesheet" href="css/basket.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <a href="shop.html" class="back-btn">
+                <span class="arrow">←</span> Back to Shop
+            </a>
+            <button class="btn btn-primary" id="viewBasketBtn">Shopping Basket (<span id="cart-count">0</span>)</button>
+            <div id="basketModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-btn">&times;</span>
+                    <h2>Your Basket</h2>
+                    <div id="basketContainer"></div> <!-- Display basket items here -->
+                    <ul id="basketList"></ul> <!-- List of basket items -->
+                    <button id="checkoutBtn">Checkout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <script>
+        const basket = loadBasketFromLocalStorage();
+
+        function loadBasketFromLocalStorage() {
+            const basketData = localStorage.getItem('basket');
+            return basketData ? JSON.parse(basketData) : [];
+        }
+
+        function displayBasketItems() {
+            const basketItemsContainer = document.getElementById('basketContainer');
+            basketItemsContainer.innerHTML = ''; // Clear previous items
+
+            basket.forEach((card, index) => {
+                const col = document.createElement('div');
+                col.className = 'col-md-3 col-sm-6';
+
+                col.innerHTML = `
+                    <div class="card mb-4">
+                        <img src="${card.images[0]}" class="card-img-top" alt="Card ${index + 1} Image">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Card ${index + 1}</h5>
+                            <p>Type: ${card.type}</p>
+                        </div>
+                    </div>
+                `;
+
+                basketItemsContainer.appendChild(col);
+            });
+
+            // Calculate and display the total price
+            const total = basket.reduce((sum, card) => sum + (card.price || 0), 0);
+            document.getElementById('cart-total').textContent = `Total: £${total.toFixed(2)}`;
+        }
+
+        function showBasketModal() {
+            document.getElementById('basketModal').classList.add('active'); 
+            displayBasketItems(); 
+        }
+
+        function closeBasketModal() {
+            document.getElementById('basketModal').classList.remove('active'); 
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const basketCount = basket.length;
+            document.getElementById('cart-count').textContent = basketCount;
+            document.getElementById('viewBasketBtn').addEventListener('click', showBasketModal);
+
+            // Attach event listener to close button of modal
+            document.querySelector('.close-btn').addEventListener('click', closeBasketModal);
+        });
+    </script>
+
+    <script src="Scripts/basket.js"></script>
+    <script src="Scripts/shop.js"></script>
+</body>
+
+</html>

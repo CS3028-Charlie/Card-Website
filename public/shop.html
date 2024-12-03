@@ -36,6 +36,11 @@
                     <a class="nav-link" href="Card_Pay.html"><i class="fas fa-star"></i> Top Up</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="basket.html" id="viewBasketBtn">
+                        <i class="fas fa-shopping-cart"></i> Basket
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="about.html"><i class="fa-solid fa-circle-info"></i> About</a>
                 </li>
                 <li class="nav-item">
@@ -151,6 +156,23 @@
                         </div>
 
 
+
+
+                        <div id="basketModal" class="modal">
+                            <div class="modal-content">
+                                <span class="close-btn" id="closeBtn">&times;</span>
+                                <h2>Your Basket</h2>
+                                <ul id="basketList"></ul>
+                                <p id="totalCredits">Total Credits: 0</p>
+                                <button id="checkoutBtn">Checkout</button>
+                            </div>
+                        </div>
+
+
+
+
+
+
                         <!-- Card Options Section -->
                         <div class="mt-4">
                             <h5>Choose Card Type</h5>
@@ -249,8 +271,8 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-success" onclick="saveCustomization()">Save & Add to
-                            Basket</button>
+                        <button type="button" class="btn btn-success" onclick="saveCustomization()">Save</button>
+                        <button id="addToBasketBtn" class="btn btn-primary">Add to Basket</button>
                     </div>
                 </div>
             </div>
@@ -272,6 +294,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <script src="Scripts/basket.js"></script>
     <script src="Scripts/shop.js"></script>
     <script src="Scripts/login.js"></script>
 </body>
