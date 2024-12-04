@@ -148,6 +148,40 @@ function deleteCard(card, element) {
         })
 }
 
+async function verifyAdmin() {
+    try {
+        const response = await fetch(`${API_URL}/api/auth/user`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization' : `Bearer ${localStorage.getItem("authToken")}`
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            alert(errorData.message); // Show error from backend
+            window.location.href = '/'
+            return;
+        }
+
+        user = await response.json()
+
+        if (user.role == "admin") {
+            return
+        } else {
+            window.location.href = '/'
+        }
+
+    } catch (error) {
+        window.location.href = '/'
+    }
+}
+
 window.onload = () => {
+    // check user credentials, redirect if not admin
+    verifyAdmin();
+
+    // load
     displayCardPreviews()
 }

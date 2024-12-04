@@ -9,12 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
         accountText.textContent = username || 'Account';
         accountIcon.title = 'Sign Out'; // Change title to reflect action
         updateNavBarForLogin(); // Update the navbar to reflect the login state
+        updateNavBarForAdmin(); // Update the navbar to include link to admin page
     } else {
         accountText.textContent = 'Login';
         accountIcon.title = 'Login';
 
         accountText.addEventListener('click', showLoginSignupModal);
     }
+
 });
 
 // Show Login/Signup Modal
@@ -130,4 +132,36 @@ function updateNavBarForLogin() {
     accountText.addEventListener('click', () => {
         showUserAccountModal();
     });
+}
+
+// Update Nav Bar for Admin
+async function updateNavBarForAdmin() {
+    try {
+        const response = await fetch(`https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/user`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization' : `Bearer ${localStorage.getItem("authToken")}`
+            },
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        user = await response.json()
+
+        if (user.role != "admin") {
+            return
+        }
+
+        const navList = document.getElementById("navbarNav").children[0]
+        const link = '<li class="nav-item"><a class="nav-link" href="admin.html"><i class="fas fa-home"></i> Admin</a></li>'
+        navList.insertAdjacentHTML("beforeend", link)
+
+    } catch (error) {
+        console.log(error)
+        return
+    }
+
 }
