@@ -78,12 +78,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const addToBasketBtn = document.getElementById('addToBasketBtn');
     if (addToBasketBtn) {
         addToBasketBtn.addEventListener('click', () => {
-            // Get the currently selected card type and its images from shop.js
             const selectedCardType = sessionStorage.getItem('selectedCardType');
-            const cardImages = getCurrentCardImages(); // You'll need to implement this function in shop.js
+            const cardImages = getCurrentCardImages(); 
 
-            // Add item to basket
-            addToBasket(selectedCardType, cardImages, 200); 
+            addToBasket(selectedCardType, cardImages, 0.99); 
 
             // Update basket display
             displayBasket();
