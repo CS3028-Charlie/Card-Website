@@ -165,7 +165,7 @@
         <div class="row">
             <!-- left side -->
             <div class="col">
-                <h3 class="title">Billing Address</h3>
+                <h3 class="title">Add. </h3>
 
                 <div class="inputBox">
                     <label>Country or Region <span class="required">*</span></label>
@@ -176,43 +176,43 @@
 
                 <div class="inputBox">
                     <label>Address 1 <span class="required">*</span></label>
-                    <input type="text" required oninvalid="this.setCustomValidity('Please fill in your address')" oninput="this.setCustomValidity('')">
+                    <input type="text" readonly required oninvalid="this.setCustomValidity('Please fill in your add.')" oninput="this.setCustomValidity('')">
                 </div>
 
                 <div class="inputBox">
                     <label>Address 2</label>
-                    <input type="text">
+                    <input type="text" readonly>
                 </div>
 
                 <div class="inputBox">
                     <label>Town / City <span class="required">*</span></label>
-                    <input type="text" required oninvalid="this.setCustomValidity('Please fill in your town/city')" oninput="this.setCustomValidity('')">
+                    <input type="text" readonly required oninvalid="this.setCustomValidity('Please fill in your town/city')" oninput="this.setCustomValidity('')">
                 </div>
 
                 <div class="inputBox">
                     <label>County / State</label>
-                    <input type="text">
+                    <input type="text" readonly>
                 </div>
 
                 <div class="inputBox">
                     <label>Postcode / Zipcode <span class="required">*</span></label>
-                    <input type="text" required oninvalid="this.setCustomValidity('Please fill in your postcode')" oninput="this.setCustomValidity('')">
+                    <input type="text" readonly required oninvalid="this.setCustomValidity('Please fill in your postcode')" oninput="this.setCustomValidity('')">
                 </div>
             </div>
 
             <!-- right side -->
             <div class="col">
-                <h3 class="title">Payment Details</h3>
+                <h3 class="title">Details</h3>
 
                 <div class="inputBox">
-                    <label>Name On Card <span class="required">*</span></label>
-                    <input type="text" required oninvalid="this.setCustomValidity('Please enter the name on your card')" oninput="this.setCustomValidity('')">
+                    <label>Name On <span class="required">*</span></label>
+                    <input type="text" readonly required oninvalid="this.setCustomValidity('Please enter the name')" oninput="this.setCustomValidity('')">
                 </div>
 
                 <div class="inputBox">
-                    <label>Card Number <span class="required">*</span></label>
-                    <input type="text" required pattern="\d*" maxlength="19" placeholder="XXXX XXXX XXXX XXXX"
-                           oninvalid="this.setCustomValidity('Please enter a valid card number')"
+                    <label>Number <span class="required">*</span></label>
+                    <input type="text" readonly required pattern="\d*" maxlength="19" placeholder="XXXX XXXX XXXX XXXX"
+                           oninvalid="this.setCustomValidity('Please enter a number')"
                            oninput="this.setCustomValidity('')">
                 </div>
 
@@ -259,9 +259,9 @@
                     </div>
                     <div class="cvv-container">
                         <div class="inputBox">
-                            <label>CVV <span class="required">*</span></label>
+                            <label>CXX <span class="required">*</span></label>
                             <input type="text" required pattern="\d*" maxlength="4" placeholder="XXX"
-                                   oninvalid="this.setCustomValidity('Please enter your CVV')"
+                                   oninvalid="this.setCustomValidity('Please enter your CXX')"
                                    oninput="this.setCustomValidity('')">
                         </div>
                     </div>
