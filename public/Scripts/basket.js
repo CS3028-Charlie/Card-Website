@@ -79,9 +79,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (addToBasketBtn) {
         addToBasketBtn.addEventListener('click', () => {
             const selectedCardType = sessionStorage.getItem('selectedCardType');
-            const cardImages = getCurrentCardImages(); 
+            const cardImages = getCurrentCardImages();  // Include the initilisation of this bit in shop.js
 
             addToBasket(selectedCardType, cardImages, 0.99); 
+            price
 
             // Update basket display
             displayBasket();
