@@ -15,20 +15,25 @@
             <a href="shop.html" class="back-btn">
                 <span class="arrow">←</span> Back to Shop
             </a>
-            <button class="btn btn-primary" id="viewBasketBtn">Shopping Basket (<span id="cart-count">0</span>)</button>
-            <div id="basketModal" class="modal">
-                <div class="modal-content">
-                    <span class="close-btn">&times;</span>
-                    <h2>Your Basket</h2>
-                    <div id="basketContainer"></div> <!-- Display basket items here -->
-                    <ul id="basketList"></ul> <!-- List of basket items -->
-                    <button id="checkoutBtn">Checkout</button>
-                </div>
-            </div>
+            <button class="btn btn-primary" id="viewBasketBtn">
+                Shopping Basket (<span id="cart-count">0</span>)
+            </button>
         </div>
     </header>
 
+    <!-- Modal for the Basket -->
+    <div id="basketModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Your Basket</h2>
+            <div id="basketContainer"></div>
+            <ul id="basketList"></ul> <!-- List of basket items -->
+            <button id="checkoutBtn">Checkout</button>
+        </div>
+    </div>
+
     <script>
+        // Load basket from localStorage or initialize an empty one
         const basket = loadBasketFromLocalStorage();
 
         function loadBasketFromLocalStorage() {
@@ -36,53 +41,83 @@
             return basketData ? JSON.parse(basketData) : [];
         }
 
+        function saveBasketToLocalStorage() {
+            localStorage.setItem('basket', JSON.stringify(basket));
+        }
+
+        // Display basket items inside the modal
         function displayBasketItems() {
-            const basketItemsContainer = document.getElementById('basketContainer');
+            const basketItemsContainer = document.getElementById('basketList');
             basketItemsContainer.innerHTML = ''; // Clear previous items
 
-            basket.forEach((card, index) => {
-                const col = document.createElement('div');
-                col.className = 'col-md-3 col-sm-6';
+            if (basket.length === 0) {
+                basketItemsContainer.innerHTML = '<p>Your basket is empty.</p>';
+                return;
+            }
 
-                col.innerHTML = `
-                    <div class="card mb-4">
-                        <img src="${card.images[0]}" class="card-img-top" alt="Card ${index + 1} Image">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Card ${index + 1}</h5>
-                            <p>Type: ${card.type}</p>
-                        </div>
+            basket.forEach((card, index) => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <img src="${card.images[0]}" alt="${card.type}" style="width: 50px; height: 50px; object-fit: cover;">
+                        <span>${card.type} - £${card.price}</span>
+                        <button class="btn btn-danger btn-sm" data-index="${index}">Remove</button>
                     </div>
                 `;
 
-                basketItemsContainer.appendChild(col);
+                basketItemsContainer.appendChild(listItem);
             });
 
-            // Calculate and display the total price
-            const total = basket.reduce((sum, card) => sum + (card.price || 0), 0);
-            document.getElementById('cart-total').textContent = `Total: £${total.toFixed(2)}`;
+            // Add event listeners to remove buttons
+            document.querySelectorAll('.btn-danger').forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    const index = event.target.dataset.index;
+                    removeFromBasket(index);
+                });
+            });
         }
 
+        // Remove an item from the basket
+        function removeFromBasket(index) {
+            basket.splice(index, 1); // Remove the item
+            saveBasketToLocalStorage(); // Save updated basket
+            displayBasketItems(); // Update the display
+            updateCartCount(); // Update the basket count
+        }
+
+        // Show the basket modal
         function showBasketModal() {
-            document.getElementById('basketModal').classList.add('active'); 
-            displayBasketItems(); 
+            displayBasketItems();
+            document.getElementById('basketModal').classList.add('active');
         }
 
+        // Close the basket modal
         function closeBasketModal() {
-            document.getElementById('basketModal').classList.remove('active'); 
+            document.getElementById('basketModal').classList.remove('active');
+        }
+
+        // Update cart count in the header
+        function updateCartCount() {
+            document.getElementById('cart-count').textContent = basket.length;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const basketCount = basket.length;
-            document.getElementById('cart-count').textContent = basketCount;
-            document.getElementById('viewBasketBtn').addEventListener('click', showBasketModal);
+            // Update the basket count on page load
+            updateCartCount();
 
-            // Attach event listener to close button of modal
+            // Attach event listeners
+            document.getElementById('viewBasketBtn').addEventListener('click', showBasketModal);
             document.querySelector('.close-btn').addEventListener('click', closeBasketModal);
+
+            // Close the modal when clicking outside the modal content
+            window.addEventListener('click', (event) => {
+                const modal = document.getElementById('basketModal');
+                if (event.target === modal) {
+                    closeBasketModal();
+                }
+            });
         });
     </script>
-
-    <script src="Scripts/basket.js"></script>
-    <script src="Scripts/shop.js"></script>
 </body>
 
 </html>
