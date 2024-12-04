@@ -543,8 +543,8 @@ function updateTextBoxPosition() {
         let width = ctx.measureText(selectedText.text).width;
         let height = parseInt(selectedText.fontSize, 10);
 
-        textBox.style.left = (selectedText.x + canvas.offsetLeft) + 'px';
-        textBox.style.top = (selectedText.y - height + canvas.offsetTop) + 'px';
+        textBox.style.left = (selectedText.x +3 + canvas.offsetLeft) + 'px';
+        textBox.style.top = (selectedText.y +5 - height + canvas.offsetTop) + 'px';
         textBox.style.width = width + 'px';
         textBox.style.height = height + 'px';
         textBox.style.display = 'block';
