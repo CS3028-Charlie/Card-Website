@@ -147,14 +147,20 @@ function openCardModal(cardIndex, images) {
             // Check the text content for "ecard" in a case-insensitive way
             const isECard = selectedButton.textContent.toLowerCase().includes('ecard');
             const creditsRequired = isECard ? 100 : 200;
+            const priceRequired = isECard ? 0.99 : 1.99;
+
 
             // Store the selection in sessionStorage with clear naming
             sessionStorage.setItem('selectedCardType', isECard ? 'eCard' : 'Printable');
             sessionStorage.setItem('creditsRequired', creditsRequired.toString());
+            sessionStorage.setItem('priceRequired', priceRequired.toString());
+
 
             console.log('Stored in session storage:', {
                 selectedCardType: sessionStorage.getItem('selectedCardType'),
-                creditsRequired: sessionStorage.getItem('creditsRequired')
+                creditsRequired: sessionStorage.getItem('creditsRequired'),
+                priceRequired: sessionStorage.getItem('priceRequired'),
+
         });
 
             // 延迟跳转，以确保数据存储完成
@@ -193,6 +199,7 @@ function selectCardType(cardType, images) {
     const isECard = cardType === 'eCard';
     const imagesToShow = isECard ? [images[0], images[2]] : images;
     document.getElementById('priceDisplay').innerText = `Credits: ${isECard ? 100 : 200}`;
+    document.getElementById('priceDisplay2').innerText = `Price: ${isECard ? 0.99 : 1.99} `; 
     loadCarouselImages(imagesToShow);
 
     if (img) {
@@ -203,6 +210,8 @@ function selectCardType(cardType, images) {
             }
         };
     }
+    sessionStorage.setItem('selectedCardType', isECard ? 'eCard' : 'Printable');
+    sessionStorage.setItem('priceRequired', isECard ? 0.99 : 1.99); 
 }
 
 /* Function to handle card type selection
