@@ -70,29 +70,31 @@ async function handleSignup() {
     const username = document.getElementById('signupUsername').value;
     const email = document.getElementById('signupEmail').value;
     const password = document.getElementById('signupPassword').value;
+    const role = document.getElementById('signupRole').value;
 
     if (!username || !email || !password) {
         alert('All fields are required.');
         return;
     }
 
+    console.log({ username, email, password, role }); // Log the request payload
+
     try {
         const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, email, password }),
+            body: JSON.stringify({ username, email, password, role }),
         });
 
         if (!response.ok) {
             const errorData = await response.json();
-            alert(errorData.message); // Show error from the backend
+            alert(errorData.message);
             return;
         }
 
         const data = await response.json();
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('username', username);
-
         alert('Signup successful!');
         location.reload();
     } catch (error) {
@@ -119,15 +121,34 @@ function updateNavBarForSignOut() {
 }
 
 // Update Nav Bar for Login
-function updateNavBarForLogin() {
+async function updateNavBarForLogin() {
     const accountText = document.getElementById('accountText');
     const accountIcon = document.getElementById('accountIcon');
+    const balanceDisplay = document.createElement('span');
 
     const username = localStorage.getItem('username');
     accountText.textContent = username || 'Account';
-    accountIcon.title = 'Sign Out'; // Change title to reflect action
+    accountIcon.title = 'Sign Out';
+
+    try {
+        const authToken = localStorage.getItem('authToken');
+        if (authToken) {
+            const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/users/balance', {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                balanceDisplay.textContent = ` | £${data.balance.toFixed(2)}`;
+                accountText.appendChild(balanceDisplay);
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching balance:', error);
+    }
 
     accountText.addEventListener('click', () => {
         showUserAccountModal();
     });
 }
+

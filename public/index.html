@@ -89,6 +89,14 @@
                             <label for="signupPassword">Password</label>
                             <input type="password" class="form-control" id="signupPassword" required>
                         </div>
+                        <div class="form-group">
+                            <label for="signupRole">Account Type</label>
+                            <select class="form-control" id="signupRole">
+                                <option value="parent">Parent</option>
+                                <option value="teacher">Teacher</option>
+                                <option value="pupil">Student</option>
+                            </select>
+                        </div>                        
                         <button type="button" class="btn btn-success" onclick="handleSignup()">Sign Up</button>
                     </form>
 
