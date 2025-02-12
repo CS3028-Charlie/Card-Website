@@ -132,6 +132,20 @@ function handleSignOut() {
     document.getElementById('signupForm').style.display = 'block';
 }
 
+document.getElementById('accountLink').addEventListener('click', async (event) => {
+    event.preventDefault(); // Prevent default link behavior
+
+    const authToken = localStorage.getItem('authToken');
+    const role = localStorage.getItem('role');
+
+    if (authToken) {
+        await updateUserUI();
+        showUserAccountModal();
+    } else {
+        showLoginSignupModal();
+    }
+});
+
 async function updateUserUI() {
     const username = localStorage.getItem('username');
     const role = localStorage.getItem('role');
@@ -153,38 +167,22 @@ async function updateUserUI() {
             document.getElementById('userAccountSection').appendChild(balanceDisplay);
         }
         if (role === 'pupil') {
-            try {
-                const authToken = localStorage.getItem('authToken');
-                const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/balance', { 
-                    method: 'GET',
-                    headers: { 'Authorization': `Bearer ${authToken}` }
-                });
-
-                if (!response.ok) {
-                    console.error('Failed to fetch balance');
-                    balanceDisplay.textContent = 'Credits: Error';
-                    return;
-                }
-
-                const data = await response.json();
-                const newBalance = data.balance;
-
-                // ✅ Update localStorage
-                localStorage.setItem('balance', newBalance);
-
-                // ✅ Update UI with the new balance
-                balanceDisplay.textContent = `Credits: ${parseFloat(newBalance).toFixed(0)}`;
-            } catch (error) {
-                console.error('Error fetching balance:', error);
-                balanceDisplay.textContent = 'Credits: Error';
-            }
+            await fetchAndUpdateBalance();
         } else {
-            balanceDisplay.textContent = ''; // Hide balance for non-pupil accounts
+            balanceDisplay.textContent = ''; // Hide balance for non-pupils
         }
 
-        // Top-up section (for teachers and parents)
-        let topupSection = document.getElementById('topupSection');
-        if (!topupSection && (role === 'teacher' || role === 'parent')) {
+        // Ensure top-up section is updated properly
+        updateTopupSection(role);
+    }
+}
+
+function updateTopupSection(role) {
+    let topupSection = document.getElementById('topupSection');
+
+    if (role === 'teacher' || role === 'parent') {
+        // If top-up section doesn't exist, create it
+        if (!topupSection) {
             topupSection = document.createElement('div');
             topupSection.id = 'topupSection';
             topupSection.innerHTML = `
@@ -198,10 +196,50 @@ async function updateUserUI() {
             // Attach event listener to top-up button
             document.getElementById('topupButton').addEventListener('click', handleTopup);
         } else {
-            // Hide everything if no user is logged in
-            topupSection.style.display = 'none';
+            topupSection.style.display = 'block'; // Ensure it's visible
+        }
+    } else if (topupSection) {
+        topupSection.style.display = 'none'; // Hide if user isn't a teacher/parent
+    }
+}
+
+async function fetchAndUpdateBalance() {
+    const authToken = localStorage.getItem('authToken');
+    const role = localStorage.getItem('role');
+
+    if (authToken && role === 'pupil') {
+        try {
+            const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/balance', { 
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            if (!response.ok) {
+                console.error('Failed to fetch balance');
+                return;
+            }
+
+            const data = await response.json();
+            const newBalance = data.balance;
+
+            localStorage.setItem('balance', newBalance);
+            updateBalanceDisplay(newBalance);
+        } catch (error) {
+            console.error('Error fetching balance:', error);
         }
     }
+}
+
+function updateBalanceDisplay(balance) {
+    let balanceElement = document.getElementById('balanceDisplay');
+
+    if (!balanceElement) {
+        balanceElement = document.createElement('p');
+        balanceElement.id = 'balanceDisplay';
+        document.getElementById('userAccountSection').appendChild(balanceElement);
+    }
+
+    balanceElement.textContent = `Credits: ${parseFloat(balance).toFixed(0)}`;
 }
 
 // Function to top-up a pupil's balance
@@ -237,62 +275,3 @@ async function handleTopup() {
         document.getElementById('topupStatus').textContent = 'Error processing top-up.';
     }
 }
-
-async function fetchAndUpdateBalance() {
-    const authToken = localStorage.getItem('authToken');
-    const role = localStorage.getItem('role');
-
-    if (authToken && role === 'pupil') {
-        try {
-            const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/balance', { 
-                method: 'GET',
-                headers: { 'Authorization': `Bearer ${authToken}` }
-            });
-
-            if (!response.ok) {
-                console.error('Failed to fetch balance');
-                return;
-            }
-
-            const data = await response.json();
-            const newBalance = data.balance;
-
-            console.log("Fetched balance:", newBalance); // Debugging log
-
-            // Update localStorage
-            localStorage.setItem('balance', newBalance);
-
-            // Update the displayed balance
-            updateBalanceDisplay(newBalance);
-        } catch (error) {
-            console.error('Error fetching balance:', error);
-        }
-    }
-}
-
-function updateBalanceDisplay(balance) {
-    let balanceElement = document.getElementById('balanceDisplay');
-
-    if (!balanceElement) {
-        balanceElement = document.createElement('p');
-        balanceElement.id = 'balanceDisplay';
-        document.getElementById('userAccountSection').appendChild(balanceElement);
-    }
-
-    console.log("Updating balance display:", balance); // Debugging log
-    balanceElement.textContent = `Credits: ${parseFloat(balance).toFixed(0)}`;
-}
-
-document.getElementById('accountLink').addEventListener('click', async (event) => {
-    event.preventDefault(); // Prevent default link behavior
-
-    const authToken = localStorage.getItem('authToken');
-    if (authToken) {
-        // User is logged in, update balance and show account modal
-        await updateUserUI();
-        showUserAccountModal();
-    } else {
-        // User is not logged in, show login/signup modal
-        showLoginSignupModal();
-    }
-});
