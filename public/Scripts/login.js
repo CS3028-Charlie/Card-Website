@@ -1,3 +1,4 @@
+document.addEventListener('DOMContentLoaded', updateUserUI);
 document.addEventListener('DOMContentLoaded', () => {
     const accountText = document.getElementById('accountText');
     const accountIcon = document.getElementById('accountIcon');
@@ -8,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (authToken) {
         accountText.textContent = username || 'Account';
         accountIcon.title = 'Sign Out'; // Change title to reflect action
-        updateNavBarForLogin(); // Update the navbar to reflect the login state
+        updateUserUI(); // Update the navbar to reflect the login state
     } else {
         accountText.textContent = 'Login';
         accountIcon.title = 'Login';
@@ -26,12 +27,17 @@ function showLoginSignupModal() {
 }
 
 // Show User Account Modal
-function showUserAccountModal() {
+async function showUserAccountModal() {
+    console.log("showUserAccountModal() called"); // Debugging log
+
     $('#accountModal').modal('show');
+
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('signupForm').style.display = 'none';
     document.getElementById('userAccountSection').style.display = 'block';
-    document.getElementById('usernameDisplay').textContent = localStorage.getItem('username');
+
+    console.log("Fetching balance..."); // Debugging log
+    await fetchAndUpdateBalance();
 }
 
 // Handle Login
@@ -40,7 +46,7 @@ async function handleLogin() {
     const password = document.getElementById('loginPassword').value;
 
     try {
-        const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/login', {
+        const response = await fetch('http://localhost:3000/api/auth/login', { // https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/login
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -55,14 +61,17 @@ async function handleLogin() {
         }
 
         const data = await response.json();
-        localStorage.setItem('authToken', data.token); // Store token in localStorage
-        localStorage.setItem('username', data.username); // Store username in localStorage
+        // Store user info
+        localStorage.setItem('username', data.username);
+        localStorage.setItem('role', data.role);
+        localStorage.setItem('authToken', data.token);
+        if (data.role === 'pupil') {
+            localStorage.setItem('balance', data.balance);
+        }
 
-        $('#accountModal').modal('hide');
-        document.getElementById('accountText').textContent = data.username;
-        updateNavBarForLogin();
+        updateUserUI();
     } catch (error) {
-        alert('Login failed: ' + error.message);
+        alert(error.message);
     }
 }
 
@@ -80,7 +89,7 @@ async function handleSignup() {
     console.log({ username, email, password, role }); // Log the request payload
 
     try {
-        const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/register', {
+        const response = await fetch('http://localhost:3000/api/auth/register', { //https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/register
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, email, password, role }),
@@ -108,47 +117,141 @@ function handleSignOut() {
     localStorage.removeItem('username');
     document.getElementById('accountText').textContent = 'Login';
     showLoginSignupModal();
-    updateNavBarForSignOut();
 }
 
 // Update Nav Bar after Sign Out
-function updateNavBarForSignOut() {
-    const accountText = document.getElementById('accountText');
-    const accountIcon = document.getElementById('accountIcon');
+function handleSignOut() {
+    localStorage.removeItem('username');
+    localStorage.removeItem('role');
+    localStorage.removeItem('balance');
+    localStorage.removeItem('token');
 
-    accountText.textContent = 'Login';
-    accountIcon.title = 'Login';
+    document.getElementById('accountText').textContent = 'Login';
+    document.getElementById('userAccountSection').style.display = 'none';
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('signupForm').style.display = 'block';
 }
 
-// Update Nav Bar for Login
-async function updateNavBarForLogin() {
-    const accountText = document.getElementById('accountText');
-    const accountIcon = document.getElementById('accountIcon');
-    const balanceDisplay = document.createElement('span');
-
+async function updateUserUI() {
     const username = localStorage.getItem('username');
-    accountText.textContent = username || 'Account';
-    accountIcon.title = 'Sign Out';
+    const role = localStorage.getItem('role');
+    const balance = localStorage.getItem('balance');
+
+    if (username) {
+        document.getElementById('usernameDisplay').textContent = username;
+        document.getElementById('accountText').textContent = username;
+        document.getElementById('userAccountSection').style.display = 'block';
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('signupForm').style.display = 'none';
+
+        // Balance display (for pupils)
+        let balanceDisplay = document.getElementById('balanceDisplay');
+        if (!balanceDisplay) {
+            balanceDisplay = document.createElement('p');
+            balanceDisplay.id = 'balanceDisplay';
+            balanceDisplay.style.marginBottom = '10px';
+            document.getElementById('userAccountSection').appendChild(balanceDisplay);
+        }
+        if (role === 'pupil' && balance !== null) {
+            balanceDisplay.textContent = `Credits: ${parseFloat(balance).toFixed(0)}`;
+        } else {
+            balanceDisplay.textContent = ''; // Hide if not a pupil
+        }
+
+        // Top-up section (for teachers and parents)
+        let topupSection = document.getElementById('topupSection');
+        if (!topupSection && (role === 'teacher' || role === 'parent')) {
+            topupSection = document.createElement('div');
+            topupSection.id = 'topupSection';
+            topupSection.innerHTML = `
+                <h5>Top-up Pupil Credits</h5>
+                <input type="email" id="topupEmail" placeholder="Enter pupil email" class="form-control mb-2">
+                <button id="topupButton" class="btn btn-success">+100 Credits</button>
+                <p id="topupStatus" class="mt-2"></p>
+            `;
+            document.getElementById('userAccountSection').appendChild(topupSection);
+
+            // Attach event listener to top-up button
+            document.getElementById('topupButton').addEventListener('click', handleTopup);
+        }
+    }
+}
+
+// Function to top-up a pupil's balance
+async function handleTopup() {
+    const pupilEmail = document.getElementById('topupEmail').value.trim();
+    const authToken = localStorage.getItem('authToken');
+
+    if (!pupilEmail) {
+        document.getElementById('topupStatus').textContent = 'Please enter a valid pupil email.';
+        return;
+    }
 
     try {
-        const authToken = localStorage.getItem('authToken');
-        if (authToken) {
-            const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/users/balance', {
+        const response = await fetch('http://localhost:3000/api/auth/topup', { // Update with your actual API URL
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ email: pupilEmail, amount: 100 })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            document.getElementById('topupStatus').textContent = data.message || 'Top-up failed.';
+            return;
+        }
+
+        document.getElementById('topupStatus').textContent = `Successfully added 100 credits to ${pupilEmail}`;
+    } catch (error) {
+        console.error('Top-up error:', error);
+        document.getElementById('topupStatus').textContent = 'Error processing top-up.';
+    }
+}
+
+async function fetchAndUpdateBalance() {
+    const authToken = localStorage.getItem('authToken');
+    const role = localStorage.getItem('role');
+
+    if (authToken && role === 'pupil') {
+        try {
+            const response = await fetch('http://localhost:3000/api/auth/balance', { 
+                method: 'GET',
                 headers: { 'Authorization': `Bearer ${authToken}` }
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                balanceDisplay.textContent = ` | £${data.balance.toFixed(2)}`;
-                accountText.appendChild(balanceDisplay);
+            if (!response.ok) {
+                console.error('Failed to fetch balance');
+                return;
             }
-        }
-    } catch (error) {
-        console.error('Error fetching balance:', error);
-    }
 
-    accountText.addEventListener('click', () => {
-        showUserAccountModal();
-    });
+            const data = await response.json();
+            const newBalance = data.balance;
+
+            console.log("Fetched balance:", newBalance); // Debugging log
+
+            // Update localStorage
+            localStorage.setItem('balance', newBalance);
+
+            // Update the displayed balance
+            updateBalanceDisplay(newBalance);
+        } catch (error) {
+            console.error('Error fetching balance:', error);
+        }
+    }
 }
 
+function updateBalanceDisplay(balance) {
+    let balanceElement = document.getElementById('balanceDisplay');
+
+    if (!balanceElement) {
+        balanceElement = document.createElement('p');
+        balanceElement.id = 'balanceDisplay';
+        document.getElementById('userAccountSection').appendChild(balanceElement);
+    }
+
+    console.log("Updating balance display:", balance); // Debugging log
+    balanceElement.textContent = `Credits: ${parseFloat(balance).toFixed(0)}`;
+}
