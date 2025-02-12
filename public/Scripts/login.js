@@ -152,10 +152,34 @@ async function updateUserUI() {
             balanceDisplay.style.marginBottom = '10px';
             document.getElementById('userAccountSection').appendChild(balanceDisplay);
         }
-        if (role === 'pupil' && balance !== null) {
-            balanceDisplay.textContent = `Credits: ${parseFloat(balance).toFixed(0)}`;
+        if (role === 'pupil') {
+            try {
+                const authToken = localStorage.getItem('authToken');
+                const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/balance', { 
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (!response.ok) {
+                    console.error('Failed to fetch balance');
+                    balanceDisplay.textContent = 'Credits: Error';
+                    return;
+                }
+
+                const data = await response.json();
+                const newBalance = data.balance;
+
+                // ✅ Update localStorage
+                localStorage.setItem('balance', newBalance);
+
+                // ✅ Update UI with the new balance
+                balanceDisplay.textContent = `Credits: ${parseFloat(newBalance).toFixed(0)}`;
+            } catch (error) {
+                console.error('Error fetching balance:', error);
+                balanceDisplay.textContent = 'Credits: Error';
+            }
         } else {
-            balanceDisplay.textContent = ''; // Hide if not a pupil
+            balanceDisplay.textContent = ''; // Hide balance for non-pupil accounts
         }
 
         // Top-up section (for teachers and parents)
@@ -173,6 +197,9 @@ async function updateUserUI() {
 
             // Attach event listener to top-up button
             document.getElementById('topupButton').addEventListener('click', handleTopup);
+        } else {
+            // Hide everything if no user is logged in
+            topupSection.style.display = 'none';
         }
     }
 }
@@ -255,3 +282,17 @@ function updateBalanceDisplay(balance) {
     console.log("Updating balance display:", balance); // Debugging log
     balanceElement.textContent = `Credits: ${parseFloat(balance).toFixed(0)}`;
 }
+
+document.getElementById('accountLink').addEventListener('click', async (event) => {
+    event.preventDefault(); // Prevent default link behavior
+
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+        // User is logged in, update balance and show account modal
+        await updateUserUI();
+        showUserAccountModal();
+    } else {
+        // User is not logged in, show login/signup modal
+        showLoginSignupModal();
+    }
+});
