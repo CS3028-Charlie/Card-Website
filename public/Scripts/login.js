@@ -46,7 +46,7 @@ async function handleLogin() {
     const password = document.getElementById('loginPassword').value;
 
     try {
-        const response = await fetch('http://localhost:3000/api/auth/login', { // https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/login
+        const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/login', { // https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/login
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -89,7 +89,7 @@ async function handleSignup() {
     console.log({ username, email, password, role }); // Log the request payload
 
     try {
-        const response = await fetch('http://localhost:3000/api/auth/register', { //https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/register
+        const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/register', { //https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/register
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, email, password, role }),
@@ -188,7 +188,7 @@ async function handleTopup() {
     }
 
     try {
-        const response = await fetch('http://localhost:3000/api/auth/topup', { // Update with your actual API URL
+        const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/topup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -217,7 +217,7 @@ async function fetchAndUpdateBalance() {
 
     if (authToken && role === 'pupil') {
         try {
-            const response = await fetch('http://localhost:3000/api/auth/balance', { 
+            const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/balance', { 
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${authToken}` }
             });
