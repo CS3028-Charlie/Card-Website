@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function loadStudents() {
     const authToken = localStorage.getItem("authToken");
     try {
-        const response = await fetch("http://localhost:3000/api/classroom/students", {
+        const response = await fetch("https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/classroom/students", {
             method: "GET",
             headers: { "Authorization": `Bearer ${authToken}` }
         });
@@ -64,7 +64,7 @@ async function addStudentToClass() {
     }
 
     try {
-        const response = await fetch("http://localhost:3000/api/classroom/add-student", {
+        const response = await fetch("https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/classroom/add-student", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -96,7 +96,7 @@ async function addCreditsToSelected() {
     }
 
     try {
-        const response = await fetch("http://localhost:3000/api/classroom/add-credits", {
+        const response = await fetch("https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/classroom/add-credits", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -115,4 +115,40 @@ async function addCreditsToSelected() {
         console.error("Error adding credits:", error);
         document.getElementById("creditStatus").textContent = "Error adding credits.";
     }
+}
+
+async function removeSelectedStudents() {
+    const authToken = localStorage.getItem("authToken");
+    const selectedStudents = [...document.querySelectorAll(".studentCheckbox:checked")].map(cb => cb.dataset.email);
+
+    if (selectedStudents.length === 0) {
+        document.getElementById("removeStudentStatus").textContent = "No students selected.";
+        return;
+    }
+
+    if (!confirm(`Are you sure you want to remove ${selectedStudents.length} students?`)) return;
+
+    try {
+        const response = await fetch("https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/classroom/remove-students", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ emails: selectedStudents })
+        });
+
+        const data = await response.json();
+        document.getElementById("removeStudentStatus").textContent = data.message;
+
+        if (response.ok) await loadStudents();
+    } catch (error) {
+        console.error("Error removing students:", error);
+        document.getElementById("removeStudentStatus").textContent = "Error removing students.";
+    }
+}
+
+function toggleSelectAll() {
+    const checkboxes = document.querySelectorAll(".studentCheckbox");
+    checkboxes.forEach(cb => cb.checked = document.getElementById("selectAll").checked);
 }

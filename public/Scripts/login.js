@@ -194,7 +194,7 @@ function updateTopupSection(role) {
             classroomButton.className = 'btn btn-primary';
             classroomButton.textContent = 'Go to Classroom';
             classroomButton.addEventListener('click', () => {
-                window.location.href = '/classroom'; // Adjust the URL as needed
+                window.location.href = '/classroom.html';
             });
 
             document.getElementById('userAccountSection').appendChild(classroomButton);

@@ -1,41 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classroom Management</title>
-    <script defer src="classroom.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Classroom - The Sustainables Academy</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #28a745;
+            color: white;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Classroom Management</h1>
-    <p id="teacherWelcome"></p>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg custom-navbar">
+        <a class="navbar-brand" href="#">
+            <img class="nav-logo" src="Images/TSA-Logo.png"> The Sustainables Academy
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html"><i class="fas fa-home"></i> Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="shop.html"><i class="fas fa-store"></i> Shop</a>
+                </li>
+                <!-- <li class="nav-item">
+                    <a class="nav-link" href="Card_Pay.html"><i class="fas fa-star"></i> Top Up</a>
+                </li> -->
+                <li class="nav-item">
+                    <a class="nav-link" href="basket.html" id="viewBasketBtn">
+                        <i class="fas fa-shopping-cart"></i> Basket
+                    </a>
+                <li class="nav-item">
+                    <a class="nav-link" href="about.html"><i class="fa-solid fa-circle-info"></i> About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="accountLink" data-toggle="modal" data-target="#accountModal">
+                        <i class="fas fa-user-circle" id="accountIcon"></i> <span id="accountText">Login</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
-    <!-- Add Student Form -->
-    <h3>Add Student to Classroom</h3>
-    <input type="email" id="studentEmail" placeholder="Enter student email">
-    <button id="addStudentButton">Add Student</button>
-    <p id="addStudentStatus"></p>
+    <!-- Account Modal -->
+    <div class="modal fade" id="accountModal" tabindex="-1" role="dialog" aria-labelledby="accountModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="accountModalLabel">Login / Sign Up</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Login Form -->
+                    <form id="loginForm" style="display: none;">
+                        <div class="form-group">
+                            <label for="loginEmail">Email address</label>
+                            <input type="email" class="form-control" id="loginEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" class="form-control" id="loginPassword" required>
+                        </div>
+                        <button type="button" class="btn btn-success" onclick="handleLogin()">Login</button>
+                    </form><br>
+                    <!-- Signup Form -->
+                    <form id="signupForm" style="display: none;">
+                        <h5>Don't have an account? Sign Up!</h5>
+                        <div class="form-group">
+                            <label for="signupUsername">Username</label>
+                            <input type="text" class="form-control" id="signupUsername" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupEmail">Email address</label>
+                            <input type="email" class="form-control" id="signupEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupPassword">Password</label>
+                            <input type="password" class="form-control" id="signupPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupRole">Account Type</label>
+                            <select class="form-control" id="signupRole">
+                                <option value="parent">Parent</option>
+                                <option value="teacher">Teacher</option>
+                                <option value="pupil">Student</option>
+                            </select>
+                        </div>                        
+                        <button type="button" class="btn btn-success" onclick="handleSignup()">Sign Up</button>
+                    </form>
 
-    <!-- Student List -->
-    <h3>Student List</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Select</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Credits</th>
-            </tr>
-        </thead>
-        <tbody id="studentTableBody">
-            <!-- Filled dynamically -->
-        </tbody>
-    </table>
-    
-    <button id="addCreditsButton">Add 100 Credits</button>
-    <p id="creditStatus"></p>
+                    <!-- User Account Section (after login) -->
+                    <div id="userAccountSection" style="display: none;">
+                        <h5>Welcome, <span id="usernameDisplay"></span>!</h5>
+                        <button type="button" class="btn btn-danger" id="signOutButton" onclick="handleSignOut()">Sign Out</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Classroom Management -->
+    <div class="container">
+        <h1 class="text-center text-success">Classroom Management</h1>
+        <p id="teacherWelcome" class="text-center"></p>
+
+        <!-- Add Student Form -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <h3 class="card-title">Add Student to Classroom</h3>
+                <div class="input-group mb-3">
+                    <input type="email" id="studentEmail" class="form-control" placeholder="Enter student email">
+                    <div class="input-group-append">
+                        <button class="btn btn-success" id="addStudentButton">Add Student</button>
+                    </div>
+                </div>
+                <p id="addStudentStatus" class="text-muted"></p>
+            </div>
+        </div>
+
+        <!-- Student List -->
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">Student List</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAll"></th>
+                                <th>Select</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Credits</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody">
+                            <!-- Filled dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+                <button class="btn btn-primary mt-3" id="addCreditsButton">Add 100 Credits</button>
+                <p id="creditStatus" class="text-muted"></p>
+
+                <button class="btn btn-danger mt-3" id="removeStudentsButton">Remove Selected Students</button>
+                <p id="removeStudentStatus" class="text-danger mt-2"></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="Scripts/login.js"></script>
     <script src="Scripts/classroom.js"></script>
 </body>
 </html>
