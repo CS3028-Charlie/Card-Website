@@ -180,7 +180,26 @@ async function updateUserUI() {
 function updateTopupSection(role) {
     let topupSection = document.getElementById('topupSection');
 
-    if (role === 'teacher' || role === 'parent') {
+    if (role === 'teacher') {
+        // Remove existing top-up section if present
+        if (topupSection) {
+            topupSection.remove();
+        }
+
+        // Create the "Go to Classroom" button if it doesn't exist
+        let classroomButton = document.getElementById('classroomButton');
+        if (!classroomButton) {
+            classroomButton = document.createElement('button');
+            classroomButton.id = 'classroomButton';
+            classroomButton.className = 'btn btn-primary';
+            classroomButton.textContent = 'Go to Classroom';
+            classroomButton.addEventListener('click', () => {
+                window.location.href = '/classroom'; // Adjust the URL as needed
+            });
+
+            document.getElementById('userAccountSection').appendChild(classroomButton);
+        }
+    } else if (role === 'parent') {
         // If top-up section doesn't exist, create it
         if (!topupSection) {
             topupSection = document.createElement('div');
@@ -198,8 +217,11 @@ function updateTopupSection(role) {
         } else {
             topupSection.style.display = 'block'; // Ensure it's visible
         }
-    } else if (topupSection) {
-        topupSection.style.display = 'none'; // Hide if user isn't a teacher/parent
+    } else {
+        // Hide top-up section for other roles
+        if (topupSection) {
+            topupSection.style.display = 'none';
+        }
     }
 }
 

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Management</title>
+    <script defer src="classroom.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Classroom Management</h1>
+    <p id="teacherWelcome"></p>
+
+    <!-- Add Student Form -->
+    <h3>Add Student to Classroom</h3>
+    <input type="email" id="studentEmail" placeholder="Enter student email">
+    <button id="addStudentButton">Add Student</button>
+    <p id="addStudentStatus"></p>
+
+    <!-- Student List -->
+    <h3>Student List</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Select</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Credits</th>
+            </tr>
+        </thead>
+        <tbody id="studentTableBody">
+            <!-- Filled dynamically -->
+        </tbody>
+    </table>
+    
+    <button id="addCreditsButton">Add 100 Credits</button>
+    <p id="creditStatus"></p>
+
+    <script src="Scripts/classroom.js"></script>
+</body>
+</html>
