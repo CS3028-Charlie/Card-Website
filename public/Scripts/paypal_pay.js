@@ -1,5 +1,6 @@
-const API_URL = "http://localhost:3000"
-// const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com"
+import config from "./config.js"
+
+const API_URL = config.API_URL
 
 window.paypal
     .Buttons({
