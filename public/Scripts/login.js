@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', updateUserUI);
+document.addEventListener('DOMContentLoaded', updateUserUI());
 document.addEventListener('DOMContentLoaded', () => {
     const accountText = document.getElementById('accountText');
     const accountIcon = document.getElementById('accountIcon');
@@ -111,25 +111,19 @@ async function handleSignup() {
     }
 }
 
-// Handle Sign Out
-function handleSignOut() {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('username');
-    document.getElementById('accountText').textContent = 'Login';
-    showLoginSignupModal();
-}
-
 // Update Nav Bar after Sign Out
 function handleSignOut() {
     localStorage.removeItem('username');
     localStorage.removeItem('role');
     localStorage.removeItem('balance');
-    localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
 
     document.getElementById('accountText').textContent = 'Login';
     document.getElementById('userAccountSection').style.display = 'none';
     document.getElementById('loginForm').style.display = 'block';
     document.getElementById('signupForm').style.display = 'block';
+    document.getElementById('signOutFooter').style.display = 'none'; // Hide sign out button
+    location.reload(); // Refresh the page
 }
 
 document.getElementById('accountLink').addEventListener('click', async (event) => {
@@ -151,12 +145,17 @@ async function updateUserUI() {
     const role = localStorage.getItem('role');
     const balance = localStorage.getItem('balance');
 
+    if (!username || username == "Account") {
+        return;
+    }
+
     if (username) {
         document.getElementById('usernameDisplay').textContent = username;
         document.getElementById('accountText').textContent = username;
         document.getElementById('userAccountSection').style.display = 'block';
         document.getElementById('loginForm').style.display = 'none';
         document.getElementById('signupForm').style.display = 'none';
+        document.getElementById('signOutFooter').style.display = 'block'; // Show sign out button
 
         // Balance display (for pupils)
         let balanceDisplay = document.getElementById('balanceDisplay');
@@ -177,15 +176,13 @@ async function updateUserUI() {
     }
 }
 
-function updateTopupSection(role) {
+function updateTopupSection(role) {  
     let topupSection = document.getElementById('topupSection');
 
     if (role === 'teacher') {
-        // Remove existing top-up section if present
         if (topupSection) {
             topupSection.remove();
         }
-
         // Create the "Go to Classroom" button if it doesn't exist
         let classroomButton = document.getElementById('classroomButton');
         if (!classroomButton) {
@@ -200,6 +197,9 @@ function updateTopupSection(role) {
             document.getElementById('userAccountSection').appendChild(classroomButton);
         }
     } else if (role === 'parent') {
+        if (classroomButton) {
+            classroomButton.remove();
+        }
         // If top-up section doesn't exist, create it
         if (!topupSection) {
             topupSection = document.createElement('div');
@@ -222,6 +222,7 @@ function updateTopupSection(role) {
         if (topupSection) {
             topupSection.style.display = 'none';
         }
+        classroomButton.remove();
     }
 }
 

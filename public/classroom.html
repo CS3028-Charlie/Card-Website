@@ -28,6 +28,19 @@
             background-color: #28a745;
             color: white;
         }
+        .notifications-panel {
+            max-height: 300px; /* Adjust height as needed */
+            overflow-y: auto;
+            border: 1px solid #ddd; /* Add border to make it obvious */
+            padding: 10px;
+        }
+        .notifications-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+        .notifications-panel::-webkit-scrollbar-thumb {
+            background-color: #28a745; /* Customize scrollbar color */
+            border-radius: 4px;
+        }
     </style>
 </head>
 
@@ -80,6 +93,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    <p>Manage your account, view your balance, and access exclusive features.</p>
                     <!-- Login Form -->
                     <form id="loginForm" style="display: none;">
                         <div class="form-group">
@@ -121,8 +135,10 @@
                     <!-- User Account Section (after login) -->
                     <div id="userAccountSection" style="display: none;">
                         <h5>Welcome, <span id="usernameDisplay"></span>!</h5>
-                        <button type="button" class="btn btn-danger" id="signOutButton" onclick="handleSignOut()">Sign Out</button>
                     </div>
+                </div>
+                <div class="modal-footer" id="signOutFooter" style="display: none;">
+                    <button type="button" class="btn btn-danger" id="signOutButton" onclick="handleSignOut()">Sign Out</button>
                 </div>
             </div>
         </div>
@@ -133,49 +149,74 @@
         <h1 class="text-center text-success">Classroom Management</h1>
         <p id="teacherWelcome" class="text-center"></p>
 
-        <!-- Add Student Form -->
-        <div class="card mb-3">
-            <div class="card-body">
-                <h3 class="card-title">Add Student to Classroom</h3>
-                <div class="input-group mb-3">
-                    <input type="email" id="studentEmail" class="form-control" placeholder="Enter student email">
-                    <div class="input-group-append">
-                        <button class="btn btn-success" id="addStudentButton">Add Student</button>
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Add Student Form -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h3 class="card-title">Add Student to Classroom</h3>
+                        <div class="input-group mb-3">
+                            <input type="email" id="studentEmail" class="form-control" placeholder="Enter student email">
+                            <div class="input-group-append">
+                                <button class="btn btn-success" id="addStudentButton">Add Student</button>
+                            </div>
+                        </div>
+                        <p id="addStudentStatus" class="text-muted"></p>
                     </div>
                 </div>
-                <p id="addStudentStatus" class="text-muted"></p>
-            </div>
-        </div>
 
-        <!-- Student List -->
-        <div class="card">
-            <div class="card-body">
-                <h3 class="card-title">Student List</h3>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th><input type="checkbox" id="selectAll"></th>
-                                <th>Select</th>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Credits</th>
-                            </tr>
-                        </thead>
-                        <tbody id="studentTableBody">
-                            <!-- Filled dynamically -->
-                        </tbody>
-                    </table>
+                <!-- Student List -->
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Student List</h3>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="selectAll"> Select</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Credits</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentTableBody">
+                                    <!-- Filled dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-success mt-3" id="addCreditsButton">Add 100 Credits</button>
+                            <button class="btn btn-success mt-3" id="withdrawCreditsButton">Withdraw Credits</button>
+                            <button class="btn btn-danger mt-3" id="removeStudentsButton">Remove Selected Students</button>
+                        </div>
+                    </div>
                 </div>
-                <button class="btn btn-primary mt-3" id="addCreditsButton">Add 100 Credits</button>
-                <p id="creditStatus" class="text-muted"></p>
+            </div>
 
-                <button class="btn btn-danger mt-3" id="removeStudentsButton">Remove Selected Students</button>
-                <p id="removeStudentStatus" class="text-danger mt-2"></p>
+            <div class="col-md-4">
+                <!-- Notifications Panel -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h3 class="card-title">Notifications</h3>
+                        <div id="notificationsPanel" class="notifications-panel">
+                            <!-- Notifications will appear here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teacher Balance -->
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Your Balance</h3>
+                        <p id="teacherBalance" class="text-muted">Loading...</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Footer -->
+    <!-- jQuery, Bootstrap, and Font Awesome JavaScript -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="Scripts/login.js"></script>
