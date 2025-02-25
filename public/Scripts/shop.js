@@ -197,22 +197,45 @@ function openCardModal(cardIndex, images) {
 // Function to handle card type selection
 function selectCardType(cardType, images) {
     const isECard = cardType === 'eCard';
-    const imagesToShow = isECard ? [images[0], images[2]] : images;
+
+    // Get the eCard and Printable buttons
+    const eCardBtn = document.querySelector(".CardButton button:nth-child(1)");
+    const printableBtn = document.querySelector(".CardButton button:nth-child(2)");
+
+    // Remove selection styles from both buttons
+    eCardBtn.classList.remove("bg-success", "text-white");
+    printableBtn.classList.remove("bg-success", "text-white");
+    eCardBtn.classList.add("btn-outline-primary");
+    printableBtn.classList.add("btn-outline-primary");
+
+    // Add selection styles to the clicked button
+    if (isECard) {
+        eCardBtn.classList.add("bg-success", "text-white");
+        eCardBtn.classList.remove("btn-outline-primary");
+    } else {
+        printableBtn.classList.add("bg-success", "text-white");
+        printableBtn.classList.remove("btn-outline-primary");
+    }
+
+    // Update UI price and credits display
     document.getElementById('priceDisplay').innerText = `Credits: ${isECard ? 100 : 200}`;
-    document.getElementById('priceDisplay2').innerText = `Price: ${isECard ? 0.99 : 1.99} `; 
+    document.getElementById('priceDisplay2').innerText = `Price: ${isECard ? 0.99 : 1.99}`;
+
+    // Update the carousel images based on selection
+    const imagesToShow = isECard ? [images[0], images[2]] : images;
     loadCarouselImages(imagesToShow);
 
-    if (img) {
-        img.src = images[2];
-        img.onload = () => {
-            if (typeof redrawCanvas === 'function') {
-                redrawCanvas();
-            }
-        };
-    }
+    // Store the selected option in sessionStorage
     sessionStorage.setItem('selectedCardType', isECard ? 'eCard' : 'Printable');
-    sessionStorage.setItem('priceRequired', isECard ? 0.99 : 1.99); 
+    sessionStorage.setItem('priceRequired', isECard ? 0.99 : 1.99);
+
+    console.log('Stored in session storage:', {
+        selectedCardType: sessionStorage.getItem('selectedCardType'),
+        priceRequired: sessionStorage.getItem('priceRequired')
+    });
 }
+
+
 
 /* Function to handle card type selection
 function selectCardType(cardType, images) {
