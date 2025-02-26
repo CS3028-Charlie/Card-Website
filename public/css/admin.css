@@ -1,3 +1,54 @@
+/* fonts */
+@font-face {
+    font-family: InterVariable;
+    src: url(../fonts/InterVariable.ttf);
+}
+
+@font-face {
+    font-family: InterVariable-Italic;
+    src: url(../fonts/InterVariable-Italic.ttf);
+}
+
+/* Custom styles for the navbar */
+.custom-navbar {
+    font-family: InterVariable;
+    background-color: rgb(57, 181, 82);
+    padding: 10px 20px;
+}
+
+.custom-navbar .nav-link {
+    color: #ffffff; /* White text */
+    background-color: rgb(232, 70, 130); /* Pink bubble background */
+    border-radius: 20px; /* Rounded bubble */
+    padding: 8px 15px;
+    margin: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    text-decoration: none;
+}
+
+.custom-navbar .nav-link:hover {
+    background-color: #ffffff; /* White background on hover */
+    color: rgb(232, 70, 130); /* Pink text on hover */
+}
+
+.nav-logo {
+    max-height: 40px;
+    width: auto;
+}
+
+/* Adjust brand styles */
+.custom-navbar .navbar-brand {
+    color: rgb(252, 238, 63);
+    font-weight: bold;
+    font-size: 1.5rem;
+    text-decoration: none;
+}
+
+.custom-navbar .navbar-brand:hover {
+    color: rgb(254, 249, 169); /* Slightly lighter color on hover */
+}
+
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -5,12 +56,7 @@ body {
     background-color: #f5f5f5;
 }
 
-header {
-    background-color: #4CAF50;
-    color: white;
-    padding: 15px;
-    text-align: center;
-}
+
 .container-grid {
     grid-template-columns: 1fr 3fr;
     display: grid;

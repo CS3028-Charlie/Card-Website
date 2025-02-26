@@ -3,10 +3,7 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
-app.use(cors({
-  origin: 'https://charlie-card-backend-fbbe5a6118ba.herokuapp.com', // Allow requests from frontend
-  credentials: true
-}));
+app.use(cors());
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public'))); // Adjust folder if needed

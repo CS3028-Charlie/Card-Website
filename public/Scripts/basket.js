@@ -9,7 +9,7 @@ function saveBasketToLocalStorage() {
 }
 
 function addToBasket(cardType, images, price, customizations = {}) {
-    const card = { type: cardType, images, price, customizations };
+    const card = { cardType, images, price, customizations };
     basket.push(card);
     saveBasketToLocalStorage();
     alert("Card added to basket!");
@@ -28,7 +28,7 @@ function displayBasket() {
     basket.forEach((item, index) => {
         const listItem = document.createElement("li");
         listItem.innerHTML = `
-            <img src="${item.images[0]}" alt="${item.type}" style="width: 50px; height: 50px;">
+            <img src="${item.images[0]}" alt="${item.cardType}" style="width: 50px; height: 50px;">
             <strong>Card Type:</strong> ${item.type} <br>
             <strong>Price:</strong> £${item.price} <br>
             <button class="btn btn-danger btn-sm" data-index="${index}">Remove</button>
@@ -78,12 +78,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const addToBasketBtn = document.getElementById('addToBasketBtn');
     if (addToBasketBtn) {
         addToBasketBtn.addEventListener('click', () => {
-            // Get the currently selected card type and its images from shop.js
             const selectedCardType = sessionStorage.getItem('selectedCardType');
-            const cardImages = getCurrentCardImages(); // You'll need to implement this function in shop.js
-
-            // Add item to basket
-            addToBasket(selectedCardType, cardImages, 200); 
+            const cardImages = getCurrentCardImages();  // Include the initilisation of this bit in shop.js
+            const priceDisplay2 = sessionStorage.getItem('priceRequired');
+            addToBasket(selectedCardType, cardImages, priceDisplay2 );
 
             // Update basket display
             displayBasket();
