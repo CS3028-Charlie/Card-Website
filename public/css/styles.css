@@ -54,6 +54,11 @@ body {
     width: auto;
 }
 
+.navbar-toggler img {
+    width: 30px;
+    height: auto;
+}
+
 /* Custom styles for the navbar */
 .custom-navbar {
     font-family: InterVariable;
@@ -84,59 +89,32 @@ body {
     text-decoration: none;
 }
 
-.featured-cards .row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-}
-.featured-cards .col-md-4 {
-    display: flex;
-    justify-content: center;
-}
-.featured-cards .card {
-    width: 100%; 
-    max-width: 320px; 
-    margin: 10px auto;
-}
-
-/* Fix hero banner to prevent scrolling */
-.hero-banner {
-    overflow: hidden;
-    padding: 20px;
-}
-.hero-banner .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-.hero-banner img {
-    width: 100%;
-    max-width: 500px; 
-    height: auto;
-}
-
-/* Fix navbar hamburger icon */
-.navbar-toggler {
-    border: none;
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    z-index: 1000;
-}
-.navbar-toggler-icon {
-    background-image: url('../Images/burger-bar-menu.png'); 
-    width: 30px;
-    height: 30px;
-    background-size: cover;
-}
-
 @media (max-width: 768px) {
-    .hero-banner .container {
-        flex-direction: column;
+    
+    body {
+        overflow-x: hidden;
     }
-    .featured-cards .card {
-        max-width: 280px; /* Slightly smaller cards on mobile */
+
+    .hero-banner {
+        flex-direction: column; /* Stack elements vertically */
+        text-align: center;
+        align-items: center;
+        padding: 20px; /* Add spacing around */
+    }
+
+    .hero-banner img {
+        width: 100%; 
+        height: auto;
+        margin-top: 10px; 
+    }
+
+    .card {
+        max-width: 90%; 
+        margin: 10px auto; 
+    }
+
+    .card img {
+        width: 100%; 
+        height: auto;
     }
 }
