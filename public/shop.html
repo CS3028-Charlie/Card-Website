@@ -64,6 +64,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    <p>Manage your account, view your balance, and access exclusive features.</p>
                     <!-- Login Form -->
                     <form id="loginForm" style="display: none;">
                         <div class="form-group">
@@ -105,8 +106,10 @@
                     <!-- User Account Section (after login) -->
                     <div id="userAccountSection" style="display: none;">
                         <h5>Welcome, <span id="usernameDisplay"></span>!</h5>
-                        <button type="button" class="btn btn-danger" id="signOutButton" onclick="handleSignOut()">Sign Out</button>
                     </div>
+                </div>
+                <div class="modal-footer" id="signOutFooter" style="display: none;">
+                    <button type="button" class="btn btn-danger" id="signOutButton" onclick="handleSignOut()">Sign Out</button>
                 </div>
             </div>
         </div>
