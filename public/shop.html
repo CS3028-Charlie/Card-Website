@@ -32,9 +32,9 @@
                 <li class="nav-item">
                     <a class="nav-link" href="shop.html"><i class="fas fa-store"></i> Shop</a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link" href="Card_Pay.html"><i class="fas fa-star"></i> Top Up</a>
-                </li>
+                </li> -->
                 <li class="nav-item">
                     <a class="nav-link" href="basket.html" id="viewBasketBtn">
                         <i class="fas fa-shopping-cart"></i> Basket
@@ -91,13 +91,21 @@
                             <label for="signupPassword">Password</label>
                             <input type="password" class="form-control" id="signupPassword" required>
                         </div>
+                        <div class="form-group">
+                            <label for="signupRole">Account Type</label>
+                            <select class="form-control" id="signupRole">
+                                <option value="parent">Parent</option>
+                                <option value="teacher">Teacher</option>
+                                <option value="pupil">Student</option>
+                            </select>
+                        </div>                        
                         <button type="button" class="btn btn-success" onclick="handleSignup()">Sign Up</button>
                     </form>
 
                     <!-- User Account Section (after login) -->
                     <div id="userAccountSection" style="display: none;">
                         <h5>Welcome, <span id="usernameDisplay"></span>!</h5>
-                        <button type="button" class="btn btn-danger" onclick="handleSignOut()">Sign Out</button>
+                        <button type="button" class="btn btn-danger" id="signOutButton" onclick="handleSignOut()">Sign Out</button>
                     </div>
                 </div>
             </div>

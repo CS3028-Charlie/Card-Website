@@ -83,3 +83,19 @@ body {
     font-size: 1.5rem;
     text-decoration: none;
 }
+
+.notifications-panel {
+    min-height: 376px; /* Adjust height as needed */
+    overflow-y: auto;
+    border: 1px solid #ddd; /* Add border to make it obvious */
+    padding: 10px;
+}
+
+.notifications-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.notifications-panel::-webkit-scrollbar-thumb {
+    background-color: #28a745; /* Customize scrollbar color */
+    border-radius: 4px;
+}
