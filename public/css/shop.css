@@ -1,8 +1,38 @@
+body {
+    background-color: #f0f8ff; /* Light blue background */
+}
+
 /* Enlarge card on hover */
+.card {
+    border-radius: 15px; /* Rounded corners */
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
 .card:hover {
-    transform: scale(1);
+    transform: scale(1.05); /* Slightly enlarge on hover */
     transition: transform 0.4s ease;
     opacity: 0.3;
+}
+
+.card-title {
+    font-size: 1.5rem; /* Larger font size */
+    color: #ff69b4; /* Bright pink color */
+}
+
+.card-text {
+    font-size: 1.2rem; /* Larger font size */
+    color: #4682b4; /* Steel blue color */
+}
+
+.btn-outline-success {
+    border-color: #ff69b4; /* Bright pink border */
+    color: #ff69b4; /* Bright pink text */
+}
+
+.btn-outline-success:hover {
+    background-color: #ff69b4; /* Bright pink background on hover */
+    color: #fff; /* White text on hover */
 }
 
 /* #canvas-container {
@@ -99,9 +129,10 @@ select {
     height: 600px;
     display: none; /* HIDDEN */
     margin: 20px auto;
-    border-radius: 8px;
-    background-color: #fff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 15px; /* Rounded corners */
+    background-color: #f0f8ff; /* Light blue background */
+    padding: 0px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     font-family: Arial, sans-serif;
   }
   
@@ -109,16 +140,17 @@ select {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
+    padding: 10px;
     border-bottom: 1px solid #ddd;
-    background-color: rgb(232, 70, 130); 
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
+    background-color: #ff69b4; /* Bright pink background */
+    color: #fff; /* White text */
+    border-top-left-radius: 15px; /* Rounded top corners */
+    border-top-right-radius: 15px; /* Rounded top corners */
   }
   
   .CardTitle {
     margin: 0;
-    font-size: 16px;
+    font-size: 2rem; /* Larger font size */
     color: #ffffff;
     font-weight: bold;
     text-align: center;
@@ -135,9 +167,10 @@ select {
   
   .CardBody {
     padding-bottom: 10px;
-    padding: 15px;
+    padding: 20px;
     font-size: 14px;
     color: #555;
+    text-align: center;
   }
   
   .CardButton {
@@ -149,7 +182,7 @@ select {
   .CardFooter {
     padding: 10px 20px;
     border-top: 1px solid #ddd;
-    background-color: #f8f9fa;
+    /* background-color: #f8f9fa; */
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
     margin-top: auto; /* Pushes the footer to the bottom */
