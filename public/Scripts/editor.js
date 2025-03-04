@@ -415,17 +415,31 @@ function redrawText(canvasId) {
                 offscreenCtx.stroke();
             }
         });
-        
-        // Copy to visible canvas
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(offscreenCanvas, 0, 0);
+
+        // Draw watermark
+        const watermark = new Image();
+        watermark.src = 'Images/watermark.png';
+        watermark.onload = function() {
+            const watermarkScale = Math.min(
+                canvas.width / watermark.width,
+                canvas.height / watermark.height
+            );
+            const watermarkX = (canvas.width - watermark.width * watermarkScale) / 2;
+            const watermarkY = (canvas.height - watermark.height * watermarkScale) / 2;
+            offscreenCtx.globalAlpha = 0.5; // Set transparency
+            offscreenCtx.drawImage(watermark, watermarkX, watermarkY, watermark.width * watermarkScale, watermark.height * watermarkScale);
+            offscreenCtx.globalAlpha = 1.0; // Reset transparency
+
+            // Copy to visible canvas
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(offscreenCanvas, 0, 0);
+        };
     };
 }
 
 // Show text box around selected text
 function showTextBox(canvasId) {
-    // Extract the correct canvas type that matches our DOM IDs
     const canvasType = canvasId.includes('inner-') ? 
         canvasId.replace('-canvas', '') : 
         canvasId.split('-')[0];
@@ -434,7 +448,6 @@ function showTextBox(canvasId) {
     
     console.log('Showing text box for:', canvasType, 'index:', textIndex);
     
-    // Get DOM elements using correct IDs
     const textBoxId = `${canvasType}-text-box`;
     const cursorId = `${canvasType}-cursor`;
     
@@ -446,36 +459,28 @@ function showTextBox(canvasId) {
         return;
     }
     
-    // Get the text array for this canvas type
-    if (!currentCardData.activeTexts[canvasType]) {
-        currentCardData.activeTexts[canvasType] = [];
-        return;
-    }
+    const texts = currentCardData.activeTexts[canvasType] || [];
     
-    if (textIndex === -1 || !currentCardData.activeTexts[canvasType][textIndex]) {
+    if (textIndex === -1 || !texts[textIndex]) {
         textBox.style.display = 'none';
         cursor.style.display = 'none';
         return;
     }
     
-    const text = currentCardData.activeTexts[canvasType][textIndex];
+    const text = texts[textIndex];
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext('2d');
     
-    // Measure text dimensions
     ctx.font = `${text.fontStyle} ${text.fontWeight} ${text.fontSize}px ${text.fontFamily}`;
     const textMetrics = ctx.measureText(text.text);
     const textWidth = textMetrics.width;
     const textHeight = parseInt(text.fontSize);
     
-    // Calculate position relative to canvas
     const canvasRect = canvas.getBoundingClientRect();
     const scale = canvas.width / canvasRect.width;
     
-    // Position the text box
     textBox.style.display = 'block';
     
-    // Calculate exact positions
     const textBoxLeft = canvasRect.left + (text.x / scale) - (textWidth / 2);
     const textBoxTop = canvasRect.top + (text.y / scale) - textHeight + 3;
     
@@ -484,7 +489,6 @@ function showTextBox(canvasId) {
     textBox.style.width = `${textWidth}px`;
     textBox.style.height = `${textHeight}px`;
     
-    // Position cursor
     cursor.style.display = 'block';
     cursor.style.left = `${textBoxLeft + textWidth}px`;
     cursor.style.top = `${textBoxTop}px`;
@@ -494,7 +498,6 @@ function showTextBox(canvasId) {
 // Handle canvas click for text selection
 function handleCanvasClick(e, canvasId) {
     const canvas = document.getElementById(canvasId);
-    // Fix canvas type detection for inner pages
     const canvasType = canvasId.includes('inner-') ? 
         canvasId.replace('-canvas', '') : 
         canvasId.split('-')[0];
@@ -696,5 +699,17 @@ document.addEventListener('keydown', (e) => {
         }
         redrawText(`${currentCardData.activeCanvas}-canvas`);
         showTextBox(`${currentCardData.activeCanvas}-canvas`);
+    }
+});
+
+// Add event listener to deselect text when clicking outside
+document.addEventListener('click', (e) => {
+    const canvasIds = ['front-canvas', 'inner-left-canvas', 'inner-right-canvas', 'back-canvas'];
+    const clickedInsideCanvas = canvasIds.some(id => document.getElementById(id).contains(e.target));
+    
+    if (!clickedInsideCanvas) {
+        currentCardData.activeTextIndex = -1;
+        textBoxIds.forEach(id => document.getElementById(id).style.display = 'none');
+        cursorIds.forEach(id => document.getElementById(id).style.display = 'none');
     }
 });
