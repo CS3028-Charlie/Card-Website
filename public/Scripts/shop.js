@@ -1,9 +1,38 @@
 // PULL IMAGES AND GEN CARDS
-const numCards = 4; // Number of cards you want to generate
 let sharedBackdrop = null;
 let cardPreview = null;
 let personalisePreview = null;
-window.onload = generateCards;
+
+// Replace the hardcoded numCards with dynamic fetching
+async function getNumberOfCards() {
+    try {
+        const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
+        const response = await fetch(`${API_URL}/assets/templates/count`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch card count');
+        }
+        const data = await response.json();
+        return data.count;
+    } catch (error) {
+        console.error('Error fetching card count:', error);
+        return 0;
+    }
+}
+
+// Modify window.onload to be async
+window.onload = async function() {
+    try {
+        const numCards = await getNumberOfCards();
+        if (numCards > 0) {
+            generateCards(numCards);
+        } else {
+            const row = document.querySelector('.row');
+            row.innerHTML = '<div class="col-12 text-center"><p>No cards available at the moment.</p></div>';
+        }
+    } catch (error) {
+        console.error('Error initializing cards:', error);
+    }
+};
 
 // HELPER FUNCTIONS
 function closeAllPreviews() {
@@ -59,17 +88,12 @@ function pullTemplateImages(numCards) {
     const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
     const positions = ["Front", "Inner-Left", "Inner-Right", "Back"];
     let cards = [];
-    const targetBackImage = "Images/background.png";
 
     for (let i = 0; i < numCards; i++) {
         let images = [];
         const folderIndex = `card-${i + 1}`;
         positions.forEach(position => {
-            if (position === "Back") {
-                images.push(targetBackImage);
-            } else {
             images.push(`${API_URL}/assets/templates/${folderIndex}/${position}.png`);
-            }
         });
 
         cards.push(images); // Each card contains an array of images for each position
@@ -78,32 +102,89 @@ function pullTemplateImages(numCards) {
     return cards;
 }
 
+// Function to standardize image size
+function standardizeImage(imageUrl) {
+    return new Promise((resolve, reject) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 567;
+        canvas.height = 794;
+        const ctx = canvas.getContext('2d');
+
+        const img = new Image();
+        img.crossOrigin = "anonymous"; // Add this line for CORS
+        img.onload = () => {
+            try {
+                // Fill white background
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Calculate scale to fill entire canvas
+                const scale = Math.max(
+                    canvas.width / img.width,
+                    canvas.height / img.height
+                );
+                
+                // Calculate position to center the scaled image
+                const scaledWidth = img.width * scale;
+                const scaledHeight = img.height * scale;
+                const x = (canvas.width - scaledWidth) / 2;
+                const y = (canvas.height - scaledHeight) / 2;
+                
+                // Draw image to exactly fill canvas
+                ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+                
+                // Try to get data URL with error handling
+                try {
+                    const dataUrl = canvas.toDataURL('image/png');
+                    resolve(dataUrl);
+                } catch (error) {
+                    console.error('Error converting to data URL:', error);
+                    // Fall back to original image if conversion fails
+                    resolve(imageUrl);
+                }
+            } catch (error) {
+                console.error('Error drawing image:', error);
+                resolve(imageUrl);
+            }
+        };
+        img.onerror = () => {
+            console.error('Error loading image:', imageUrl);
+            resolve(imageUrl); // Fall back to original image
+        };
+        img.src = imageUrl;
+    });
+}
+
 // Function to generate cards
-function generateCards() {
+async function generateCards(numCards) {
     const row = document.querySelector('.row');
+    row.innerHTML = ''; // Clear existing content
     const allCardsImages = pullTemplateImages(numCards);
 
-    allCardsImages.forEach((cardImages, index) => {
+    for (let index = 0; index < allCardsImages.length; index++) {
+        const cardImages = allCardsImages[index];
         const col = document.createElement('div');
-        col.className = 'col-md-3 col-sm-6';
+        col.className = 'col-md-3 col-sm-6 mb-4';
 
+        // Load the first image directly without standardization
         col.innerHTML = `
             <div class="card mb-4">
-                <img src="${cardImages[0]}" class="card-img-top" alt="Card ${index + 1} Image">
+                <div class="card-img-container" style="height: 300px; overflow: hidden;">
+                    <img src="${cardImages[0]}" 
+                         class="card-img-top" 
+                         alt="Card ${index + 1} Image"
+                         style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
                 <div class="card-body text-center">
-                    <h5 class="card-title">Card ${index + 1}</h5>
+                    <button class="btn btn-success view-btn">View</button>
                 </div>
             </div>
         `;
 
-        const viewButton = document.createElement('button');
-        viewButton.className = 'btn btn-success';
-        viewButton.textContent = 'View';
+        const viewButton = col.querySelector('.view-btn');
         viewButton.onclick = () => openCardModal(index, cardImages);
-
-        col.querySelector('.card-body').appendChild(viewButton);
         row.appendChild(col);
-    });
+    }
 }
 
 // Function to open the card modal
@@ -268,7 +349,7 @@ function selectCardType(cardType, images) {
 */
 
 // Function to dynamically load carousel images
-function loadCarouselImages(images) {
+async function loadCarouselImages(images) {
     const carouselImages = document.getElementById('carouselImages');
     const carouselIndicators = document.getElementById('carouselIndicators');
 
@@ -276,21 +357,22 @@ function loadCarouselImages(images) {
     carouselImages.innerHTML = '';
     carouselIndicators.innerHTML = '';
 
-    // Add images to carousel
-    images.forEach((image, index) => {
+    images.forEach((imageUrl, index) => {
         const carouselItem = document.createElement('div');
         carouselItem.classList.add('carousel-item');
-        if (index === 0) carouselItem.classList.add('active'); // First item active
+        if (index === 0) carouselItem.classList.add('active');
 
         const imgElement = document.createElement('img');
-        imgElement.src = image;
+        imgElement.src = imageUrl;
         imgElement.alt = `Carousel Image ${index + 1}`;
-        imgElement.classList.add('d-block', 'w-50', 'mx-auto'); // Use w-100 for full width
+        imgElement.classList.add('d-block', 'mx-auto');
+        imgElement.style.maxHeight = '500px';
+        imgElement.style.width = 'auto';
+        imgElement.style.objectFit = 'contain';
 
         carouselItem.appendChild(imgElement);
         carouselImages.appendChild(carouselItem);
 
-        // Create carousel indicator
         const indicator = document.createElement('li');
         indicator.setAttribute('data-target', '#cardCarousel');
         indicator.setAttribute('data-slide-to', index);

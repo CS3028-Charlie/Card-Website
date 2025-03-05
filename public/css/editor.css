@@ -66,35 +66,38 @@ canvas {
     margin-right: 5px;
 }
 
-/* Color selection buttons */
+/* Color selection buttons - Base styles */
 .circle-btn {
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    border: none;
+    border: 3px solid transparent;
     cursor: pointer;
     margin: 5px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
 }
 
-.red {
-    background-color: red;
+/* White button style - Higher specificity to maintain black border */
+.circle-btn:not(.selected) {
+    border: 2px solid #000 !important;
 }
 
-.blue {
-    background-color: blue;
+/* Selected state - Highest priority for selected state */
+.circle-btn.selected {
+    border: 3px solid rgb(232, 70, 130) !important;
+    transform: scale(1.1);
 }
 
-.green {
-    background-color: green;
-}
+/* Color-specific backgrounds */
+.circle-btn.red { background-color: red; }
+.circle-btn.blue { background-color: blue; }
+.circle-btn.green { background-color: green; }
+.circle-btn.black { background-color: black; }
+.circle-btn.white { background-color: white; }
 
-.white {
-    background-color: white;
-    border: 1px solid #ccc;
-}
-
-.black {
-    background-color: black;
+.circle-btn:hover {
+    transform: scale(1.1);
 }
 
 /* Tab styling */
@@ -125,5 +128,57 @@ canvas {
 
 .selected {
     color: white;
-    background-color: green;
+}
+
+.btn-outline-success.selected {
+    background-color: rgb(57, 181, 82);
+    color: white;
+}
+
+/* 3D Preview Modal */
+#3DPreviewContainer {
+    width: 100%;
+    height: 500px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Add these new styles */
+.sticker-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f8f9fa;
+}
+
+.sticker-option {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    cursor: move;
+    transition: transform 0.2s;
+}
+
+.sticker-option:hover {
+    transform: scale(1.1);
+}
+
+.placed-sticker {
+    position: absolute;
+    cursor: move;
+    user-select: none;
+}
+
+@font-face {
+    font-family: 'Pacifico';
+    src: url('../fonts/Pacifico-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'Montserrat-Regular';
+    src: url('../fonts/Montserrat-Regular.ttf');
 }

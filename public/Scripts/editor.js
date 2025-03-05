@@ -18,7 +18,13 @@ let currentCardData = {
     fontColor: 'black',
     fontStyle: 'normal',
     fontWeight: 'normal',
-    textDecoration: 'none'
+    textDecoration: 'none',
+    stickers: {
+        'front': [],
+        'inner-left': [],
+        'inner-right': [],
+        'back': []
+    }
 };
 
 // DOM Elements
@@ -32,6 +38,7 @@ window.onload = function() {
     setupCanvases();
     setupEventListeners();
     updateCardTypeView();
+    initializeStickerDragAndDrop();
 };
 
 // Load card data from URL parameters or sessionStorage
@@ -71,59 +78,83 @@ function loadCardData() {
 function loadCardImages(cardIndex) {
     const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
     const positions = ["Front", "Inner-Left", "Inner-Right", "Back"];
-    const targetBackImage = "Images/background.png";
     const folderIndex = `card-${cardIndex + 1}`;
     
-    const images = [];
-    
-    positions.forEach(position => {
-        if (position === "Back") {
-            images.push(targetBackImage);
-        } else {
-            images.push(`${API_URL}/assets/templates/${folderIndex}/${position}.png`);
-        }
-    });
+    const images = positions.map(position => 
+        `${API_URL}/assets/templates/${folderIndex}/${position}.png`
+    );
     
     currentCardData.images = images;
+    
+    // Set canvas dimensions to 567x794
+    canvasIds.forEach(canvasId => {
+        const canvas = document.getElementById(canvasId);
+        if (canvas) {
+            canvas.width = 567;
+            canvas.height = 794;
+        }
+    });
     
     // Start loading images into canvases
     loadImagesIntoCanvases();
 }
 
-// Load images into canvases
-function loadImagesIntoCanvases() {
-    canvasIds.forEach((canvasId, index) => {
-        if (index < currentCardData.images.length) {
+// Modify loadImagesIntoCanvases to store the standardized images
+async function loadImagesIntoCanvases() {
+    for (let i = 0; i < canvasIds.length; i++) {
+        const canvasId = canvasIds[i];
+        if (i < currentCardData.images.length) {
             const canvas = document.getElementById(canvasId);
+            canvas.width = 567;
+            canvas.height = 794;
             const ctx = canvas.getContext('2d');
             
-            // Store canvas and context references
             currentCardData.canvases[canvasId] = canvas;
             currentCardData.contexts[canvasId] = ctx;
             
-            // Load the image
-            const img = new Image();
-            img.onload = function() {
-                // Clear canvas
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                // Draw image centered and scaled to fit canvas
-                const scale = Math.min(
-                    canvas.width / img.width,
-                    canvas.height / img.height
-                );
-                
-                const x = (canvas.width - img.width * scale) / 2;
-                const y = (canvas.height - img.height * scale) / 2;
-                
-                ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
-                
-                // Redraw any existing text
-                redrawText(canvasId);
-            };
-            img.src = currentCardData.images[index];
+            try {
+                const img = new Image();
+                img.onload = () => {
+                    // Clear canvas
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Fill white background first
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Calculate scale to fill entire canvas
+                    const scale = Math.max(
+                        canvas.width / img.width,
+                        canvas.height / img.height
+                    );
+                    
+                    // Calculate position to center the scaled image
+                    const scaledWidth = img.width * scale;
+                    const scaledHeight = img.height * scale;
+                    const x = (canvas.width - scaledWidth) / 2;
+                    const y = (canvas.height - scaledHeight) / 2;
+                    
+                    // Draw image to exactly fill canvas
+                    ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+
+                    // Store the scaling info with the image
+                    currentCardData.images[i] = {
+                        src: img.src,
+                        scale: scale,
+                        x: x,
+                        y: y,
+                        width: scaledWidth,
+                        height: scaledHeight
+                    };
+                    
+                    redrawText(canvasId);
+                };
+                img.src = currentCardData.images[i];
+            } catch (error) {
+                console.error(`Error loading image for ${canvasId}:`, error);
+            }
         }
-    });
+    }
 }
 
 // Set up canvases
@@ -296,6 +327,8 @@ function setActiveCanvas(canvasType) {
     });
 }
 
+
+
 // Add text to the active canvas
 function addTextToActiveCanvas() {
     const activeCanvas = currentCardData.activeCanvas;
@@ -355,21 +388,14 @@ function deleteSelectedText() {
     }
 }
 
-// Redraw text on canvas
+// Update redrawText to use stored image dimensions
 function redrawText(canvasId) {
     const canvas = document.getElementById(canvasId);
-    if (!canvas) {
-        console.error('Canvas not found for redraw:', canvasId);
-        return;
-    }
+    if (!canvas) return;
     
-    // Fix canvas type detection
-    let canvasType = canvasId.includes('inner-') ? 
+    const canvasType = canvasId.includes('inner-') ? 
         canvasId.replace('-canvas', '') : 
         canvasId.split('-')[0];
-    
-    console.log('Redrawing canvas type:', canvasType);
-    console.log('Active texts for canvas:', currentCardData.activeTexts[canvasType]);
     
     // Create an off-screen canvas for double buffering
     const offscreenCanvas = document.createElement('canvas');
@@ -377,65 +403,100 @@ function redrawText(canvasId) {
     offscreenCanvas.height = canvas.height;
     const offscreenCtx = offscreenCanvas.getContext('2d');
     
-    // Get the texts for this canvas
-    const texts = currentCardData.activeTexts[canvasType] || [];
+    // Get image data from stored array
+    const imageData = currentCardData.images[canvasIds.indexOf(canvasId)];
     
-    // Draw background image
-    const img = new Image();
-    img.src = currentCardData.images[canvasIds.indexOf(canvasId)];
-    
-    img.onload = function() {
-        // Draw to offscreen canvas first
-        const scale = Math.min(
-            canvas.width / img.width,
-            canvas.height / img.height
-        );
-        
-        const x = (canvas.width - img.width * scale) / 2;
-        const y = (canvas.height - img.height * scale) / 2;
-        
-        offscreenCtx.drawImage(img, x, y, img.width * scale, img.height * scale);
-        
-        // Draw all texts
-        texts.forEach(text => {
-            offscreenCtx.font = `${text.fontStyle} ${text.fontWeight} ${text.fontSize}px ${text.fontFamily}`;
-            offscreenCtx.fillStyle = text.color;
-            offscreenCtx.textAlign = 'center';
+    if (imageData) {
+        const img = new Image();
+        img.onload = function() {
+            // Fill white background
+            offscreenCtx.fillStyle = '#ffffff';
+            offscreenCtx.fillRect(0, 0, canvas.width, canvas.height);
             
-            console.log('Drawing text:', text.text, 'at:', text.x, text.y);
-            offscreenCtx.fillText(text.text, text.x, text.y);
+            // Draw using stored dimensions
+            offscreenCtx.drawImage(img, imageData.x, imageData.y, imageData.width, imageData.height);
             
-            if (text.textDecoration === 'underline') {
-                const textWidth = offscreenCtx.measureText(text.text).width;
-                offscreenCtx.beginPath();
-                offscreenCtx.moveTo(text.x - textWidth / 2, text.y + 5);
-                offscreenCtx.lineTo(text.x + textWidth / 2, text.y + 5);
-                offscreenCtx.strokeStyle = text.color;
-                offscreenCtx.lineWidth = 1;
-                offscreenCtx.stroke();
-            }
-        });
-
-        // Draw watermark
-        const watermark = new Image();
-        watermark.src = 'Images/watermark.png';
-        watermark.onload = function() {
-            const watermarkScale = Math.min(
-                canvas.width / watermark.width,
-                canvas.height / watermark.height
-            );
-            const watermarkX = (canvas.width - watermark.width * watermarkScale) / 2;
-            const watermarkY = (canvas.height - watermark.height * watermarkScale) / 2;
-            offscreenCtx.globalAlpha = 0.5; // Set transparency
-            offscreenCtx.drawImage(watermark, watermarkX, watermarkY, watermark.width * watermarkScale, watermark.height * watermarkScale);
-            offscreenCtx.globalAlpha = 1.0; // Reset transparency
+            // Draw all texts
+            const texts = currentCardData.activeTexts[canvasType] || [];
+            texts.forEach(text => {
+                offscreenCtx.font = `${text.fontStyle} ${text.fontWeight} ${text.fontSize}px ${text.fontFamily}`;
+                offscreenCtx.fillStyle = text.color;
+                offscreenCtx.textAlign = 'center';
+                offscreenCtx.fillText(text.text, text.x, text.y);
+                
+                if (text.textDecoration === 'underline') {
+                    const textWidth = offscreenCtx.measureText(text.text).width;
+                    offscreenCtx.beginPath();
+                    offscreenCtx.moveTo(text.x - textWidth / 2, text.y + 5);
+                    offscreenCtx.lineTo(text.x + textWidth / 2, text.y + 5);
+                    offscreenCtx.strokeStyle = text.color;
+                    offscreenCtx.lineWidth = 1;
+                    offscreenCtx.stroke();
+                }
+            });
 
             // Copy to visible canvas
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(offscreenCanvas, 0, 0);
+
+            // Handle stickers
+            const existingStickers = canvas.parentElement.querySelectorAll('.placed-sticker');
+            const currentStickers = currentCardData.stickers[canvasType] || [];
+            
+            // Remove only stickers that aren't in currentCardData
+            existingStickers.forEach(sticker => {
+                const stickerData = currentStickers.find(s => 
+                    s.src === sticker.src && 
+                    s.x === parseInt(sticker.style.left) && 
+                    s.y === parseInt(sticker.style.top)
+                );
+                if (!stickerData) {
+                    sticker.remove();
+                }
+            });
+            
+            // Add any missing stickers
+            currentStickers.forEach(stickerData => {
+                const exists = Array.from(existingStickers).some(sticker => 
+                    sticker.src === stickerData.src && 
+                    parseInt(sticker.style.left) === stickerData.x && 
+                    parseInt(sticker.style.top) === stickerData.y
+                );
+                
+                if (!exists) {
+                    const sticker = document.createElement('img');
+                    sticker.src = stickerData.src;
+                    sticker.classList.add('placed-sticker');
+                    sticker.style.left = `${stickerData.x}px`;
+                    sticker.style.top = `${stickerData.y}px`;
+                    sticker.style.width = `${stickerData.width}px`;
+                    sticker.style.height = `${stickerData.height}px`;
+                    makeStickerDraggable(sticker);
+                    canvas.parentElement.appendChild(sticker);
+                }
+            });
+
+            // Draw watermark last
+            const watermark = new Image();
+            watermark.src = 'Images/watermark.png';
+            watermark.onload = function() {
+                const watermarkScale = Math.min(
+                    canvas.width / watermark.width,
+                    canvas.height / watermark.height
+                );
+                const watermarkX = (canvas.width - watermark.width * watermarkScale) / 2;
+                const watermarkY = (canvas.height - watermark.height * watermarkScale) / 2;
+                offscreenCtx.globalAlpha = 0.5;
+                offscreenCtx.drawImage(watermark, watermarkX, watermarkY, watermark.width * watermarkScale, watermark.height * watermarkScale);
+                offscreenCtx.globalAlpha = 1.0;
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(offscreenCanvas, 0, 0);
+            };
         };
-    };
+        img.src = imageData.src;
+    }
 }
 
 // Show text box around selected text
@@ -502,20 +563,16 @@ function handleCanvasClick(e, canvasId) {
         canvasId.replace('-canvas', '') : 
         canvasId.split('-')[0];
     
-    console.log('Handling click for canvas type:', canvasType);
-    
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
     
-    // Check if click is on a text
     const texts = currentCardData.activeTexts[canvasType] || [];
-    console.log('Active texts for this canvas:', texts);
-    
     let clickedTextIndex = -1;
     
+    // Check if click is on any text
     for (let i = texts.length - 1; i >= 0; i--) {
         const text = texts[i];
         const ctx = canvas.getContext('2d');
@@ -532,137 +589,168 @@ function handleCanvasClick(e, canvasId) {
         }
     }
     
-    // Update selection
     currentCardData.activeTextIndex = clickedTextIndex;
     currentCardData.activeCanvas = canvasType;
-    
-    console.log('Selected text index:', clickedTextIndex);
-    console.log('Active canvas:', currentCardData.activeCanvas);
     
     if (clickedTextIndex !== -1) {
         const selectedText = texts[clickedTextIndex];
         selectedText.dragStartX = x - selectedText.x;
         selectedText.dragStartY = y - selectedText.y;
         
+        // Update UI to match selected text properties
+        updateUIFromText(selectedText);
+        
         canvas.addEventListener('mousedown', startDragging);
         showTextBox(canvasId);
     } else {
-        // Hide text box and cursor
-        const textBox = document.getElementById(`${canvasType}-text-box`);
-        const cursor = document.getElementById(`${canvasType}-cursor`);
-        
-        if (textBox) textBox.style.display = 'none';
-        if (cursor) cursor.style.display = 'none';
+        hideTextBox(canvasType);
     }
+}
+
+// Add helper function to hide text box
+function hideTextBox(canvasType) {
+    const textBox = document.getElementById(`${canvasType}-text-box`);
+    const cursor = document.getElementById(`${canvasType}-cursor`);
+    
+    if (textBox) textBox.style.display = 'none';
+    if (cursor) cursor.style.display = 'none';
 }
 
 // Start dragging
 function startDragging(e) {
     const canvas = e.target;
+    const canvasType = currentCardData.activeCanvas;
+    const textIndex = currentCardData.activeTextIndex;
+    let isDragging = false;
+    let initialX, initialY;
     
-    // Only proceed if we have a text selected
-    if (currentCardData.activeTextIndex === -1) return;
-    
-    function dragMove(e) {
+    function handleMouseDown(e) {
+        isDragging = true;
+        const text = currentCardData.activeTexts[canvasType][textIndex];
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
         
-        const x = (e.clientX - rect.left) * scaleX;
-        const y = (e.clientY - rect.top) * scaleY;
+        initialX = e.clientX - (text.x / scaleX);
+        initialY = e.clientY - (text.y / scaleY);
+    }
+    
+    function handleMouseMove(e) {
+        if (!isDragging) return;
+        e.preventDefault();
         
-        const text = currentCardData.activeTexts[currentCardData.activeCanvas][currentCardData.activeTextIndex];
-        text.x = x - text.dragStartX;
-        text.y = y - text.dragStartY;
+        const text = currentCardData.activeTexts[canvasType][textIndex];
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        
+        // Calculate new position with bounds checking
+        const newX = Math.max(50, Math.min(canvas.width - 50, (e.clientX - initialX) * scaleX));
+        const newY = Math.max(50, Math.min(canvas.height - 50, (e.clientY - initialY) * scaleY));
+        
+        text.x = newX;
+        text.y = newY;
         
         redrawText(canvas.id);
         showTextBox(canvas.id);
     }
     
-    function dragEnd() {
-        document.removeEventListener('mousemove', dragMove);
-        document.removeEventListener('mouseup', dragEnd);
+    function handleMouseUp() {
+        isDragging = false;
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
     }
     
-    document.addEventListener('mousemove', dragMove);
-    document.addEventListener('mouseup', dragEnd);
+    handleMouseDown(e);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
 }
 
 // Toggle bold text
 function toggleBold() {
     currentCardData.fontWeight = currentCardData.fontWeight === 'bold' ? 'normal' : 'bold';
-    if (currentCardData.activeTextIndex !== -1) {
-        const text = currentCardData.activeTexts[currentCardData.activeCanvas][currentCardData.activeTextIndex];
+    updateTextStyle(text => {
         text.fontWeight = currentCardData.fontWeight;
-        redrawText(`${currentCardData.activeCanvas}-canvas`);
-        showTextBox(`${currentCardData.activeCanvas}-canvas`);
-    }
+    });
 }
 
 // Toggle italic text
 function toggleItalic() {
     currentCardData.fontStyle = currentCardData.fontStyle === 'italic' ? 'normal' : 'italic';
-    if (currentCardData.activeTextIndex !== -1) {
-        const text = currentCardData.activeTexts[currentCardData.activeCanvas][currentCardData.activeTextIndex];
+    updateTextStyle(text => {
         text.fontStyle = currentCardData.fontStyle;
-        redrawText(`${currentCardData.activeCanvas}-canvas`);
-        showTextBox(`${currentCardData.activeCanvas}-canvas`);
-    }
+    });
 }
 
 // Toggle underline text
 function toggleUnderline() {
     currentCardData.textDecoration = currentCardData.textDecoration === 'underline' ? 'none' : 'underline';
-    if (currentCardData.activeTextIndex !== -1) {
-        const text = currentCardData.activeTexts[currentCardData.activeCanvas][currentCardData.activeTextIndex];
+    updateTextStyle(text => {
         text.textDecoration = currentCardData.textDecoration;
-        redrawText(`${currentCardData.activeCanvas}-canvas`);
-        showTextBox(`${currentCardData.activeCanvas}-canvas`);
-    }
+    });
 }
 
 // Increase font size
 function increaseFontSize() {
     currentCardData.fontSize += 5;
-    if (currentCardData.activeTextIndex !== -1) {
-        const text = currentCardData.activeTexts[currentCardData.activeCanvas][currentCardData.activeTextIndex];
+    updateTextStyle(text => {
         text.fontSize = currentCardData.fontSize;
-        redrawText(`${currentCardData.activeCanvas}-canvas`);
-        showTextBox(`${currentCardData.activeCanvas}-canvas`);
-    }
+    });
 }
 
 // Decrease font size
 function decreaseFontSize() {
     currentCardData.fontSize = Math.max(5, currentCardData.fontSize - 5);
-    if (currentCardData.activeTextIndex !== -1) {
-        const text = currentCardData.activeTexts[currentCardData.activeCanvas][currentCardData.activeTextIndex];
+    updateTextStyle(text => {
         text.fontSize = currentCardData.fontSize;
-        redrawText(`${currentCardData.activeCanvas}-canvas`);
-        showTextBox(`${currentCardData.activeCanvas}-canvas`);
-    }
+    });
 }
 
 // Change font style
 function changeFontStyle(e) {
     currentCardData.fontFamily = e.target.value;
-    if (currentCardData.activeTextIndex !== -1) {
-        const text = currentCardData.activeTexts[currentCardData.activeCanvas][currentCardData.activeTextIndex];
+    updateTextStyle(text => {
         text.fontFamily = currentCardData.fontFamily;
-        redrawText(`${currentCardData.activeCanvas}-canvas`);
-        showTextBox(`${currentCardData.activeCanvas}-canvas`);
-    }
+    });
 }
 
 // Set text color
 function setTextColor(color) {
     currentCardData.fontColor = color;
+    updateTextStyle(text => {
+        text.color = currentCardData.fontColor;
+    });
+}
+
+function updateTextStyle(updateFn) {
     if (currentCardData.activeTextIndex !== -1) {
         const text = currentCardData.activeTexts[currentCardData.activeCanvas][currentCardData.activeTextIndex];
-        text.color = currentCardData.fontColor;
-        redrawText(`${currentCardData.activeCanvas}-canvas`);
-        showTextBox(`${currentCardData.activeCanvas}-canvas`);
+        updateFn(text);
+        
+        const canvasId = `${currentCardData.activeCanvas}-canvas`;
+        redrawText(canvasId);
     }
+}
+
+// Update redrawCanvas to maintain selection
+function redrawCanvas(canvasId) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    
+    // ... existing drawing code ...
+    
+    // Always show text box if there's an active selection
+    if (currentCardData.activeTextIndex !== -1 && 
+        canvasId === `${currentCardData.activeCanvas}-canvas`) {
+        showTextBox(canvasId);
+    }
+}
+
+function maintainTextSelection() {
+    const textBox = document.getElementById(`${currentCardData.activeCanvas}-text-box`);
+    const cursor = document.getElementById(`${currentCardData.activeCanvas}-cursor`);
+    if (textBox) textBox.style.display = 'block';
+    if (cursor) cursor.style.display = 'block';
 }
 
 // Save customization
@@ -713,3 +801,214 @@ document.addEventListener('click', (e) => {
         cursorIds.forEach(id => document.getElementById(id).style.display = 'none');
     }
 });
+
+// Add these new functions
+function initializeStickerDragAndDrop() {
+    const stickerOptions = document.querySelectorAll('.sticker-option');
+    const canvasContainers = document.querySelectorAll('.canvas-container');
+
+    stickerOptions.forEach(sticker => {
+        sticker.addEventListener('dragstart', handleStickerDragStart);
+    });
+
+    canvasContainers.forEach(container => {
+        container.addEventListener('dragover', handleStickerDragOver);
+        container.addEventListener('drop', handleStickerDrop);
+    });
+}
+
+function handleStickerDragStart(e) {
+    e.dataTransfer.setData('text/plain', e.target.src);
+}
+
+function handleStickerDragOver(e) {
+    e.preventDefault();
+}
+
+// Update handleStickerDrop to maintain aspect ratio
+function handleStickerDrop(e) {
+    e.preventDefault();
+    const container = e.currentTarget;
+    const stickerSrc = e.dataTransfer.getData('text/plain');
+    const canvasId = container.querySelector('canvas').id;
+    const canvasType = canvasId.replace('-canvas', '');
+
+    // Calculate position relative to canvas container
+    const rect = container.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    // Create and load sticker image
+    const tempImg = new Image();
+    tempImg.onload = () => {
+        const aspectRatio = tempImg.width / tempImg.height;
+        const baseSize = 200; // Base size in pixels
+        
+        const sticker = document.createElement('img');
+        sticker.src = stickerSrc;
+        sticker.classList.add('placed-sticker');
+        
+        // Set size maintaining aspect ratio
+        if (aspectRatio > 1) {
+            sticker.style.width = `${baseSize}px`;
+            sticker.style.height = `${baseSize / aspectRatio}px`;
+        } else {
+            sticker.style.height = `${baseSize}px`;
+            sticker.style.width = `${baseSize * aspectRatio}px`;
+        }
+        
+        // Center sticker on drop position
+        const stickerWidth = aspectRatio > 1 ? baseSize : baseSize * aspectRatio;
+        const stickerHeight = aspectRatio > 1 ? baseSize / aspectRatio : baseSize;
+        sticker.style.left = `${x - stickerWidth/2}px`;
+        sticker.style.top = `${y - stickerHeight/2}px`;
+        
+        makeStickerDraggable(sticker);
+        container.appendChild(sticker);
+        
+        // Save sticker data
+        currentCardData.stickers[canvasType].push({
+            src: stickerSrc,
+            x: x - stickerWidth/2,
+            y: y - stickerHeight/2,
+            width: stickerWidth,
+            height: stickerHeight
+        });
+    };
+    tempImg.src = stickerSrc;
+}
+
+function makeStickerDraggable(sticker) {
+    let isDragging = false;
+    let initialX;
+    let initialY;
+
+    function handleMouseDown(e) {
+        isDragging = true;
+        initialX = e.clientX - sticker.offsetLeft;
+        initialY = e.clientY - sticker.offsetTop;
+        sticker.classList.add('dragging');
+    }
+
+    function handleMouseMove(e) {
+        if (!isDragging) return;
+        e.preventDefault();
+        
+        const currentX = e.clientX - initialX;
+        const currentY = e.clientY - initialY;
+        
+        const container = sticker.parentElement;
+        const containerRect = container.getBoundingClientRect();
+        
+        // Check if sticker is outside container bounds
+        if (currentX < -25 || currentY < -25 || 
+            currentX > containerRect.width - 25 || 
+            currentY > containerRect.height - 25) {
+            // Remove sticker if dragged outside
+            removeSticker(sticker);
+            return;
+        }
+        
+        // Constrain movement within container
+        const boundedX = Math.max(0, Math.min(currentX, containerRect.width - sticker.offsetWidth));
+        const boundedY = Math.max(0, Math.min(currentY, containerRect.height - sticker.offsetHeight));
+        
+        sticker.style.left = `${boundedX}px`;
+        sticker.style.top = `${boundedY}px`;
+    }
+
+    function removeSticker(sticker) {
+        const container = sticker.parentElement;
+        const canvasType = container.querySelector('canvas').id.replace('-canvas', '');
+        const stickerIndex = Array.from(container.querySelectorAll('.placed-sticker')).indexOf(sticker);
+        
+        // Remove from currentCardData
+        if (stickerIndex !== -1) {
+            currentCardData.stickers[canvasType].splice(stickerIndex, 1);
+        }
+        
+        // Clean up event listeners
+        if (sticker.cleanup) sticker.cleanup();
+        
+        // Remove the element
+        sticker.remove();
+        isDragging = false;
+    }
+
+    function handleMouseUp() {
+        if (isDragging) {
+            isDragging = false;
+            sticker.classList.remove('dragging');
+            
+            // Update sticker position in currentCardData
+            const container = sticker.parentElement;
+            const canvasType = container.querySelector('canvas').id.replace('-canvas', '');
+            const stickerIndex = Array.from(container.querySelectorAll('.placed-sticker')).indexOf(sticker);
+            
+            if (stickerIndex !== -1 && currentCardData.stickers[canvasType][stickerIndex]) {
+                currentCardData.stickers[canvasType][stickerIndex].x = parseInt(sticker.style.left);
+                currentCardData.stickers[canvasType][stickerIndex].y = parseInt(sticker.style.top);
+            }
+        }
+    }
+
+    // Remove any existing listeners before adding new ones
+    sticker.removeEventListener('mousedown', handleMouseDown);
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+    
+    // Add the new listeners
+    sticker.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    // Add cleanup for when sticker is removed
+    sticker.cleanup = () => {
+        sticker.removeEventListener('mousedown', handleMouseDown);
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+    };
+}
+
+// Add CSS for dragging state
+const style = document.createElement('style');
+style.textContent = `
+    .placed-sticker.dragging {
+        opacity: 0.8;
+        pointer-events: none;
+    }
+`;
+document.head.appendChild(style);
+
+// Add new function to update UI based on selected text
+function updateUIFromText(text) {
+    // Update currentCardData properties
+    currentCardData.fontSize = text.fontSize;
+    currentCardData.fontFamily = text.fontFamily;
+    currentCardData.fontColor = text.color;
+    currentCardData.fontStyle = text.fontStyle;
+    currentCardData.fontWeight = text.fontWeight;
+    currentCardData.textDecoration = text.textDecoration;
+
+    // Update font style dropdown
+    document.getElementById('fontStyleSelect').value = text.fontFamily;
+
+    // Update text style buttons
+    document.getElementById('boldBtn').classList.toggle('selected', text.fontWeight === 'bold');
+    document.getElementById('italicBtn').classList.toggle('selected', text.fontStyle === 'italic');
+    document.getElementById('underlineBtn').classList.toggle('selected', text.textDecoration === 'underline');
+
+    // Update color buttons
+    const colorButtons = ['white', 'black', 'red', 'blue', 'green'];
+    colorButtons.forEach(color => {
+        const button = document.getElementById(`${color}Btn`);
+        if (button) {
+            button.classList.toggle('selected', text.color === color);
+            if (text.color === color) {
+                button.style.border = '3px solid rgb(232, 70, 130)';
+            } else {
+                button.style.border = 'none';
+            }
+        }
+    });
+}

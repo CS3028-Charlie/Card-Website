@@ -99,3 +99,33 @@ body {
     background-color: #28a745; /* Customize scrollbar color */
     border-radius: 4px;
 }
+
+/* Featured Cards styles */
+.card-image-container {
+    position: relative;
+    width: 100%;
+    padding-top: 140%; /* Maintains 567x794 aspect ratio */
+    overflow: hidden;
+}
+
+.card-image-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.featured-cards .card {
+    transition: transform 0.3s ease;
+    margin-bottom: 2rem;
+}
+
+.featured-cards .card:hover {
+    transform: translateY(-5px);
+}
+
+.featured-cards .card-body {
+    padding: 1.5rem;
+}

@@ -1,38 +1,8 @@
-body {
-    background-color: #f0f8ff; /* Light blue background */
-}
-
 /* Enlarge card on hover */
-.card {
-    border-radius: 15px; /* Rounded corners */
-    overflow: hidden;
-    transition: transform 0.3s ease;
-}
-
 .card:hover {
-    transform: scale(1.05); /* Slightly enlarge on hover */
-    transition: transform 0.4s ease;
-    opacity: 0.3;
-}
-
-.card-title {
-    font-size: 1.5rem; /* Larger font size */
-    color: #ff69b4; /* Bright pink color */
-}
-
-.card-text {
-    font-size: 1.2rem; /* Larger font size */
-    color: #4682b4; /* Steel blue color */
-}
-
-.btn-outline-success {
-    border-color: #ff69b4; /* Bright pink border */
-    color: #ff69b4; /* Bright pink text */
-}
-
-.btn-outline-success:hover {
-    background-color: #ff69b4; /* Bright pink background on hover */
-    color: #fff; /* White text on hover */
+  transform: scale(1);
+  transition: transform 0.4s ease;
+  opacity: 0.3;
 }
 
 /* #canvas-container {
@@ -41,286 +11,398 @@ body {
 } */
 
 canvas {
-    border: 1px solid black;
+  border: 1px solid black;
 }
 
 .text-box {
-    border: 2px dashed rgb(232, 70, 130);
-    border-radius: 3px;
-    position: absolute;
-    display: none;
-    pointer-events: none;
-    /* Allow clicks to pass through */
+  border: 2px dashed rgb(232, 70, 130);
+  border-radius: 3px;
+  position: absolute;
+  display: none;
+  pointer-events: none;
+  /* Allow clicks to pass through */
 }
 
 .cursor {
-    position: absolute;
-    width: 2px;
-    height: 30px;
-    /* Match the height of the text */
-    background-color: black;
-    display: none;
-    /* Initially hidden */
-    animation: blink 1s step-start infinite;
-    /* Blinking effect */
+  position: absolute;
+  width: 2px;
+  height: 30px;
+  /* Match the height of the text */
+  background-color: black;
+  display: none;
+  /* Initially hidden */
+  animation: blink 1s step-start infinite;
+  /* Blinking effect */
 }
 
 @keyframes blink {
-    50% {
-        opacity: 0;
-    }
+  50% {
+    opacity: 0;
+  }
 }
 
 /* Sidebar Styles */
 .customise-sidebar {
-    width: 250px;
-    border-right: 1px solid #ddd;
-    background: #f9f9f9;
+  width: 250px;
+  border-right: 1px solid #ddd;
+  background: #f9f9f9;
 }
 
 .customise-sidebar h6 {
-    font-weight: bold;
-    margin-bottom: 15px;
+  font-weight: bold;
+  margin-bottom: 15px;
 }
 
 .form-group {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 
-#increaseSizeBtn, #decreaseSizeBtn, #boldBtn, #italicBtn, #underlineBtn, #addTextBtn, #deleteTextBtn {
-    width: 40px;
-    height: 40px;
-    font-weight: bold;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.3s ease;
+#increaseSizeBtn,
+#decreaseSizeBtn,
+#boldBtn,
+#italicBtn,
+#underlineBtn,
+#addTextBtn,
+#deleteTextBtn {
+  width: 40px;
+  height: 40px;
+  font-weight: bold;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
 }
 
 /* Canvas Styles */
 .canvas-container {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .selected {
-    color: white;
-    background-color: green;
+  color: white;
+  background-color: green;
 }
 
 select {
-    margin-right: 10px;
-    padding: 5px;
+  margin-right: 10px;
+  padding: 5px;
 }
 
 .canvas-container {
-    background-image: URL('../Images/Elipse-Group.png');
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
+  background-image: URL('../Images/Elipse-Group.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 /* JAY CARD */
 .CardPreview {
-    width: 500px;
-    height: 600px;
-    display: none; /* HIDDEN */
-    margin: 20px auto;
-    border-radius: 15px; /* Rounded corners */
-    background-color: #f0f8ff; /* Light blue background */
-    padding: 0px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    font-family: Arial, sans-serif;
-  }
-  
-  .CardHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    background-color: #ff69b4; /* Bright pink background */
-    color: #fff; /* White text */
-    border-top-left-radius: 15px; /* Rounded top corners */
-    border-top-right-radius: 15px; /* Rounded top corners */
-  }
-  
-  .CardTitle {
-    margin: 0;
-    font-size: 2rem; /* Larger font size */
-    color: #ffffff;
-    font-weight: bold;
-    text-align: center;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Black outline with semi-transparency */
-  }
-  
-  
-  .close {
-    border: none;
-    background: none;
-    font-size: 18px;
-    cursor: pointer;
-  }
-  
-  .CardBody {
-    padding-bottom: 10px;
-    padding: 20px;
-    font-size: 14px;
-    color: #555;
-    text-align: center;
-  }
-  
-  .CardButton {
-    text-align: center;
-    margin: auto;
-    margin-top: 20px; /* Slightly move the button down */
-  }
-  
-  .CardFooter {
-    padding: 10px 20px;
-    border-top: 1px solid #ddd;
-    /* background-color: #f8f9fa; */
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-    margin-top: auto; /* Pushes the footer to the bottom */
-    text-align: center; /* Centers the content */
-    position: relative; /* or absolute */
-  }
-  
-  .CardFooter .btn {
-    margin-left: 5px;
-    padding: 5px 10px;
-    font-size: 14px;
-    border-radius: 4px;
-  }
-  
-  /* Personalise Part */
-  .PersonalisePreview {
-    width: 900px;
-    height: 600px;
-    display: none; /* HIDDEN */
-    margin: -30px auto;
-    border-radius: 8px;
-    background-color: #fff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    font-family: Arial, sans-serif;
-    background-image: url(../Images/Elipse-Group.png);
-  }
-  
-  .PersonaliseBody {
-    padding-bottom: 10px;
-    padding: 15px;
-    font-size: 14px;
-    color: #555;
-    overflow: hidden;
-  }
-  
-  #image-canvas {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    border: 4px solid rgb(232, 70, 130); 
-    border-radius: 10px;
-  }
-  
-  #cursor{
-    position: auto;
-    overflow: hidden;
-  }
-  .Editor {
-    position: fixed;        /* Fixed positioning relative to the viewport */
-    width: 50%;
-    top: 50%;               /* Position it in the vertical middle */
-    right: 20px;            /* Position it 20px from the right edge */
-    transform: translateY(-50%);  /* Center it vertically by shifting it up by 50% of its height */
-    z-index: 1000;          /* Ensure it stays on top */
-    display: flex;          /* Optional: align items horizontally */
-    flex-direction: column; /* Optional: stack buttons vertically */
-    gap: 10px;              /* Optional: space between buttons */
-  }
-  
-  #addbasket {
-    position: fixed; /* Use fixed positioning relative to the viewport */
-    bottom: 20px;    /* Distance from the bottom of the viewport */
-    right: 20px;     /* Distance from the right edge of the viewport */
-    z-index: 1000;   /* Ensure it stays on top of other content */
-    padding: 5px 20px;  /* Optional padding for button size */
-    font-size: 16px;     /* Optional font size */
-    border-radius: 5px;  /* Optional rounded corners */
-  }
-  #hotbar {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .circular-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: #ddd;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-  }
-  
-  /* Customize the previous and next arrow colors */
-  .carousel-control-prev-icon,
-  .carousel-control-next-icon {
-    background-color: transparent; /* Ensure no unwanted background */
-    width: 30px;
-    height: 30px;
-    border-radius: 50%; /* Optional for circular arrows */
-  }
-  
-  /* Add a custom arrow class to apply a new color */
-  .custom-arrow {
-    background-color: rgb(232, 70, 130);  /* Change the color here */
-    background-size: 50%, 100%;
-  }
-  
-  /* Optional hover effect to change color */
-  .carousel-control-prev:hover .custom-arrow,
-  .carousel-control-next:hover .custom-arrow {
-    background-color: rgba(0, 119, 255, 0.8); /* Change hover color here */
-  }
+  display: none;
+  width: 90%;
+  max-width: 900px;
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  background-image: url('../Images/Elipse-Group.png');
+  background-position: center;
+  background-size: cover;
+  border: 3px solid rgb(57, 181, 82);
+}
 
-  #EditTag {
-    right: 20px;
-    width: 400px;
-  }
+.CardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 3px solid rgb(57, 181, 82);
+  background-color: rgb(232, 70, 130);
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
 
-  .circle-btn {
-    width: 30px; /* Adjust the size of the button */
-    height: 30px;
-    border-radius: 50%; /* Makes the button circular */
-    border: none;
-    cursor: pointer;
-    margin: 5px;
+.CardTitle {
+  margin: 0;
+  font-size: 24px;
+  color: #ffffff;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  /* Black outline with semi-transparency */
+}
+
+
+.close {
+  border: none;
+  background: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.CardBody {
+  padding-bottom: 10px;
+  padding: 30px;
+  font-size: 14px;
+  color: #555;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.CardButton {
+  text-align: center;
+  margin: auto;
+  margin-top: 30px;
+  /* Slightly move the button down */
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.CardButton button {
+  padding: 10px 25px;
+  font-size: 16px;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+
+.CardButton button.active {
+  background-color: rgb(57, 181, 82);
+  border-color: rgb(57, 181, 82);
+  color: white;
+}
+
+.CardFooter {
+  padding: 20px;
+  border-top: 3px solid rgb(57, 181, 82);
+  background-color: rgba(255, 255, 255, 0.95);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  margin-top: auto;
+  /* Pushes the footer to the bottom */
+  text-align: center;
+  /* Centers the content */
+  position: relative;
+  /* or absolute */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.CardFooter h5 {
+  color: rgb(232, 70, 130);
+  font-weight: bold;
+  margin: 0;
+}
+
+.CardFooter .btn {
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+.CardFooter .btn-primary {
+  background-color: rgb(232, 70, 130);
+  border-color: rgb(232, 70, 130);
+}
+
+.CardFooter .btn-primary:hover {
+  background-color: rgb(57, 181, 82);
+  border-color: rgb(57, 181, 82);
+}
+
+/* Personalise Part */
+.PersonalisePreview {
+  width: 900px;
+  height: 600px;
+  display: none;
+  /* HIDDEN */
+  margin: -30px auto;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+  background-image: url(../Images/Elipse-Group.png);
+}
+
+.PersonaliseBody {
+  padding-bottom: 10px;
+  padding: 15px;
+  font-size: 14px;
+  color: #555;
+  overflow: hidden;
+}
+
+.circular-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* Customize the previous and next arrow colors */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: transparent;
+  /* Ensure no unwanted background */
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  /* Optional for circular arrows */
+}
+
+/* Add a custom arrow class to apply a new color */
+.custom-arrow {
+  background-color: rgb(232, 70, 130);
+  /* Change the color here */
+  background-size: 50%, 100%;
+}
+
+/* Optional hover effect to change color */
+.carousel-control-prev:hover .custom-arrow,
+.carousel-control-next:hover .custom-arrow {
+  background-color: rgba(57, 181, 82, 0.8);
+  /* Change hover color here */
+}
+
+.carousel {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-inner img {
+  max-height: 70vh;
+  border-radius: 8px;
+  border: 2px solid rgb(57, 181, 82);
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: rgb(232, 70, 130);
+  padding: 25px;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.carousel-indicators li {
+  background-color: rgb(232, 70, 130);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 0 5px;
+}
+
+.carousel-indicators li.active {
+  background-color: rgb(57, 181, 82);
+}
+
+#EditTag {
+  right: 20px;
+  width: 400px;
+}
+
+.circle-btn {
+  width: 30px;
+  /* Adjust the size of the button */
+  height: 30px;
+  border-radius: 50%;
+  /* Makes the button circular */
+  border: none;
+  cursor: pointer;
+  margin: 5px;
 }
 
 .red {
-    background-color: red;
+  background-color: red;
 }
 
 .blue {
-    background-color: blue;
+  background-color: blue;
 }
 
 .green {
-    background-color: green;
+  background-color: green;
 }
 
 .white {
-    background-color: white;
-    border: 1px solid #ccc; /* Add a border for visibility */
+  background-color: white;
+  border: 1px solid #ccc;
+  /* Add a border for visibility */
 }
 
 .black {
-    background-color: black;
+  background-color: black;
+}
+
+.card-img-wrapper {
+  width: 100%;
+  padding-top: 140%;
+  /* Maintain aspect ratio 567:794 */
+  position: relative;
+  overflow: hidden;
+}
+
+.card-img-wrapper img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card {
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.card-body {
+  padding: 15px;
+}
+
+/* Card Preview Modal Styles */
+.CardPreview {
+  width: 90%;
+  max-width: 900px;
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  background-image: url('../Images/Elipse-Group.png');
+  background-position: center;
+  background-size: cover;
+  border: 3px solid rgb(57, 181, 82);
+}
+
+.carousel-inner img {
+  max-height: 70vh;
+  border-radius: 8px;
+  border: 2px solid rgb(57, 181, 82);
+}
+
+.card-img-container {
+  position: relative;
+  padding-bottom: 140%;
+  /* Maintain aspect ratio */
+  overflow: hidden;
+}
+
+.card-img-container img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }

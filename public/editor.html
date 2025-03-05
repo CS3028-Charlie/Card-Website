@@ -104,28 +104,28 @@
                         <div class="tab-content" id="cardViewContent">
                             <div class="tab-pane fade show active" id="front" role="tabpanel">
                                 <div class="canvas-container">
-                                    <canvas id="front-canvas" width="500" height="700"></canvas>
+                                    <canvas id="front-canvas" width="567" height="794"></canvas>
                                     <div class="text-box" id="front-text-box"></div>
                                     <div class="cursor" id="front-cursor"></div>
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="inner-left" role="tabpanel">
                                 <div class="canvas-container">
-                                    <canvas id="inner-left-canvas" width="500" height="700"></canvas>
+                                    <canvas id="inner-left-canvas" width="567" height="794"></canvas>
                                     <div class="text-box" id="inner-left-text-box"></div>
                                     <div class="cursor" id="inner-left-cursor"></div>
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="inner-right" role="tabpanel">
                                 <div class="canvas-container">
-                                    <canvas id="inner-right-canvas" width="500" height="700"></canvas>
+                                    <canvas id="inner-right-canvas" width="567" height="794"></canvas>
                                     <div class="text-box" id="inner-right-text-box"></div>
                                     <div class="cursor" id="inner-right-cursor"></div>
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="back" role="tabpanel">
                                 <div class="canvas-container">
-                                    <canvas id="back-canvas" width="500" height="700"></canvas>
+                                    <canvas id="back-canvas" width="567" height="794"></canvas>
                                     <div class="text-box" id="back-text-box"></div>
                                     <div class="cursor" id="back-cursor"></div>
                                 </div>
@@ -170,10 +170,10 @@
                         <div class="form-group">
                             <label for="fontStyleSelect">Font Style</label>
                             <select id="fontStyleSelect" class="form-control">
-                                <option selected disabled>Choose</option>
-                                <option value="regular">Regular</option>
-                                <option value="simple">Simple</option>
-                                <option value="fancy">Fancy</option>
+                                <option disabled>Choose</option>
+                                <option selected value="Arial">Regular</option>
+                                <option value="Montserrat-Regular">Simple</option>
+                                <option value="Pacifico">Fancy</option>
                             </select>
                         </div>
 
@@ -184,6 +184,16 @@
                                     class="fa-solid fa-italic"></i></button>
                             <button id="underlineBtn" class="btn btn-outline-success btn-sm"><i
                                     class="fa-solid fa-underline"></i></button>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Stickers</label><br>
+                            <div id="stickerPanel" class="sticker-panel">
+                                <img src="Images/TSA-Logo.png" class="sticker-option" draggable="true" alt="Sticker 1">
+                                <img src="Images/Plasto.webp" class="sticker-option" draggable="true" alt="Sticker 2">
+                                <img src="Images/scientists.webp" class="sticker-option" draggable="true" alt="Sticker 3">
+                                <img src="Images/Sustainables-team.webp" class="sticker-option" draggable="true" alt="Sticker 4">
+                            </div>
                         </div>
 
                         <hr>
@@ -204,8 +214,26 @@
                             <button type="button" class="btn btn-success btn-block mb-2" id="saveCustomizationBtn">Save Changes</button>
                             <button type="button" class="btn btn-primary btn-block mb-2" id="addToBasketBtn">Add to Basket</button>
                             <button type="button" class="btn btn-outline-secondary btn-block" id="downloadCanvasBtn">Download as PNG</button>
+                            <button type="button" class="btn btn-info btn-block" id="preview3DButton">Preview 3D</button>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3D Preview Modal -->
+    <div class="modal fade" id="preview3DModal" tabindex="-1" role="dialog" aria-labelledby="preview3DModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="preview3DModalLabel">3D Card Preview</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="3DPreviewContainer" style="width: 100%; height: 500px;"></div>
                 </div>
             </div>
         </div>
@@ -225,9 +253,24 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="Scripts/basket.js"></script>
+    <script src="Scripts/preview3D.js"></script>
     <script src="Scripts/editor.js"></script>
     <script src="Scripts/login.js"></script>
+    <script>
+        // Initialize 3D preview when document is ready
+        $(document).ready(function() {
+            const previewButton = document.getElementById('preview3DButton');
+            previewButton.addEventListener('click', function() {
+                $('#preview3DModal').modal('show');
+            });
+
+            $('#preview3DModal').on('shown.bs.modal', function() {
+                render3DPreview();
+            });
+        });
+    </script>
 </body>
 
 </html>
