@@ -1,0 +1,184 @@
+/* Card Editor Page Styles */
+.canvas-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    width: 100%;
+    height: 500px;
+    background-image: url('../Images/Elipse-Group.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+canvas {
+    border: 3px solid rgb(232, 70, 130);
+    border-radius: 10px;
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+    background-color: white;
+}
+
+.text-box {
+    border: 2px dashed rgb(232, 70, 130);
+    border-radius: 3px;
+    position: fixed; /* Change to fixed positioning */
+    display: none;
+    pointer-events: none;
+    box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+    transform: translateZ(0); /* Force hardware acceleration */
+    z-index: 1000; /* Ensure it's above other elements */
+}
+
+.cursor {
+    position: fixed; /* Change to fixed positioning */
+    width: 2px;
+    background-color: black;
+    display: none;
+    animation: blink 1s step-start infinite;
+    z-index: 1001; /* Ensure it's above the text box */
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+/* Styling for card type buttons */
+.btn-group-toggle .btn {
+    margin-right: 5px;
+}
+
+/* Styling for text modification buttons */
+#increaseSizeBtn, #decreaseSizeBtn, #boldBtn, #italicBtn, #underlineBtn, #addTextBtn, #deleteTextBtn {
+    width: 40px;
+    height: 40px;
+    font-weight: bold;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+    margin-right: 5px;
+}
+
+/* Color selection buttons - Base styles */
+.circle-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+    margin: 5px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+/* White button style - Higher specificity to maintain black border */
+.circle-btn:not(.selected) {
+    border: 2px solid #000 !important;
+}
+
+/* Selected state - Highest priority for selected state */
+.circle-btn.selected {
+    border: 3px solid rgb(232, 70, 130) !important;
+    transform: scale(1.1);
+}
+
+/* Color-specific backgrounds */
+.circle-btn.red { background-color: red; }
+.circle-btn.blue { background-color: blue; }
+.circle-btn.green { background-color: green; }
+.circle-btn.black { background-color: black; }
+.circle-btn.white { background-color: white; }
+
+.circle-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Tab styling */
+.nav-tabs .nav-link.active {
+    background-color: #ff69b4;
+    color: white;
+    border-color: #ff69b4;
+}
+
+.nav-tabs .nav-link {
+    color: #555;
+}
+
+/* Card type and price displays */
+.card-type-info .badge {
+    font-size: 14px;
+}
+
+/* Make sure form controls are consistent */
+.form-control {
+    margin-bottom: 10px;
+}
+
+/* Action buttons */
+.action-buttons .btn {
+    font-weight: bold;
+}
+
+.selected {
+    color: white;
+}
+
+.btn-outline-success.selected {
+    background-color: rgb(57, 181, 82);
+    color: white;
+}
+
+/* 3D Preview Modal */
+#3DPreviewContainer {
+    width: 100%;
+    height: 500px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Add these new styles */
+.sticker-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f8f9fa;
+}
+
+.sticker-option {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    cursor: move;
+    transition: transform 0.2s;
+}
+
+.sticker-option:hover {
+    transform: scale(1.1);
+}
+
+.placed-sticker {
+    position: absolute;
+    cursor: move;
+    user-select: none;
+}
+
+@font-face {
+    font-family: 'Pacifico';
+    src: url('../fonts/Pacifico-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'Montserrat-Regular';
+    src: url('../fonts/Montserrat-Regular.ttf');
+}

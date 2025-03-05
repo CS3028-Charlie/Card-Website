@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Card Editor - The Sustainables Academy</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/editor.css">
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg custom-navbar">
+        <a class="navbar-brand" href="#">
+            <img class="nav-logo" src="Images/TSA-Logo.png"> The Sustainables Academy
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html"><i class="fas fa-home"></i> Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="shop.html"><i class="fas fa-store"></i> Shop</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="basket.html" id="viewBasketBtn">
+                        <i class="fas fa-shopping-cart"></i> Basket
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="about.html"><i class="fa-solid fa-circle-info"></i> About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="accountLink" data-toggle="modal" data-target="#accountModal">
+                        <i class="fas fa-user-circle" id="accountIcon"></i> <span id="accountText">Login</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Account Modal -->
+    <div class="modal fade" id="accountModal" tabindex="-1" role="dialog" aria-labelledby="accountModalLabel"
+        aria-hidden="true">
+        <!-- Account modal content (same as shop.html) -->
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="accountModalLabel">Login / Sign Up</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Login/signup forms (same as shop.html) -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="container-fluid my-4">
+        <div class="row">
+            <!-- Left Side - Card Preview Area -->
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Card Preview</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-type-info mb-3">
+                            <span id="cardTypeDisplay" class="badge badge-info p-2">eCard</span>
+                            <span id="priceDisplay" class="badge badge-success p-2 ml-2">100 Credits</span>
+                            <span id="priceDisplay2" class="badge badge-warning p-2 ml-2">£0.99</span>
+                        </div>
+                        
+                        <!-- Tab navigation for different card views -->
+                        <ul class="nav nav-tabs mb-3" id="cardViewTabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="front-tab" data-toggle="tab" href="#front" role="tab">Front</a>
+                            </li>
+                            <li class="nav-item" id="inner-left-tab-item" style="display: none;">
+                                <a class="nav-link" id="inner-left-tab" data-toggle="tab" href="#inner-left" role="tab">Inner Left</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="inner-right-tab" data-toggle="tab" href="#inner-right" role="tab">Inner Right</a>
+                            </li>
+                            <li class="nav-item" id="back-tab-item" style="display: none;">
+                                <a class="nav-link" id="back-tab" data-toggle="tab" href="#back" role="tab">Back</a>
+                            </li>
+                        </ul>
+                        
+                        <!-- Tab content for different card views -->
+                        <div class="tab-content" id="cardViewContent">
+                            <div class="tab-pane fade show active" id="front" role="tabpanel">
+                                <div class="canvas-container">
+                                    <canvas id="front-canvas" width="567" height="794"></canvas>
+                                    <div class="text-box" id="front-text-box"></div>
+                                    <div class="cursor" id="front-cursor"></div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="inner-left" role="tabpanel">
+                                <div class="canvas-container">
+                                    <canvas id="inner-left-canvas" width="567" height="794"></canvas>
+                                    <div class="text-box" id="inner-left-text-box"></div>
+                                    <div class="cursor" id="inner-left-cursor"></div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="inner-right" role="tabpanel">
+                                <div class="canvas-container">
+                                    <canvas id="inner-right-canvas" width="567" height="794"></canvas>
+                                    <div class="text-box" id="inner-right-text-box"></div>
+                                    <div class="cursor" id="inner-right-cursor"></div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="back" role="tabpanel">
+                                <div class="canvas-container">
+                                    <canvas id="back-canvas" width="567" height="794"></canvas>
+                                    <div class="text-box" id="back-text-box"></div>
+                                    <div class="cursor" id="back-cursor"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - Editing Tools -->
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0">Customisation Tools</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Text Options</label><br>
+                            <button id="addTextBtn" class="btn btn-outline-success btn-sm"><i
+                                class="fa-solid fa-plus"></i>T</button>
+                            <button id="deleteTextBtn" class="btn btn-outline-success btn-sm"><i
+                                class="fa-solid fa-minus"></i>T</button>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Text Color</label><br>
+                            <button id="whiteBtn" class="circle-btn white"></button>
+                            <button id="blackBtn" class="circle-btn black"></button>
+                            <button id="redBtn" class="circle-btn red"></button>
+                            <button id="blueBtn" class="circle-btn blue"></button>
+                            <button id="greenBtn" class="circle-btn green"></button>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Font Size</label><br>
+                            <button id="increaseSizeBtn" class="btn btn-outline-success btn-sm"><i
+                                    class="fa-solid fa-plus"></i></button>
+                            <button id="decreaseSizeBtn" class="btn btn-outline-success btn-sm"><i
+                                    class="fa-solid fa-minus"></i></button>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fontStyleSelect">Font Style</label>
+                            <select id="fontStyleSelect" class="form-control">
+                                <option disabled>Choose</option>
+                                <option selected value="Arial">Regular</option>
+                                <option value="Montserrat-Regular">Simple</option>
+                                <option value="Pacifico">Fancy</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <button id="boldBtn" class="btn btn-outline-success btn-sm"><i
+                                    class="fa-solid fa-bold"></i></button>
+                            <button id="italicBtn" class="btn btn-outline-success btn-sm"><i
+                                    class="fa-solid fa-italic"></i></button>
+                            <button id="underlineBtn" class="btn btn-outline-success btn-sm"><i
+                                    class="fa-solid fa-underline"></i></button>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Stickers</label><br>
+                            <div id="stickerPanel" class="sticker-panel">
+                                <img src="Images/TSA-Logo.png" class="sticker-option" draggable="true" alt="Sticker 1">
+                                <img src="Images/Plasto.webp" class="sticker-option" draggable="true" alt="Sticker 2">
+                                <img src="Images/scientists.webp" class="sticker-option" draggable="true" alt="Sticker 3">
+                                <img src="Images/Sustainables-team.webp" class="sticker-option" draggable="true" alt="Sticker 4">
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="form-group">
+                            <label>Card Type</label><br>
+                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                <label class="btn btn-outline-primary active" id="eCardBtn">
+                                    <input type="radio" name="cardType" value="eCard" checked> eCard
+                                </label>
+                                <label class="btn btn-outline-primary" id="printableBtn">
+                                    <input type="radio" name="cardType" value="printable"> Printable
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons mt-4">
+                            <button type="button" class="btn btn-success btn-block mb-2" id="saveCustomizationBtn">Save Changes</button>
+                            <button type="button" class="btn btn-primary btn-block mb-2" id="addToBasketBtn">Add to Basket</button>
+                            <button type="button" class="btn btn-outline-secondary btn-block" id="downloadCanvasBtn">Download as PNG</button>
+                            <button type="button" class="btn btn-info btn-block" id="preview3DButton">Preview 3D</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3D Preview Modal -->
+    <div class="modal fade" id="preview3DModal" tabindex="-1" role="dialog" aria-labelledby="preview3DModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="preview3DModalLabel">3D Card Preview</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="3DPreviewContainer" style="width: 100%; height: 500px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-4 bg-dark text-light text-center">
+        <p>&copy; 2024 The Sustainables Academy. All Rights Reserved.</p>
+        <div>
+            <a href="#" class="text-light mx-2"><i class="fab fa-facebook"></i></a>
+            <a href="#" class="text-light mx-2"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="text-light mx-2"><i class="fab fa-instagram"></i></a>
+        </div>
+    </footer>
+
+    <!-- jQuery, Bootstrap, and Font Awesome JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="Scripts/basket.js"></script>
+    <script src="Scripts/preview3D.js"></script>
+    <script src="Scripts/editor.js"></script>
+    <script src="Scripts/login.js"></script>
+    <script>
+        // Initialize 3D preview when document is ready
+        $(document).ready(function() {
+            const previewButton = document.getElementById('preview3DButton');
+            previewButton.addEventListener('click', function() {
+                $('#preview3DModal').modal('show');
+            });
+
+            $('#preview3DModal').on('shown.bs.modal', function() {
+                render3DPreview();
+            });
+        });
+    </script>
+</body>
+
+</html>

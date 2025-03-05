@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Home - The Sustainables Academy</title>
+    <title>Shop - The Sustainables Academy</title>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -32,9 +32,6 @@
                 <li class="nav-item">
                     <a class="nav-link" href="shop.html"><i class="fas fa-store"></i> Shop</a>
                 </li>
-                <!-- <li class="nav-item">
-                    <a class="nav-link" href="Card_Pay.html"><i class="fas fa-star"></i> Top Up</a>
-                </li> -->
                 <li class="nav-item">
                     <a class="nav-link" href="basket.html" id="viewBasketBtn">
                         <i class="fas fa-shopping-cart"></i> Basket
@@ -129,6 +126,7 @@
     <!-- Shop Grid Section -->
     <div class="container my-5">
         <div class="row">
+
         </div>
     </div>
 
@@ -156,8 +154,8 @@
             </div>
     
             <div class="CardButton"> 
-              <button class="btn btn-outline-primary mb-3" onclick="selectCardType('eCard')">eCard</button>
-              <button class="btn btn-outline-primary mb-3" onclick="selectCardType('printable')">Printable</button>
+              <button class="btn btn-outline-success mb-3" onclick="selectCardType('eCard')">eCard</button>
+              <button class="btn btn-outline-success mb-3" onclick="selectCardType('printable')">Printable</button>
             </div>
         </div>
     
@@ -182,60 +180,6 @@
           <div class="text-box" id="text-box"></div>
           <div class="cursor" id="cursor"></div>
         </div>
-    
-        <div class = "Editor">
-            <!-- Sidebar -->
-            <div class="customise" id="EditTag">
-                <h6>Customisation Tools</h6>
-                <div>
-                    <label for="fontSizeSelect">Text Options</label><br>
-                    <button id="addTextBtn" class="btn btn-outline-success btn-sm"><i
-                        class="fa-solid fa-plus"></i>T</button>
-                    <button id="deleteTextBtn" class="btn btn-outline-success btn-sm"><i
-                        class="fa-solid fa-minus"></i>T</button>
-                </div><br>
-                <div>
-                    <label for="ColourSelect">Text Colour</label><br>
-                    <button id="whiteBtn" class="circle-btn white"></button>
-                    <button id="blackBtn" class="circle-btn black"></button>
-                    <button id="redBtn" class="circle-btn red"></button>
-                    <button id="blueBtn" class="circle-btn blue"></button>
-                    <button id="greenBtn" class="circle-btn green"></button>
-                </div><br>
-                <div class="form-group">
-                    <label for="fontSizeSelect">Font Size</label><br>
-                    <button id="increaseSizeBtn" class="btn btn-outline-success btn-sm"><i
-                            class="fa-solid fa-plus"></i></button>
-                    <button id="decreaseSizeBtn" class="btn btn-outline-success btn-sm"><i
-                            class="fa-solid fa-minus"></i></button>
-                </div>
-
-                <div class="form-group">
-                    <label for="fontStyleSelect">Font Style</label>
-                    <select id="fontStyleSelect" class="form-control">
-                        <option selected disabled>Choose</option>
-                        <option value="regular">Regular</option>
-                        <option value="simple">Simple</option>
-                        <option value="fancy">Fancy</option>
-                    </select>
-                </div>
-                <div>
-                    <button id="boldBtn" class="btn btn-outline-success btn-sm"><i
-                            class="fa-solid fa-bold"></i></button>
-                    <button id="italicBtn" class="btn btn-outline-success btn-sm"><i
-                            class="fa-solid fa-italic"></i></button>
-                    <button id="underlineBtn" class="btn btn-outline-success btn-sm"><i
-                            class="fa-solid fa-underline"></i></button>
-                </div><br>
-            </div>
-
-            <button type="button" class="btn btn-success" onclick="saveCustomization()">Save</button>
-            <button type="button" class="btn btn-outline-success" id="downloadCanvasBtn">Download as PNG</button>
-            <button id="addToBasketBtn" class="btn btn-primary">Add to Basket</button>
-        </div>
-        
-
-    </div>
 
     <!-- Footer -->
     <footer class="py-4 bg-dark text-light text-center">
