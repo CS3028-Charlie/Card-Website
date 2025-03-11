@@ -406,3 +406,137 @@ select {
   height: 100%;
   object-fit: cover;
 }
+
+/* Drafts Icon */
+.drafts-icon {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background-color: rgb(232, 70, 130);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 999;
+    transition: all 0.3s ease;
+}
+
+.drafts-icon i {
+    font-size: 20px;
+    margin-bottom: 2px;
+}
+
+.drafts-icon span {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.drafts-icon:hover {
+    transform: scale(1.1);
+    background-color: rgb(57, 181, 82);
+}
+
+/* Drafts Modal */
+.drafts-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.drafts-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 500px;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    border: 3px solid rgb(57, 181, 82);
+    background-image: url('../Images/Elipse-Group.png');
+    background-position: center;
+    background-size: cover;
+}
+
+.drafts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 3px solid rgb(57, 181, 82);
+    background-color: rgb(232, 70, 130);
+}
+
+.drafts-header h5 {
+    margin: 0;
+    font-size: 24px;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.drafts-body {
+    padding: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.drafts-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.drafts-list li {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.drafts-list li:hover {
+    background-color: rgba(57, 181, 82, 0.1);
+}
+
+.drafts-list li .draft-info {
+    flex-grow: 1;
+}
+
+.drafts-list li .draft-name {
+    font-weight: bold;
+    color: rgb(232, 70, 130);
+}
+
+.drafts-list li .draft-date {
+    font-size: 12px;
+    color: #777;
+}
+
+.drafts-list li .draft-delete {
+    color: #dc3545;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.drafts-list .no-drafts {
+    text-align: center;
+    padding: 20px;
+    color: #777;
+    font-style: italic;
+}

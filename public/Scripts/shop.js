@@ -29,10 +29,148 @@ window.onload = async function() {
             const row = document.querySelector('.row');
             row.innerHTML = '<div class="col-12 text-center"><p>No cards available at the moment.</p></div>';
         }
+
+        // 初始化草稿功能
+        initializeDrafts();
     } catch (error) {
         console.error('Error initializing cards:', error);
     }
+
 };
+
+// 添加草稿功能初始化
+function initializeDrafts() {
+    const draftsIcon = document.getElementById('draftsIcon');
+    const draftsModal = document.getElementById('draftsModal');
+    const closeDraftsModal = document.getElementById('closeDraftsModal');
+
+    if (draftsIcon) {
+        draftsIcon.addEventListener('click', () => {
+            loadDrafts();
+            draftsModal.style.display = 'block';
+        });
+    }
+
+    if (closeDraftsModal) {
+        closeDraftsModal.addEventListener('click', () => {
+            draftsModal.style.display = 'none';
+        });
+    }
+
+    // 点击模态框外部关闭
+    window.addEventListener('click', (e) => {
+        if (e.target === draftsModal) {
+            draftsModal.style.display = 'none';
+        }
+    });
+}
+
+// 加载用户草稿列表
+async function loadDrafts() {
+    const draftsList = document.getElementById('draftsList');
+    const authToken = localStorage.getItem('authToken');
+
+    // 清空现有列表
+    draftsList.innerHTML = '';
+
+    if (!authToken) {
+        draftsList.innerHTML = '<div class="no-drafts">Please log in to view your drafts.</div>';
+        return;
+    }
+
+    try {
+        const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
+        const response = await fetch(`${API_URL}/api/drafts`, {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch drafts');
+        }
+
+        const drafts = await response.json();
+
+        if (drafts.length === 0) {
+            draftsList.innerHTML = '<div class="no-drafts">You have no saved drafts.</div>';
+            return;
+        }
+
+        drafts.forEach(draft => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <div class="draft-info">
+                    <div class="draft-name">${draft.name}</div>
+                    <div class="draft-date">Last updated: ${new Date(draft.updatedAt).toLocaleDateString()}</div>
+                </div>
+                <i class="fas fa-trash draft-delete" data-id="${draft._id}"></i>
+            `;
+
+            // 点击草稿项跳转到编辑器
+            li.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('draft-delete')) {
+                    openDraft(draft._id);
+                }
+            });
+
+            draftsList.appendChild(li);
+        });
+
+        // 添加删除草稿的事件监听器
+        document.querySelectorAll('.draft-delete').forEach(deleteBtn => {
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteDraft(e.target.dataset.id);
+            });
+        });
+
+    } catch (error) {
+        console.error('Error loading drafts:', error);
+        draftsList.innerHTML = '<div class="no-drafts">Failed to load drafts. Please try again.</div>';
+    }
+}
+
+// 打开草稿
+function openDraft(draftId) {
+    sessionStorage.setItem('draftId', draftId);
+    window.location.href = 'editor.html';
+}
+
+// 删除草稿
+async function deleteDraft(draftId) {
+    if (!confirm('Are you sure you want to delete this draft?')) {
+        return;
+    }
+
+    const authToken = localStorage.getItem('authToken');
+
+    if (!authToken) {
+        alert('You must be logged in to delete drafts.');
+        return;
+    }
+
+    try {
+        const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
+        const response = await fetch(`${API_URL}/api/drafts/${draftId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to delete draft');
+        }
+
+        // 重新加载草稿列表
+        loadDrafts();
+
+    } catch (error) {
+        console.error('Error deleting draft:', error);
+        alert('Failed to delete draft. Please try again.');
+    }
+}
 
 // HELPER FUNCTIONS
 function closeAllPreviews() {

@@ -123,6 +123,28 @@
         </div>
     </section>
 
+    <div id="draftsIcon" class="drafts-icon">
+    <i class="fas fa-file-alt"></i>
+    <span>Drafts</span>
+    </div>
+
+    <!-- 添加草稿列表模态框 -->
+    <div id="draftsModal" class="drafts-modal">
+        <div class="drafts-modal-content">
+            <div class="drafts-header">
+                <h5>Your Drafts</h5>
+                <button type="button" class="close" id="closeDraftsModal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="drafts-body">
+                <ul id="draftsList" class="drafts-list">
+                    <!-- 草稿项将通过JavaScript动态添加 -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <!-- Shop Grid Section -->
     <div class="container my-5">
         <div class="row">

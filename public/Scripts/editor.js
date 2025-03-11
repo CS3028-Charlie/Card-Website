@@ -39,7 +39,72 @@ window.onload = function() {
     setupEventListeners();
     updateCardTypeView();
     initializeStickerDragAndDrop();
+
+    // 检查是否有草稿ID
+    const draftId = sessionStorage.getItem('draftId');
+    if (draftId) {
+        loadDraft(draftId);
+    }
 };
+
+// 添加加载草稿的函数
+async function loadDraft(draftId) {
+    const authToken = localStorage.getItem('authToken');
+
+    if (!authToken) {
+        alert('You must be logged in to load drafts.');
+        return;
+    }
+
+    try {
+        const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
+        const response = await fetch(`${API_URL}/api/drafts/${draftId}`, {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to load draft');
+        }
+
+        const draft = await response.json();
+
+        // 更新当前卡片数据
+        currentCardData.cardIndex = draft.cardIndex;
+        currentCardData.cardType = draft.cardType;
+        currentCardData.images = draft.images;
+        currentCardData.activeTexts = draft.activeTexts;
+        currentCardData.stickers = draft.stickers;
+
+        // 更新UI显示
+        document.getElementById('cardTypeDisplay').textContent = draft.cardType;
+        document.getElementById('priceDisplay').textContent = draft.cardType === 'eCard' ? '100 Credits' : '200 Credits';
+        document.getElementById('priceDisplay2').textContent = draft.cardType === 'eCard' ? '£0.99' : '£1.99';
+
+        // 选择相应的卡片类型按钮
+        if (draft.cardType === 'eCard') {
+            document.getElementById('eCardBtn').classList.add('active');
+            document.getElementById('printableBtn').classList.remove('active');
+        } else {
+            document.getElementById('eCardBtn').classList.remove('active');
+            document.getElementById('printableBtn').classList.add('active');
+        }
+
+        // 更新卡片类型视图
+        updateCardTypeView();
+
+        // 重新绘制所有画布
+        canvasIds.forEach(canvasId => {
+            const canvasType = canvasId.replace('-canvas', '');
+            redrawText(canvasId);
+        });
+
+    } catch (error) {
+        console.error('Error loading draft:', error);
+        alert('Failed to load draft. Please try again.');
+    }
+}
 
 // Load card data from URL parameters or sessionStorage
 function loadCardData() {
@@ -753,11 +818,100 @@ function maintainTextSelection() {
     if (cursor) cursor.style.display = 'block';
 }
 
-// Save customization
+// 替换现有的saveCustomization函数
 function saveCustomization() {
-    // Save the current card data to sessionStorage or send it to the server
-    sessionStorage.setItem('currentCardData', JSON.stringify(currentCardData));
-    alert('Customization saved!');
+    // 创建保存草稿对话框
+    const draftDialog = document.createElement('div');
+    draftDialog.classList.add('draft-dialog');
+    draftDialog.innerHTML = `
+        <div class="draft-dialog-content">
+            <div class="draft-dialog-header">
+                <h5>Save Draft</h5>
+                <button type="button" class="close" id="closeDraftDialog">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="draft-dialog-body">
+                <form id="saveDraftForm">
+                    <div class="form-group">
+                        <label for="draftName">Draft Name:</label>
+                        <input type="text" class="form-control" id="draftName" placeholder="Enter a name for your draft" required>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-block">Save Draft</button>
+                </form>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(draftDialog);
+
+    // 获取对话框元素
+    const closeDraftDialog = document.getElementById('closeDraftDialog');
+    const saveDraftForm = document.getElementById('saveDraftForm');
+
+    // 关闭对话框
+    closeDraftDialog.addEventListener('click', () => {
+        draftDialog.remove();
+    });
+
+    // 提交表单
+    saveDraftForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const draftName = document.getElementById('draftName').value;
+        const authToken = localStorage.getItem('authToken');
+
+        if (!authToken) {
+            alert('You must be logged in to save drafts.');
+            draftDialog.remove();
+            return;
+        }
+
+        // 准备草稿数据
+        const draftData = {
+            name: draftName,
+            cardIndex: currentCardData.cardIndex,
+            cardType: currentCardData.cardType,
+            images: currentCardData.images,
+            activeTexts: currentCardData.activeTexts,
+            stickers: currentCardData.stickers
+        };
+
+        try {
+            const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
+
+            // 检查是否是编辑现有草稿
+            const draftId = sessionStorage.getItem('draftId');
+            let url = `${API_URL}/api/drafts`;
+            let method = 'POST';
+
+            if (draftId) {
+                url = `${API_URL}/api/drafts/${draftId}`;
+                method = 'PUT';
+            }
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(draftData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to save draft');
+            }
+
+            alert('Draft saved successfully!');
+            draftDialog.remove();
+
+        } catch (error) {
+            console.error('Error saving draft:', error);
+            alert('Failed to save draft. Please try again.');
+            draftDialog.remove();
+        }
+    });
 }
 
 // Add to basket
