@@ -49,7 +49,7 @@ async function handleLogin() {
     const password = document.getElementById('loginPassword').value;
 
     try {
-        const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/login', { // https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/login
+        const response = await fetch(`https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/login`, { // https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/login
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -89,28 +89,57 @@ async function handleSignup() {
         return;
     }
 
-    console.log({ username, email, password, role }); // Log the request payload
-
     try {
-        const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/register', { //https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/register
+        // Register the user
+        const registerResponse = await fetch(`https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, email, password, role }),
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
+        if (!registerResponse.ok) {
+            const errorData = await registerResponse.json();
             alert(errorData.message);
             return;
         }
 
-        const data = await response.json();
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('username', username);
-        alert('Signup successful!');
-        location.reload();
+        // Clear any existing auth data
+        localStorage.removeItem('username');
+        localStorage.removeItem('role');
+        localStorage.removeItem('balance');
+        localStorage.removeItem('authToken');
+
+        // Automatically log in
+        const loginResponse = await fetch(`https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        if (!loginResponse.ok) {
+            alert('Registration successful. Please log in.');
+            location.reload();
+            return;
+        }
+
+        const loginData = await loginResponse.json();
+
+        // Store user info
+        localStorage.setItem('username', loginData.username);
+        localStorage.setItem('role', loginData.role);
+        localStorage.setItem('authToken', loginData.token);
+        if (loginData.role === 'pupil') {
+            localStorage.setItem('balance', loginData.balance);
+        }
+
+        // Update UI without page reload
+        updateUserUI();
+        $('#accountModal').modal('hide');
+        alert('Account created and logged in successfully!');
+
     } catch (error) {
-        alert('Signup failed: ' + error.message);
+        console.error('Signup error:', error);
+        alert('Error during signup: ' + error.message);
     }
 }
 
@@ -176,11 +205,23 @@ async function updateUserUI() {
 
         // Ensure top-up section is updated properly
         updateTopupSection(role);
+
+        // Add delete account button next to sign out
+        const signOutFooter = document.getElementById('signOutFooter');
+        if (!document.getElementById('deleteAccountBtn')) {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.id = 'deleteAccountBtn';
+            deleteBtn.className = 'btn btn-danger ml-2';
+            deleteBtn.textContent = 'Delete Account';
+            deleteBtn.addEventListener('click', showDeleteConfirmation);
+            signOutFooter.appendChild(deleteBtn);
+        }
     }
 }
 
 function updateTopupSection(role) {  
     let topupSection = document.getElementById('topupSection');
+    let classroomButton = document.getElementById('classroomButton');
 
     if (role === 'teacher') {
         if (topupSection) {
@@ -235,7 +276,7 @@ async function fetchAndUpdateBalance() {
 
     if (authToken && role === 'pupil') {
         try {
-            const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/balance', { 
+            const response = await fetch(`https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/balance`, { 
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${authToken}` }
             });
@@ -279,7 +320,7 @@ async function handleTopup() {
     }
 
     try {
-        const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/topup', {
+        const response = await fetch(`https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/topup`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -332,4 +373,66 @@ async function updateNavBarForAdmin() {
         return
     }
 
+}
+
+function showDeleteConfirmation() {
+    const confirmationHtml = `
+        <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete Account</h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-danger">Warning: All credits and account data will be permanently deleted.</p>
+                        <div class="form-group">
+                            <label>Enter your password to confirm:</label>
+                            <input type="password" id="deleteConfirmPassword" class="form-control">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger" onclick="handleDeleteAccount()">Delete Account</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    if (!document.getElementById('deleteConfirmModal')) {
+        document.body.insertAdjacentHTML('beforeend', confirmationHtml);
+    }
+    $('#deleteConfirmModal').modal('show');
+}
+
+async function handleDeleteAccount() {
+    const password = document.getElementById('deleteConfirmPassword').value;
+    const authToken = localStorage.getItem('authToken');
+
+    try {
+        const response = await fetch(`https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/delete-account`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ password })
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            alert(data.message);
+            return;
+        }
+
+        $('#deleteConfirmModal').modal('hide');
+        handleSignOut();
+        alert('Account deleted successfully');
+    } catch (error) {
+        console.error('Delete account error:', error);
+        alert('Error deleting account');
+    }
 }
