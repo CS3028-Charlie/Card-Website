@@ -52,7 +52,6 @@
     <!-- Account Modal -->
     <div class="modal fade" id="accountModal" tabindex="-1" role="dialog" aria-labelledby="accountModalLabel"
         aria-hidden="true">
-        <!-- Account modal content (same as shop.html) -->
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -62,7 +61,52 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <!-- Login/signup forms (same as shop.html) -->
+                    <p>Manage your account, view your balance, and access exclusive features.</p>
+                    <!-- Login Form -->
+                    <form id="loginForm" style="display: none;">
+                        <div class="form-group">
+                            <label for="loginEmail">Email address</label>
+                            <input type="email" class="form-control" id="loginEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" class="form-control" id="loginPassword" required>
+                        </div>
+                        <button type="button" class="btn btn-success" onclick="handleLogin()">Login</button>
+                    </form><br>
+                    <!-- Signup Form -->
+                    <form id="signupForm" style="display: none;">
+                        <h5>Don't have an account? Sign Up!</h5>
+                        <div class="form-group">
+                            <label for="signupUsername">Username</label>
+                            <input type="text" class="form-control" id="signupUsername" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupEmail">Email address</label>
+                            <input type="email" class="form-control" id="signupEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupPassword">Password</label>
+                            <input type="password" class="form-control" id="signupPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupRole">Account Type</label>
+                            <select class="form-control" id="signupRole">
+                                <option value="parent">Parent</option>
+                                <option value="teacher">Teacher</option>
+                                <option value="pupil">Student</option>
+                            </select>
+                        </div>                        
+                        <button type="button" class="btn btn-success" onclick="handleSignup()">Sign Up</button>
+                    </form>
+
+                    <!-- User Account Section (after login) -->
+                    <div id="userAccountSection" style="display: none;">
+                        <h5>Welcome, <span id="usernameDisplay"></span>!</h5>
+                    </div>
+                </div>
+                <div class="modal-footer" id="signOutFooter" style="display: none;">
+                    <button type="button" class="btn btn-danger" id="signOutButton" onclick="handleSignOut()">Sign Out</button>
                 </div>
             </div>
         </div>
