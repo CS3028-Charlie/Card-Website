@@ -1003,8 +1003,7 @@ async function buyNow() {
         }
     }
 }
-
-// Helper function to create CORS-safe canvas copies
+// Helper function to create secure canvas copies 
 async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
     const sourceCanvas = document.getElementById(sourceId);
     const tempCanvas = document.createElement('canvas');
@@ -1041,7 +1040,6 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
             tempCtx.textAlign = 'center';
             tempCtx.fillText(text.text, text.x, text.y);
             
-            // Draw underline if needed
             if (text.textDecoration === 'underline') {
                 const textWidth = tempCtx.measureText(text.text).width;
                 tempCtx.beginPath();
@@ -1053,45 +1051,39 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
             }
         });
 
-        // Draw the stickers with corrected scaling
+        // Draw all stickers for this canvas type
         const stickers = currentCardData.stickers[canvasType] || [];
-        const container = sourceCanvas.parentElement;
-        const containerRect = container.getBoundingClientRect();
-
-        // Calculate scale factors based on canvas and display dimensions
-        const containerWidth = containerRect.width;
-        const containerHeight = containerRect.height;
-        const scaleX = sourceCanvas.width / containerWidth;
-        const scaleY = sourceCanvas.height / containerHeight;
+        const containerRect = sourceCanvas.parentElement.getBoundingClientRect();
+        const scaleX = sourceCanvas.width / containerRect.width;
+        const scaleY = sourceCanvas.height / containerRect.height;
 
         for (const sticker of stickers) {
             const img = new Image();
             img.crossOrigin = "anonymous";
             await new Promise((resolve, reject) => {
-            img.onload = () => {
-                // Scale position and size using both dimensions
-                const canvasX = (sticker.x - 50) * scaleX;  // Subtract offset to correct position
-                const canvasY = sticker.y * scaleY;
-                const canvasWidth = sticker.width * 2.5 * scaleX;
-                const canvasHeight = sticker.height * scaleY;
+                img.onload = () => {
+                    const canvasX = (sticker.x - 50) * scaleX;  // Subtract offset to correct position
+                    const canvasY = sticker.y * scaleY;
+                    const canvasWidth = sticker.width * 2.5 * scaleX;
+                    const canvasHeight = sticker.height * scaleY;
 
-                // Center the sticker at the scaled position
-                tempCtx.drawImage(
-                img,
-                canvasX,
-                canvasY,
-                canvasWidth,
-                canvasHeight
-                );
-                resolve();
-            };
-            img.onerror = reject;
-            img.src = sticker.src;
+                    tempCtx.drawImage(
+                        img,
+                        canvasX,
+                        canvasY,
+                        canvasWidth,
+                        canvasHeight
+                    );
+                    resolve();
+                };
+                img.onerror = reject;
+                img.src = sticker.src;
             });
         }
 
         // Draw to target canvas
         targetCtx.drawImage(tempCanvas, x, y);
+
     } catch (error) {
         console.error('Error in createSecureCanvasCopy:', error);
         throw error;
