@@ -979,101 +979,117 @@ async function buyNow() {
 
     try {
         const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
-        let finalCanvas;
-        let filename;
 
         if (currentCardData.cardType === 'printable') {
-            // Create two pages for printable cards
-            finalCanvas = document.createElement('canvas');
-            const ctx = finalCanvas.getContext('2d');
+            // Create PDF for printable card
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('landscape', 'px', [794, 1134]); // Width: 2 * 567, Height: 794
 
-            // Set dimensions for A4 size at 300 DPI
-            finalCanvas.width = 2480; // A4 width at 300 DPI
-            finalCanvas.height = 3508; // A4 height at 300 DPI
+            // Page 1: Front and Back
+            const page1Canvas = document.createElement('canvas');
+            const ctx1 = page1Canvas.getContext('2d');
+            page1Canvas.width = 1134; // 2 * 567
+            page1Canvas.height = 794;
 
-            // Copy front and inner-left to page 1
+            // Page 2: Inner Left and Inner Right
+            const page2Canvas = document.createElement('canvas');
+            const ctx2 = page2Canvas.getContext('2d');
+            page2Canvas.width = 1134; // 2 * 567
+            page2Canvas.height = 794;
+
+            // Draw canvases
             await Promise.all([
-                createSecureCanvasCopy('front-canvas', ctx, 0, 0, true),
-                createSecureCanvasCopy('inner-left-canvas', ctx, 1240, 0, true),
-                createSecureCanvasCopy('inner-right-canvas', ctx, 0, 1754, true),
-                createSecureCanvasCopy('back-canvas', ctx, 1240, 1754, true)
+                createSecureCanvasCopy('front-canvas', ctx1, 0, 0, true),
+                createSecureCanvasCopy('back-canvas', ctx1, 567, 0, true)
             ]);
 
-            filename = `printable-card-${Date.now()}.png`;
+            await Promise.all([
+                createSecureCanvasCopy('inner-left-canvas', ctx2, 0, 0, true),
+                createSecureCanvasCopy('inner-right-canvas', ctx2, 567, 0, true)
+            ]);
+
+            // Add pages to PDF
+            pdf.addImage(page1Canvas.toDataURL('image/png'), 'PNG', 0, 0, 794, 567);
+            pdf.addPage();
+            pdf.addImage(page2Canvas.toDataURL('image/png'), 'PNG', 0, 0, 794, 567);
+
+            const pdfBlob = pdf.output('blob');
+            
+            // Make purchase request
+            const formData = new FormData();
+            formData.append('type', currentCardData.cardType);
+            formData.append('imageData', pdfBlob, 'card.pdf');
+
+            const response = await fetch(`${API_URL}/api/cardPurchase/purchase`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Purchase failed');
+            }
+
+            // Download PDF
+            pdf.save(`printable-card-${Date.now()}.pdf`);
+
         } else {
             // Handle eCard
-            finalCanvas = document.createElement('canvas');
+            const finalCanvas = document.createElement('canvas');
             const ctx = finalCanvas.getContext('2d');
-            
-            finalCanvas.width = 567 * 2;
+            finalCanvas.width = 1134; // 2 * 567
             finalCanvas.height = 794;
-            
+
             await Promise.all([
                 createSecureCanvasCopy('front-canvas', ctx, 0, 0, true),
                 createSecureCanvasCopy('inner-right-canvas', ctx, 567, 0, true)
             ]);
 
-            filename = `ecard-${Date.now()}.png`;
+            const imageBlob = await new Promise(resolve => finalCanvas.toBlob(resolve, 'image/png'));
+            
+            // Make purchase request
+            const formData = new FormData();
+            formData.append('type', currentCardData.cardType);
+            formData.append('imageData', imageBlob, 'card.png');
+
+            const response = await fetch(`${API_URL}/api/cardPurchase/purchase`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Purchase failed');
+            }
+
+            // Download image
+            const downloadUrl = URL.createObjectURL(imageBlob);
+            const downloadLink = document.createElement('a');
+            downloadLink.href = downloadUrl;
+            downloadLink.download = `ecard-${Date.now()}.png`;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+            URL.revokeObjectURL(downloadUrl);
         }
 
-        // Convert canvas to Blob
-        const imageBlob = await new Promise(resolve => finalCanvas.toBlob(resolve, 'image/png'));
-
-        // Make purchase request
-        const formData = new FormData();
-        formData.append('type', currentCardData.cardType);
-        formData.append('imageData', imageBlob, 'card.png');
-
-        const purchaseResponse = await fetch(`${API_URL}/api/cardPurchase/purchase`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            },
-            body: formData
-        });
-
-        if (purchaseResponse.status === 401) {
-            localStorage.removeItem('authToken');
-            alert('Your session has expired. Please login again.');
-            window.location.href = '/login.html';
-            return;
-        }
-
-        if (!purchaseResponse.ok) {
-            const errorData = await purchaseResponse.json();
-            throw new Error(errorData.message || 'Purchase failed');
-        }
-
-        // Download the card
-        const downloadUrl = URL.createObjectURL(imageBlob);
-        const downloadLink = document.createElement('a');
-        downloadLink.href = downloadUrl;
-        downloadLink.download = filename;
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        URL.revokeObjectURL(downloadUrl);
-
-        // Show success message
         alert('Purchase successful! Your card has been downloaded.');
 
     } catch (error) {
         console.error('Purchase error:', error);
-        if (error.message.includes('Insufficient balance')) {
-            alert('Insufficient credits. Please add more credits to your account.');
-        } else {
-            alert('Purchase failed. Please try again.');
-        }
+        alert('Purchase failed: ' + error.message);
     }
 }
 
-// Helper function to create CORS-safe canvas copies
 async function createSecureCanvasCopy(sourceId, targetCtx, x, y, isHighRes = false) {
     const sourceCanvas = document.getElementById(sourceId);
     const tempCanvas = document.createElement('canvas');
-    
-    // Use higher resolution for final output
     const scale = isHighRes ? 2 : 1;
+    
     tempCanvas.width = sourceCanvas.width * scale;
     tempCanvas.height = sourceCanvas.height * scale;
     
@@ -1081,56 +1097,58 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y, isHighRes = fal
     tempCtx.scale(scale, scale);
 
     try {
-        // Fill white background
+        // Fill background
         tempCtx.fillStyle = '#ffffff';
         tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
 
-        // Draw background image
+        // Draw card image
         const imgData = currentCardData.images[canvasIds.indexOf(sourceId)];
         if (imgData) {
             const img = new Image();
             img.crossOrigin = "anonymous";
             await new Promise((resolve, reject) => {
                 img.onload = () => {
-                    tempCtx.drawImage(img, imgData.x, imgData.y, imgData.width, imgData.height);
+                    tempCtx.drawImage(img, imgData.x * scale, imgData.y * scale, 
+                        imgData.width * scale, imgData.height * scale);
                     resolve();
                 };
                 img.onerror = reject;
-                img.src = `${imgData.src}?t=${new Date().getTime()}`;
+                img.src = imgData.src;
             });
         }
 
-        // Draw texts with underlines
+        // Draw text
         const canvasType = sourceId.replace('-canvas', '');
         const texts = currentCardData.activeTexts[canvasType] || [];
+        
         texts.forEach(text => {
-            tempCtx.font = `${text.fontStyle} ${text.fontWeight} ${text.fontSize}px ${text.fontFamily}`;
+            tempCtx.font = `${text.fontStyle} ${text.fontWeight} ${text.fontSize * scale}px ${text.fontFamily}`;
             tempCtx.fillStyle = text.color;
             tempCtx.textAlign = 'center';
-            tempCtx.fillText(text.text, text.x, text.y);
-            
+            tempCtx.fillText(text.text, text.x * scale, text.y * scale);
+
             if (text.textDecoration === 'underline') {
                 const textWidth = tempCtx.measureText(text.text).width;
                 tempCtx.beginPath();
-                tempCtx.moveTo(text.x - textWidth / 2, text.y + 3);
-                tempCtx.lineTo(text.x + textWidth / 2, text.y + 3);
+                tempCtx.moveTo((text.x * scale) - textWidth / 2, (text.y * scale) + 3);
+                tempCtx.lineTo((text.x * scale) + textWidth / 2, (text.y * scale) + 3);
                 tempCtx.strokeStyle = text.color;
                 tempCtx.lineWidth = 2;
                 tempCtx.stroke();
             }
         });
 
-        // Draw stickers with proper scaling
+        // Draw stickers
         const stickers = currentCardData.stickers[canvasType] || [];
-        stickers.forEach(async (sticker) => {
+        for (const sticker of stickers) {
             const img = new Image();
             img.crossOrigin = "anonymous";
             await new Promise((resolve, reject) => {
                 img.onload = () => {
-                    const stickerWidth = sticker.width * scale;
-                    const stickerHeight = sticker.height * scale;
                     const stickerX = sticker.x * scale;
                     const stickerY = sticker.y * scale;
+                    const stickerWidth = sticker.width * scale;
+                    const stickerHeight = sticker.height * scale;
                     
                     tempCtx.drawImage(img, stickerX, stickerY, stickerWidth, stickerHeight);
                     resolve();
@@ -1138,64 +1156,14 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y, isHighRes = fal
                 img.onerror = reject;
                 img.src = sticker.src;
             });
-        });
+        }
 
         // Draw to target canvas
         targetCtx.drawImage(tempCanvas, x, y);
-        
+
     } catch (error) {
         console.error('Error in createSecureCanvasCopy:', error);
         throw error;
-    }
-}
-
-function createPreviewImage() {
-    const finalCanvas = document.createElement('canvas');
-    const ctx = finalCanvas.getContext('2d');
-    
-    try {
-        if (currentCardData.cardType === 'eCard') {
-            finalCanvas.width = 567 * 2;
-            finalCanvas.height = 794;
-            
-            // Use a clean canvas for each panel
-            const frontCanvas = document.createElement('canvas');
-            const innerRightCanvas = document.createElement('canvas');
-            frontCanvas.width = innerRightCanvas.width = 567;
-            frontCanvas.height = innerRightCanvas.height = 794;
-            
-            // Copy the content from the original canvases
-            frontCanvas.getContext('2d').drawImage(document.getElementById('front-canvas'), 0, 0);
-            innerRightCanvas.getContext('2d').drawImage(document.getElementById('inner-right-canvas'), 0, 0);
-            
-            // Draw to final canvas
-            ctx.drawImage(frontCanvas, 0, 0);
-            ctx.drawImage(innerRightCanvas, 567, 0);
-        } else {
-            finalCanvas.width = 567 * 2;
-            finalCanvas.height = 794 * 2;
-            
-            // Use clean canvases for each panel
-            const panels = ['front', 'inner-left', 'inner-right', 'back'].map(id => {
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = 567;
-                tempCanvas.height = 794;
-                tempCanvas.getContext('2d').drawImage(document.getElementById(`${id}-canvas`), 0, 0);
-                return tempCanvas;
-            });
-            
-            // Draw to final canvas
-            ctx.drawImage(panels[0], 0, 0); // front
-            ctx.drawImage(panels[1], 567, 0); // inner-left
-            ctx.drawImage(panels[2], 0, 794); // inner-right
-            ctx.drawImage(panels[3], 567, 794); // back
-        }
-        
-        return finalCanvas.toDataURL('image/png');
-    } catch (error) {
-        console.error('Error creating preview:', error);
-        alert('Unable to create preview. Please try again.');
-        return null;
     }
 }
 
