@@ -1021,7 +1021,7 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
         const imgData = currentCardData.images[canvasIds.indexOf(sourceId)];
         if (imgData) {
             const img = new Image();
-            img.crossOrigin = "use-credentials";
+            // img.crossOrigin = "use-credentials";
             await new Promise((resolve, reject) => {
                 img.onload = () => {
                     tempCtx.drawImage(img, imgData.x, imgData.y, imgData.width, imgData.height);
@@ -1046,7 +1046,7 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
         const stickers = currentCardData.stickers[canvasType] || [];
         for (const sticker of stickers) {
             const img = new Image();
-            img.crossOrigin = "anonymous";
+            // img.crossOrigin = "anonymous";
             await new Promise((resolve, reject) => {
                 img.onload = () => {
                     // Convert pixel positions to canvas scale
