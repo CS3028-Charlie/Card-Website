@@ -1032,7 +1032,7 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
             });
         }
 
-        // Draw the texts
+        // Draw the texts and underlines
         const canvasType = sourceId.replace('-canvas', '');
         const texts = currentCardData.activeTexts[canvasType] || [];
         texts.forEach(text => {
@@ -1040,26 +1040,49 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
             tempCtx.fillStyle = text.color;
             tempCtx.textAlign = 'center';
             tempCtx.fillText(text.text, text.x, text.y);
+            
+            // Draw underline if needed
+            if (text.textDecoration === 'underline') {
+                const textWidth = tempCtx.measureText(text.text).width;
+                tempCtx.beginPath();
+                tempCtx.moveTo(text.x - textWidth / 2, text.y + 3);
+                tempCtx.lineTo(text.x + textWidth / 2, text.y + 3);
+                tempCtx.strokeStyle = text.color;
+                tempCtx.lineWidth = 2;
+                tempCtx.stroke();
+            }
         });
 
-        // Draw the stickers
+        // Draw the stickers with corrected scaling
         const stickers = currentCardData.stickers[canvasType] || [];
         const container = sourceCanvas.parentElement;
         const containerRect = container.getBoundingClientRect();
-        const containerScale = sourceCanvas.width / containerRect.width;
+
+        // Calculate scale factors based on canvas and display dimensions
+        const containerWidth = containerRect.width;
+        const containerHeight = containerRect.height;
+        const scaleX = sourceCanvas.width / containerWidth;
+        const scaleY = sourceCanvas.height / containerHeight;
 
         for (const sticker of stickers) {
             const img = new Image();
             img.crossOrigin = "anonymous";
             await new Promise((resolve, reject) => {
                 img.onload = () => {
-                    // Scale sticker position and size to canvas coordinates
-                    const canvasX = sticker.x * containerScale;
-                    const canvasY = sticker.y * containerScale;
-                    const canvasWidth = sticker.width * containerScale;
-                    const canvasHeight = sticker.height * containerScale;
+                    // Scale position and size using both dimensions
+                    const canvasX = sticker.x * scaleX;
+                    const canvasY = sticker.y * scaleY;
+                    const canvasWidth = sticker.width * scaleX;
+                    const canvasHeight = sticker.height * scaleY;
 
-                    tempCtx.drawImage(img, canvasX, canvasY, canvasWidth, canvasHeight);
+                    // Center the sticker at the scaled position
+                    tempCtx.drawImage(
+                        img,
+                        canvasX,
+                        canvasY,
+                        canvasWidth,
+                        canvasHeight
+                    );
                     resolve();
                 };
                 img.onerror = reject;
@@ -1174,7 +1197,7 @@ function handleStickerDragOver(e) {
     e.preventDefault();
 }
 
-// Update handleStickerDrop to store canvas-relative positions
+// Update handleStickerDrop to use larger base size
 function handleStickerDrop(e) {
     e.preventDefault();
     const container = e.currentTarget;
@@ -1192,7 +1215,7 @@ function handleStickerDrop(e) {
     const tempImg = new Image();
     tempImg.onload = () => {
         const aspectRatio = tempImg.width / tempImg.height;
-        const baseSize = 100; // Smaller base size
+        const baseSize = 150; // Increased base size for stickers
         
         const sticker = document.createElement('img');
         sticker.src = stickerSrc;
