@@ -1044,12 +1044,22 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
 
         // Draw the stickers
         const stickers = currentCardData.stickers[canvasType] || [];
+        const container = sourceCanvas.parentElement;
+        const containerRect = container.getBoundingClientRect();
+        const containerScale = sourceCanvas.width / containerRect.width;
+
         for (const sticker of stickers) {
             const img = new Image();
             img.crossOrigin = "anonymous";
             await new Promise((resolve, reject) => {
                 img.onload = () => {
-                    tempCtx.drawImage(img, sticker.x, sticker.y, sticker.width, sticker.height);
+                    // Scale sticker position and size to canvas coordinates
+                    const canvasX = sticker.x * containerScale;
+                    const canvasY = sticker.y * containerScale;
+                    const canvasWidth = sticker.width * containerScale;
+                    const canvasHeight = sticker.height * containerScale;
+
+                    tempCtx.drawImage(img, canvasX, canvasY, canvasWidth, canvasHeight);
                     resolve();
                 };
                 img.onerror = reject;
