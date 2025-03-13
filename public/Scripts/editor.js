@@ -982,48 +982,23 @@ async function buyNow() {
         let imageBlob;
 
         if (currentCardData.cardType === 'printable') {
-            // Create two pages for printable cards
-            const page1Canvas = document.createElement('canvas');
-            const page2Canvas = document.createElement('canvas');
-            const ctx1 = page1Canvas.getContext('2d');
-            const ctx2 = page2Canvas.getContext('2d');
+            // Create single canvas for printable card preview
+            const previewCanvas = document.createElement('canvas');
+            const ctx = previewCanvas.getContext('2d');
 
-            // Set dimensions for A4 size at 300 DPI
-            page1Canvas.width = page2Canvas.width = 2480; // A4 width at 300 DPI
-            page1Canvas.height = page2Canvas.height = 3508; // A4 height at 300 DPI
+            // Set dimensions for preview
+            previewCanvas.width = 2480; // A4 width at 300 DPI
+            previewCanvas.height = 3508; // A4 height at 300 DPI
 
-            // Copy front and inner-left to page 1
+            // Copy all panels to the preview
             await Promise.all([
-                createSecureCanvasCopy('front-canvas', ctx1, 0, 0, true),
-                createSecureCanvasCopy('back-canvas', ctx1, 1240, 0, true)
+                createSecureCanvasCopy('front-canvas', ctx, 0, 0, true),
+                createSecureCanvasCopy('back-canvas', ctx, 1240, 0, true),
+                createSecureCanvasCopy('inner-left-canvas', ctx, 0, 1754, true),
+                createSecureCanvasCopy('inner-right-canvas', ctx, 1240, 1754, true)
             ]);
 
-            // Copy inner-right and back to page 2
-            await Promise.all([
-                createSecureCanvasCopy('inner-left-canvas', ctx2, 0, 0, true),
-                createSecureCanvasCopy('inner-right-canvas', ctx2, 1240, 0, true)
-            ]);
-
-            // Convert both pages to blobs
-            const page1Blob = await new Promise(resolve => page1Canvas.toBlob(resolve, 'image/png'));
-            const page2Blob = await new Promise(resolve => page2Canvas.toBlob(resolve, 'image/png'));
-
-            // Create PDF using jsPDF
-            const pdf = new jspdf.jsPDF({
-                orientation: 'portrait',
-                unit: 'px',
-                format: 'a4'
-            });
-
-            // Add both pages to PDF
-            await pdf.addImage(page1Canvas.toDataURL('image/png'), 'PNG', 0, 0, 595, 842);
-            pdf.addPage();
-            await pdf.addImage(page2Canvas.toDataURL('image/png'), 'PNG', 0, 0, 595, 842);
-
-            // Save PDF
-            pdf.save(`printable-card-${Date.now()}.pdf`);
-            imageBlob = await new Promise(resolve => page1Canvas.toBlob(resolve, 'image/png'));
-
+            imageBlob = await new Promise(resolve => previewCanvas.toBlob(resolve, 'image/png'));
         } else {
             // Handle eCard
             const finalCanvas = document.createElement('canvas');
@@ -1045,7 +1020,7 @@ async function buyNow() {
         formData.append('type', currentCardData.cardType);
         formData.append('imageData', imageBlob, 'card.png');
 
-        const purchaseResponse = await fetch(`${API_URL}/api/cardPurchase/purchase`, {
+        const response = await fetch(`${API_URL}/api/cardPurchase/purchase`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${authToken}`
@@ -1053,12 +1028,11 @@ async function buyNow() {
             body: formData
         });
 
-        if (!purchaseResponse.ok) {
-            throw new Error('Purchase request failed');
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Purchase request failed');
         }
 
-        const purchaseResult = await purchaseResponse.json();
-        
         // Clear any existing draft ID
         sessionStorage.removeItem('draftId');
         
@@ -1067,7 +1041,7 @@ async function buyNow() {
 
     } catch (error) {
         console.error('Purchase error:', error);
-        alert('Purchase failed. Please try again.');
+        alert('Purchase failed: ' + error.message);
     }
 }
 
