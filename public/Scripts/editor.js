@@ -1090,11 +1090,11 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y, isHighRes = fal
     const tempCanvas = document.createElement('canvas');
     const scale = isHighRes ? 2 : 1;
     
-    tempCanvas.width = sourceCanvas.width * scale;
-    tempCanvas.height = sourceCanvas.height * scale;
+    // Set canvas size to match source dimensions
+    tempCanvas.width = sourceCanvas.width;
+    tempCanvas.height = sourceCanvas.height;
     
     const tempCtx = tempCanvas.getContext('2d');
-    tempCtx.scale(scale, scale);
 
     try {
         // Fill background
@@ -1108,8 +1108,8 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y, isHighRes = fal
             img.crossOrigin = "anonymous";
             await new Promise((resolve, reject) => {
                 img.onload = () => {
-                    tempCtx.drawImage(img, imgData.x * scale, imgData.y * scale, 
-                        imgData.width * scale, imgData.height * scale);
+                    // Draw the image at the stored dimensions
+                    tempCtx.drawImage(img, imgData.x, imgData.y, imgData.width, imgData.height);
                     resolve();
                 };
                 img.onerror = reject;
@@ -1117,21 +1117,21 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y, isHighRes = fal
             });
         }
 
-        // Draw text
+        // Draw texts
         const canvasType = sourceId.replace('-canvas', '');
         const texts = currentCardData.activeTexts[canvasType] || [];
         
         texts.forEach(text => {
-            tempCtx.font = `${text.fontStyle} ${text.fontWeight} ${text.fontSize * scale}px ${text.fontFamily}`;
+            tempCtx.font = `${text.fontStyle} ${text.fontWeight} ${text.fontSize}px ${text.fontFamily}`;
             tempCtx.fillStyle = text.color;
             tempCtx.textAlign = 'center';
-            tempCtx.fillText(text.text, text.x * scale, text.y * scale);
+            tempCtx.fillText(text.text, text.x, text.y);
 
             if (text.textDecoration === 'underline') {
                 const textWidth = tempCtx.measureText(text.text).width;
                 tempCtx.beginPath();
-                tempCtx.moveTo((text.x * scale) - textWidth / 2, (text.y * scale) + 3);
-                tempCtx.lineTo((text.x * scale) + textWidth / 2, (text.y * scale) + 3);
+                tempCtx.moveTo(text.x - textWidth / 2, text.y + 3);
+                tempCtx.lineTo(text.x + textWidth / 2, text.y + 3);
                 tempCtx.strokeStyle = text.color;
                 tempCtx.lineWidth = 2;
                 tempCtx.stroke();
@@ -1140,15 +1140,19 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y, isHighRes = fal
 
         // Draw stickers
         const stickers = currentCardData.stickers[canvasType] || [];
+        const container = sourceCanvas.parentElement;
+        const containerRect = container.getBoundingClientRect();
+        const scaleRatio = sourceCanvas.width / containerRect.width;
+
         for (const sticker of stickers) {
             const img = new Image();
             img.crossOrigin = "anonymous";
             await new Promise((resolve, reject) => {
                 img.onload = () => {
-                    const stickerX = sticker.x * scale;
-                    const stickerY = sticker.y * scale;
-                    const stickerWidth = sticker.width * scale;
-                    const stickerHeight = sticker.height * scale;
+                    const stickerX = sticker.x * scaleRatio;
+                    const stickerY = sticker.y * scaleRatio;
+                    const stickerWidth = sticker.width * scaleRatio;
+                    const stickerHeight = sticker.height * scaleRatio;
                     
                     tempCtx.drawImage(img, stickerX, stickerY, stickerWidth, stickerHeight);
                     resolve();
@@ -1158,8 +1162,27 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y, isHighRes = fal
             });
         }
 
-        // Draw to target canvas
-        targetCtx.drawImage(tempCanvas, x, y);
+        // Scale up the final result if high resolution is requested
+        if (isHighRes) {
+            const hiResCanvas = document.createElement('canvas');
+            hiResCanvas.width = tempCanvas.width * scale;
+            hiResCanvas.height = tempCanvas.height * scale;
+            const hiResCtx = hiResCanvas.getContext('2d');
+            
+            // Use better image scaling
+            hiResCtx.imageSmoothingEnabled = true;
+            hiResCtx.imageSmoothingQuality = 'high';
+            
+            // Scale up the temp canvas
+            hiResCtx.scale(scale, scale);
+            hiResCtx.drawImage(tempCanvas, 0, 0);
+            
+            // Draw to target canvas
+            targetCtx.drawImage(hiResCanvas, x, y);
+        } else {
+            // Draw directly to target canvas at original size
+            targetCtx.drawImage(tempCanvas, x, y);
+        }
 
     } catch (error) {
         console.error('Error in createSecureCanvasCopy:', error);
