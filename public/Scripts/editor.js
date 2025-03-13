@@ -1072,7 +1072,7 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
                     // Scale position and size using both dimensions
                     const canvasX = sticker.x * scaleX;
                     const canvasY = sticker.y * scaleY;
-                    const canvasWidth = sticker.width * scaleX;
+                    const canvasWidth = sticker.width * 2 * scaleX;
                     const canvasHeight = sticker.height * scaleY;
 
                     // Center the sticker at the scaled position
