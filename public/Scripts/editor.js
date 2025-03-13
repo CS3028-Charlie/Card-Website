@@ -979,29 +979,30 @@ async function buyNow() {
 
     try {
         const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
-        let imageBlob;
+        let finalCanvas;
+        let filename;
 
         if (currentCardData.cardType === 'printable') {
-            // Create single canvas for printable card preview
-            const previewCanvas = document.createElement('canvas');
-            const ctx = previewCanvas.getContext('2d');
+            // Create two pages for printable cards
+            finalCanvas = document.createElement('canvas');
+            const ctx = finalCanvas.getContext('2d');
 
-            // Set dimensions for preview
-            previewCanvas.width = 2480; // A4 width at 300 DPI
-            previewCanvas.height = 3508; // A4 height at 300 DPI
+            // Set dimensions for A4 size at 300 DPI
+            finalCanvas.width = 2480; // A4 width at 300 DPI
+            finalCanvas.height = 3508; // A4 height at 300 DPI
 
-            // Copy all panels to the preview
+            // Copy front and inner-left to page 1
             await Promise.all([
                 createSecureCanvasCopy('front-canvas', ctx, 0, 0, true),
-                createSecureCanvasCopy('back-canvas', ctx, 1240, 0, true),
-                createSecureCanvasCopy('inner-left-canvas', ctx, 0, 1754, true),
-                createSecureCanvasCopy('inner-right-canvas', ctx, 1240, 1754, true)
+                createSecureCanvasCopy('inner-left-canvas', ctx, 1240, 0, true),
+                createSecureCanvasCopy('inner-right-canvas', ctx, 0, 1754, true),
+                createSecureCanvasCopy('back-canvas', ctx, 1240, 1754, true)
             ]);
 
-            imageBlob = await new Promise(resolve => previewCanvas.toBlob(resolve, 'image/png'));
+            filename = `printable-card-${Date.now()}.png`;
         } else {
             // Handle eCard
-            const finalCanvas = document.createElement('canvas');
+            finalCanvas = document.createElement('canvas');
             const ctx = finalCanvas.getContext('2d');
             
             finalCanvas.width = 567 * 2;
@@ -1012,15 +1013,18 @@ async function buyNow() {
                 createSecureCanvasCopy('inner-right-canvas', ctx, 567, 0, true)
             ]);
 
-            imageBlob = await new Promise(resolve => finalCanvas.toBlob(resolve, 'image/png'));
+            filename = `ecard-${Date.now()}.png`;
         }
+
+        // Convert canvas to Blob
+        const imageBlob = await new Promise(resolve => finalCanvas.toBlob(resolve, 'image/png'));
 
         // Make purchase request
         const formData = new FormData();
         formData.append('type', currentCardData.cardType);
         formData.append('imageData', imageBlob, 'card.png');
 
-        const response = await fetch(`${API_URL}/api/cardPurchase/purchase`, {
+        const purchaseResponse = await fetch(`${API_URL}/api/cardPurchase/purchase`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${authToken}`
@@ -1028,20 +1032,38 @@ async function buyNow() {
             body: formData
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Purchase request failed');
+        if (purchaseResponse.status === 401) {
+            localStorage.removeItem('authToken');
+            alert('Your session has expired. Please login again.');
+            window.location.href = '/login.html';
+            return;
         }
 
-        // Clear any existing draft ID
-        sessionStorage.removeItem('draftId');
-        
-        // Redirect to success page
-        window.location.href = '/purchase-success.html';
+        if (!purchaseResponse.ok) {
+            const errorData = await purchaseResponse.json();
+            throw new Error(errorData.message || 'Purchase failed');
+        }
+
+        // Download the card
+        const downloadUrl = URL.createObjectURL(imageBlob);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = downloadUrl;
+        downloadLink.download = filename;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        URL.revokeObjectURL(downloadUrl);
+
+        // Show success message
+        alert('Purchase successful! Your card has been downloaded.');
 
     } catch (error) {
         console.error('Purchase error:', error);
-        alert('Purchase failed: ' + error.message);
+        if (error.message.includes('Insufficient balance')) {
+            alert('Insufficient credits. Please add more credits to your account.');
+        } else {
+            alert('Purchase failed. Please try again.');
+        }
     }
 }
 
