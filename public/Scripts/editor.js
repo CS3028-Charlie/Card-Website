@@ -1044,23 +1044,23 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
 
         // Draw the stickers
         const stickers = currentCardData.stickers[canvasType] || [];
+        const canvas = document.getElementById(sourceId);
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
         for (const sticker of stickers) {
             const img = new Image();
             img.crossOrigin = "anonymous";
             await new Promise((resolve, reject) => {
                 img.onload = () => {
-                    // Convert pixel positions to canvas scale
-                    const canvas = document.getElementById(sourceId);
-                    const rect = canvas.getBoundingClientRect();
-                    const scaleX = canvas.width / rect.width;
-                    const scaleY = canvas.height / rect.height;
+                    // Convert from screen coordinates to canvas coordinates
+                    const canvasX = sticker.x * scaleX;
+                    const canvasY = sticker.y * scaleY;
+                    const canvasWidth = sticker.width * scaleX;
+                    const canvasHeight = sticker.height * scaleY;
 
-                    const x = sticker.x * scaleX;
-                    const y = sticker.y * scaleY;
-                    const width = sticker.width * scaleX;
-                    const height = sticker.height * scaleY;
-
-                    tempCtx.drawImage(img, x, y, width, height);
+                    tempCtx.drawImage(img, canvasX, canvasY, canvasWidth, canvasHeight);
                     resolve();
                 };
                 img.onerror = reject;
@@ -1175,13 +1175,14 @@ function handleStickerDragOver(e) {
     e.preventDefault();
 }
 
-// Update handleStickerDrop to maintain aspect ratio
+// Update handleStickerDrop to store canvas-relative positions
 function handleStickerDrop(e) {
     e.preventDefault();
     const container = e.currentTarget;
     const stickerSrc = e.dataTransfer.getData('text/plain');
     const canvasId = container.querySelector('canvas').id;
     const canvasType = canvasId.replace('-canvas', '');
+    const canvas = document.getElementById(canvasId);
 
     // Calculate position relative to canvas container
     const rect = container.getBoundingClientRect();
@@ -1192,26 +1193,31 @@ function handleStickerDrop(e) {
     const tempImg = new Image();
     tempImg.onload = () => {
         const aspectRatio = tempImg.width / tempImg.height;
-        const baseSize = 200; // Base size in pixels
+        const baseSize = 100; // Smaller base size
         
         const sticker = document.createElement('img');
         sticker.src = stickerSrc;
         sticker.classList.add('placed-sticker');
         
         // Set size maintaining aspect ratio
+        let stickerWidth, stickerHeight;
         if (aspectRatio > 1) {
-            sticker.style.width = `${baseSize}px`;
-            sticker.style.height = `${baseSize / aspectRatio}px`;
+            stickerWidth = baseSize;
+            stickerHeight = baseSize / aspectRatio;
         } else {
-            sticker.style.height = `${baseSize}px`;
-            sticker.style.width = `${baseSize * aspectRatio}px`;
+            stickerHeight = baseSize;
+            stickerWidth = baseSize * aspectRatio;
         }
         
+        sticker.style.width = `${stickerWidth}px`;
+        sticker.style.height = `${stickerHeight}px`;
+        
         // Center sticker on drop position
-        const stickerWidth = aspectRatio > 1 ? baseSize : baseSize * aspectRatio;
-        const stickerHeight = aspectRatio > 1 ? baseSize / aspectRatio : baseSize;
-        sticker.style.left = `${x - stickerWidth/2}px`;
-        sticker.style.top = `${y - stickerHeight/2}px`;
+        const stickerX = x - stickerWidth/2;
+        const stickerY = y - stickerHeight/2;
+        
+        sticker.style.left = `${stickerX}px`;
+        sticker.style.top = `${stickerY}px`;
         
         makeStickerDraggable(sticker);
         container.appendChild(sticker);
@@ -1219,8 +1225,8 @@ function handleStickerDrop(e) {
         // Save sticker data
         currentCardData.stickers[canvasType].push({
             src: stickerSrc,
-            x: x - stickerWidth/2,
-            y: y - stickerHeight/2,
+            x: stickerX,
+            y: stickerY,
             width: stickerWidth,
             height: stickerHeight
         });
