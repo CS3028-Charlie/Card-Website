@@ -948,9 +948,9 @@ async function buyNow() {
             finalCanvas.height = 794 * 2;
             await Promise.all([
                 createSecureCanvasCopy('front-canvas', ctx, 0, 0),
-                createSecureCanvasCopy('inner-left-canvas', ctx, 567, 0),
-                createSecureCanvasCopy('inner-right-canvas', ctx, 0, 794),
-                createSecureCanvasCopy('back-canvas', ctx, 567, 794)
+                createSecureCanvasCopy('back-canvas', ctx, 567, 0),
+                createSecureCanvasCopy('inner-left-canvas', ctx, 0, 794),
+                createSecureCanvasCopy('inner-right-canvas', ctx, 567, 794)
             ]);
         }
 
@@ -1068,25 +1068,25 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
             const img = new Image();
             img.crossOrigin = "anonymous";
             await new Promise((resolve, reject) => {
-                img.onload = () => {
-                    // Scale position and size using both dimensions
-                    const canvasX = sticker.x * scaleX;
-                    const canvasY = sticker.y * scaleY;
-                    const canvasWidth = sticker.width * 2.5 * scaleX;
-                    const canvasHeight = sticker.height * scaleY;
+            img.onload = () => {
+                // Scale position and size using both dimensions
+                const canvasX = (sticker.x - 50) * scaleX;  // Subtract offset to correct position
+                const canvasY = sticker.y * scaleY;
+                const canvasWidth = sticker.width * 2.5 * scaleX;
+                const canvasHeight = sticker.height * scaleY;
 
-                    // Center the sticker at the scaled position
-                    tempCtx.drawImage(
-                        img,
-                        canvasX,
-                        canvasY,
-                        canvasWidth,
-                        canvasHeight
-                    );
-                    resolve();
-                };
-                img.onerror = reject;
-                img.src = sticker.src;
+                // Center the sticker at the scaled position
+                tempCtx.drawImage(
+                img,
+                canvasX,
+                canvasY,
+                canvasWidth,
+                canvasHeight
+                );
+                resolve();
+            };
+            img.onerror = reject;
+            img.src = sticker.src;
             });
         }
 
