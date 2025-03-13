@@ -999,13 +999,13 @@ async function buyNow() {
 
             // Draw canvases
             await Promise.all([
-                createSecureCanvasCopy('front-canvas', ctx1, 0, 0, true),
-                createSecureCanvasCopy('back-canvas', ctx1, 567, 0, true)
+                createSecureCanvasCopy('front-canvas', ctx1, 0, 0, false),
+                createSecureCanvasCopy('back-canvas', ctx1, 567, 0, false)
             ]);
 
             await Promise.all([
-                createSecureCanvasCopy('inner-left-canvas', ctx2, 0, 0, true),
-                createSecureCanvasCopy('inner-right-canvas', ctx2, 567, 0, true)
+                createSecureCanvasCopy('inner-left-canvas', ctx2, 0, 0, false),
+                createSecureCanvasCopy('inner-right-canvas', ctx2, 567, 0, false)
             ]);
 
             // Add pages to PDF
@@ -1043,8 +1043,8 @@ async function buyNow() {
             finalCanvas.height = 794;
 
             await Promise.all([
-                createSecureCanvasCopy('front-canvas', ctx, 0, 0, true),
-                createSecureCanvasCopy('inner-right-canvas', ctx, 567, 0, true)
+                createSecureCanvasCopy('front-canvas', ctx, 0, 0, false),
+                createSecureCanvasCopy('inner-right-canvas', ctx, 567, 0, false)
             ]);
 
             const imageBlob = await new Promise(resolve => finalCanvas.toBlob(resolve, 'image/png'));
