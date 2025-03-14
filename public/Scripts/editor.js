@@ -1003,6 +1003,7 @@ async function buyNow() {
         }
     }
 }
+
 // Helper function to create secure canvas copies 
 async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
     // Get the tab and canvas type
@@ -1026,7 +1027,10 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
     document.querySelectorAll('.tab-pane').forEach(pane => {
         pane.classList.remove('show', 'active');
     });
-    document.getElementById(canvasType).classList.add('show', 'active');
+    const tabContent = document.getElementById(canvasType + '-tab');
+    if (tabContent) {
+        tabContent.classList.add('show', 'active');
+    }
     
     // Wait a moment for the tab switch animations to complete
     await new Promise(resolve => setTimeout(resolve, 200));
@@ -1036,7 +1040,6 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
     tempCanvas.width = sourceCanvas.width;
     tempCanvas.height = sourceCanvas.height;
     const tempCtx = tempCanvas.getContext('2d');
-
 
     try {
         // Fill with white background
