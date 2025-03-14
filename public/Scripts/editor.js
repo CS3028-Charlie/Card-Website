@@ -1005,6 +1005,13 @@ async function buyNow() {
 }
 // Helper function to create secure canvas copies 
 async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
+    // Force load the tab for this canvas first
+    const tabId = sourceId.replace('-canvas', '-tab');
+    document.getElementById(tabId).click();
+    
+    // Wait a moment for the tab switch to complete
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     const sourceCanvas = document.getElementById(sourceId);
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = sourceCanvas.width;
@@ -1031,7 +1038,7 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
             });
         }
 
-        // Draw the texts and underlines
+        // Draw texts with underlines
         const canvasType = sourceId.replace('-canvas', '');
         const texts = currentCardData.activeTexts[canvasType] || [];
         texts.forEach(text => {
@@ -1051,34 +1058,42 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
             }
         });
 
-        // Draw all stickers for this canvas type
+        // Draw stickers at high resolution
         const stickers = currentCardData.stickers[canvasType] || [];
         const container = document.querySelector(`#${sourceId}`).parentElement;
         const containerRect = container.getBoundingClientRect();
         const scaleX = sourceCanvas.width / containerRect.width;
         const scaleY = sourceCanvas.height / containerRect.height;
 
-        // Create an array of promises for loading and drawing stickers
-        const stickerPromises = stickers.map(sticker => {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = "anonymous";
+        // Create high-res offscreen canvas for stickers
+        const stickerCanvas = document.createElement('canvas');
+        stickerCanvas.width = tempCanvas.width * 2;  // Double resolution
+        stickerCanvas.height = tempCanvas.height * 2;
+        const stickerCtx = stickerCanvas.getContext('2d');
+        stickerCtx.scale(2, 2);  // Scale up for higher resolution
+
+        // Draw each sticker
+        for (const sticker of stickers) {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            await new Promise((resolve, reject) => {
                 img.onload = () => {
-                    const canvasX = (sticker.x - 50) * scaleX;  // Subtract offset to correct position
+                    const canvasX = (sticker.x - 50) * scaleX;
                     const canvasY = sticker.y * scaleY;
-                    const canvasWidth = sticker.width * 2.5 * scaleX;
-                    const canvasHeight = sticker.height * scaleY;
+                    const canvasWidth = sticker.width * 2.5 * scaleX * 1.5;  // Increased size
+                    const canvasHeight = sticker.height * scaleY * 1.5;  // Increased size
                     
-                    tempCtx.drawImage(img, canvasX, canvasY, canvasWidth, canvasHeight);
+                    // Draw to high-res canvas
+                    stickerCtx.drawImage(img, canvasX, canvasY, canvasWidth, canvasHeight);
                     resolve();
                 };
                 img.onerror = reject;
                 img.src = sticker.src;
             });
-        });
+        }
 
-        // Wait for all stickers to be drawn
-        await Promise.all(stickerPromises);
+        // Draw high-res sticker canvas onto temp canvas
+        tempCtx.drawImage(stickerCanvas, 0, 0, tempCanvas.width, tempCanvas.height);
 
         // Draw to target canvas
         targetCtx.drawImage(tempCanvas, x, y);
