@@ -931,33 +931,37 @@ async function buyNow() {
 
     try {
         const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
-
-        // Create final canvas with card content
         const finalCanvas = document.createElement('canvas');
         const ctx = finalCanvas.getContext('2d');
+
+        async function switchTabAndCreateCopy(canvasId, x, y) {
+            // Switch to the correct tab first
+            const tabId = canvasId.replace('-canvas', '-tab');
+            document.getElementById(tabId).click();
+            
+            // Wait for tab switch and canvas update
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
+            // Create the secure copy
+            await createSecureCanvasCopy(canvasId, ctx, x, y);
+        }
 
         if (currentCardData.cardType === 'eCard') {
             finalCanvas.width = 567 * 2;
             finalCanvas.height = 794;
-            await Promise.all([
-                createSecureCanvasCopy('front-canvas', ctx, 0, 0),
-                createSecureCanvasCopy('inner-right-canvas', ctx, 567, 0)
-            ]);
+            await switchTabAndCreateCopy('front-canvas', 0, 0);
+            await switchTabAndCreateCopy('inner-right-canvas', 567, 0);
         } else {
             finalCanvas.width = 567 * 2;
             finalCanvas.height = 794 * 2;
-            await Promise.all([
-                createSecureCanvasCopy('front-canvas', ctx, 0, 0),
-                createSecureCanvasCopy('back-canvas', ctx, 567, 0),
-                createSecureCanvasCopy('inner-left-canvas', ctx, 0, 794),
-                createSecureCanvasCopy('inner-right-canvas', ctx, 567, 794)
-            ]);
+            await switchTabAndCreateCopy('front-canvas', 0, 0);
+            await switchTabAndCreateCopy('back-canvas', 567, 0);
+            await switchTabAndCreateCopy('inner-left-canvas', 0, 794);
+            await switchTabAndCreateCopy('inner-right-canvas', 567, 794);
         }
 
-        // Convert canvas to Blob
+        // Rest of the buyNow function remains the same
         const imageBlob = await new Promise(resolve => finalCanvas.toBlob(resolve, 'image/png'));
-
-        // Create FormData
         const formData = new FormData();
         formData.append('type', currentCardData.cardType);
         formData.append('imageData', imageBlob, 'card.png');
@@ -1017,8 +1021,23 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
     // Update active canvas and trigger all tab change logic
     setActiveCanvas(canvasType);
     
+    // Remove active class from all tabs and show the correct one
+    document.querySelectorAll('.nav-tabs .nav-link').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    tabElement.classList.add('active');
+    
+    // Update tab content visibility
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+        pane.classList.remove('show', 'active');
+    });
+    const tabContent = document.getElementById(canvasType + '-tab');
+    if (tabContent) {
+        tabContent.classList.add('show', 'active');
+    }
+    
     // Wait a moment for the tab switch animations to complete
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 200));
     
     const sourceCanvas = document.getElementById(sourceId);
     const tempCanvas = document.createElement('canvas');
