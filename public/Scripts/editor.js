@@ -1017,21 +1017,6 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
     // Update active canvas and trigger all tab change logic
     setActiveCanvas(canvasType);
     
-    // Remove active class from all tabs and show the correct one
-    document.querySelectorAll('.nav-tabs .nav-link').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    tabElement.classList.add('active');
-    
-    // Update tab content visibility
-    document.querySelectorAll('.tab-pane').forEach(pane => {
-        pane.classList.remove('show', 'active');
-    });
-    const tabContent = document.getElementById(canvasType + '-tab');
-    if (tabContent) {
-        tabContent.classList.add('show', 'active');
-    }
-    
     // Wait a moment for the tab switch animations to complete
     await new Promise(resolve => setTimeout(resolve, 200));
     
