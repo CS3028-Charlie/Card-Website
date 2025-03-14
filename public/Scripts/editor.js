@@ -1053,33 +1053,32 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
 
         // Draw all stickers for this canvas type
         const stickers = currentCardData.stickers[canvasType] || [];
-        const containerRect = sourceCanvas.parentElement.getBoundingClientRect();
+        const container = document.querySelector(`#${sourceId}`).parentElement;
+        const containerRect = container.getBoundingClientRect();
         const scaleX = sourceCanvas.width / containerRect.width;
         const scaleY = sourceCanvas.height / containerRect.height;
 
-        for (const sticker of stickers) {
-            const img = new Image();
-            img.crossOrigin = "anonymous";
-            await new Promise((resolve, reject) => {
+        // Create an array of promises for loading and drawing stickers
+        const stickerPromises = stickers.map(sticker => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
                 img.onload = () => {
                     const canvasX = (sticker.x - 50) * scaleX;  // Subtract offset to correct position
                     const canvasY = sticker.y * scaleY;
                     const canvasWidth = sticker.width * 2.5 * scaleX;
                     const canvasHeight = sticker.height * scaleY;
-
-                    tempCtx.drawImage(
-                        img,
-                        canvasX,
-                        canvasY,
-                        canvasWidth,
-                        canvasHeight
-                    );
+                    
+                    tempCtx.drawImage(img, canvasX, canvasY, canvasWidth, canvasHeight);
                     resolve();
                 };
                 img.onerror = reject;
                 img.src = sticker.src;
             });
-        }
+        });
+
+        // Wait for all stickers to be drawn
+        await Promise.all(stickerPromises);
 
         // Draw to target canvas
         targetCtx.drawImage(tempCanvas, x, y);
