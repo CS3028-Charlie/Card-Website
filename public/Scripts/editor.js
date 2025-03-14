@@ -1018,7 +1018,7 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
     setActiveCanvas(canvasType);
     
     // Wait a moment for the tab switch animations to complete
-    await new Promise(resolve => setTimeout(resolve, 200));
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
     const sourceCanvas = document.getElementById(sourceId);
     const tempCanvas = document.createElement('canvas');
