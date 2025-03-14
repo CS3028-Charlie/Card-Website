@@ -1005,18 +1005,38 @@ async function buyNow() {
 }
 // Helper function to create secure canvas copies 
 async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
-    // Force load the tab for this canvas first
+    // Get the tab and canvas type
     const tabId = sourceId.replace('-canvas', '-tab');
-    document.getElementById(tabId).click();
+    const canvasType = sourceId.split('-')[0];
     
-    // Wait a moment for the tab switch to complete
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // Programmatically click the tab
+    const tabElement = document.getElementById(tabId);
+    tabElement.click();
+    
+    // Update active canvas and trigger all tab change logic
+    setActiveCanvas(canvasType);
+    
+    // Remove active class from all tabs and show the correct one
+    document.querySelectorAll('.nav-tabs .nav-link').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    tabElement.classList.add('active');
+    
+    // Update tab content visibility
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+        pane.classList.remove('show', 'active');
+    });
+    document.getElementById(canvasType).classList.add('show', 'active');
+    
+    // Wait a moment for the tab switch animations to complete
+    await new Promise(resolve => setTimeout(resolve, 200));
     
     const sourceCanvas = document.getElementById(sourceId);
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = sourceCanvas.width;
     tempCanvas.height = sourceCanvas.height;
     const tempCtx = tempCanvas.getContext('2d');
+
 
     try {
         // Fill with white background
@@ -1080,8 +1100,8 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
                 img.onload = () => {
                     const canvasX = (sticker.x - 50) * scaleX;
                     const canvasY = sticker.y * scaleY;
-                    const canvasWidth = sticker.width * 2.5 * scaleX * 1.5;  // Increased size
-                    const canvasHeight = sticker.height * scaleY * 1.5;  // Increased size
+                    const canvasWidth = sticker.width * 2.5 * scaleX
+                    const canvasHeight = sticker.height * scaleY
                     
                     // Draw to high-res canvas
                     stickerCtx.drawImage(img, canvasX, canvasY, canvasWidth, canvasHeight);
