@@ -931,37 +931,33 @@ async function buyNow() {
 
     try {
         const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
+
+        // Create final canvas with card content
         const finalCanvas = document.createElement('canvas');
         const ctx = finalCanvas.getContext('2d');
-
-        async function switchTabAndCreateCopy(canvasId, x, y) {
-            // Switch to the correct tab first
-            const tabId = canvasId.replace('-canvas', '-tab');
-            document.getElementById(tabId).click();
-            
-            // Wait for tab switch and canvas update
-            await new Promise(resolve => setTimeout(resolve, 200));
-            
-            // Create the secure copy
-            await createSecureCanvasCopy(canvasId, ctx, x, y);
-        }
 
         if (currentCardData.cardType === 'eCard') {
             finalCanvas.width = 567 * 2;
             finalCanvas.height = 794;
-            await switchTabAndCreateCopy('front-canvas', 0, 0);
-            await switchTabAndCreateCopy('inner-right-canvas', 567, 0);
+            await Promise.all([
+                createSecureCanvasCopy('front-canvas', ctx, 0, 0),
+                createSecureCanvasCopy('inner-right-canvas', ctx, 567, 0)
+            ]);
         } else {
             finalCanvas.width = 567 * 2;
             finalCanvas.height = 794 * 2;
-            await switchTabAndCreateCopy('front-canvas', 0, 0);
-            await switchTabAndCreateCopy('back-canvas', 567, 0);
-            await switchTabAndCreateCopy('inner-left-canvas', 0, 794);
-            await switchTabAndCreateCopy('inner-right-canvas', 567, 794);
+            await Promise.all([
+                createSecureCanvasCopy('front-canvas', ctx, 0, 0),
+                createSecureCanvasCopy('back-canvas', ctx, 567, 0),
+                createSecureCanvasCopy('inner-left-canvas', ctx, 0, 794),
+                createSecureCanvasCopy('inner-right-canvas', ctx, 567, 794)
+            ]);
         }
 
-        // Rest of the buyNow function remains the same
+        // Convert canvas to Blob
         const imageBlob = await new Promise(resolve => finalCanvas.toBlob(resolve, 'image/png'));
+
+        // Create FormData
         const formData = new FormData();
         formData.append('type', currentCardData.cardType);
         formData.append('imageData', imageBlob, 'card.png');
@@ -1007,38 +1003,8 @@ async function buyNow() {
         }
     }
 }
-
 // Helper function to create secure canvas copies 
 async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
-    // Get the tab and canvas type
-    const tabId = sourceId.replace('-canvas', '-tab');
-    const canvasType = sourceId.split('-')[0];
-    
-    // Programmatically click the tab
-    const tabElement = document.getElementById(tabId);
-    tabElement.click();
-    
-    // Update active canvas and trigger all tab change logic
-    setActiveCanvas(canvasType);
-    
-    // Remove active class from all tabs and show the correct one
-    document.querySelectorAll('.nav-tabs .nav-link').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    tabElement.classList.add('active');
-    
-    // Update tab content visibility
-    document.querySelectorAll('.tab-pane').forEach(pane => {
-        pane.classList.remove('show', 'active');
-    });
-    const tabContent = document.getElementById(canvasType + '-tab');
-    if (tabContent) {
-        tabContent.classList.add('show', 'active');
-    }
-    
-    // Wait a moment for the tab switch animations to complete
-    await new Promise(resolve => setTimeout(resolve, 200));
-    
     const sourceCanvas = document.getElementById(sourceId);
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = sourceCanvas.width;
@@ -1065,7 +1031,7 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
             });
         }
 
-        // Draw texts with underlines
+        // Draw the texts and underlines
         const canvasType = sourceId.replace('-canvas', '');
         const texts = currentCardData.activeTexts[canvasType] || [];
         texts.forEach(text => {
@@ -1085,42 +1051,35 @@ async function createSecureCanvasCopy(sourceId, targetCtx, x, y) {
             }
         });
 
-        // Draw stickers at high resolution
+        // Draw all stickers for this canvas type
         const stickers = currentCardData.stickers[canvasType] || [];
-        const container = document.querySelector(`#${sourceId}`).parentElement;
-        const containerRect = container.getBoundingClientRect();
+        const containerRect = sourceCanvas.parentElement.getBoundingClientRect();
         const scaleX = sourceCanvas.width / containerRect.width;
         const scaleY = sourceCanvas.height / containerRect.height;
 
-        // Create high-res offscreen canvas for stickers
-        const stickerCanvas = document.createElement('canvas');
-        stickerCanvas.width = tempCanvas.width * 2;  // Double resolution
-        stickerCanvas.height = tempCanvas.height * 2;
-        const stickerCtx = stickerCanvas.getContext('2d');
-        stickerCtx.scale(2, 2);  // Scale up for higher resolution
-
-        // Draw each sticker
         for (const sticker of stickers) {
             const img = new Image();
             img.crossOrigin = "anonymous";
             await new Promise((resolve, reject) => {
                 img.onload = () => {
-                    const canvasX = (sticker.x - 50) * scaleX;
+                    const canvasX = (sticker.x - 50) * scaleX;  // Subtract offset to correct position
                     const canvasY = sticker.y * scaleY;
-                    const canvasWidth = sticker.width * 2.5 * scaleX
-                    const canvasHeight = sticker.height * scaleY
-                    
-                    // Draw to high-res canvas
-                    stickerCtx.drawImage(img, canvasX, canvasY, canvasWidth, canvasHeight);
+                    const canvasWidth = sticker.width * 2.5 * scaleX;
+                    const canvasHeight = sticker.height * scaleY;
+
+                    tempCtx.drawImage(
+                        img,
+                        canvasX,
+                        canvasY,
+                        canvasWidth,
+                        canvasHeight
+                    );
                     resolve();
                 };
                 img.onerror = reject;
                 img.src = sticker.src;
             });
         }
-
-        // Draw high-res sticker canvas onto temp canvas
-        tempCtx.drawImage(stickerCanvas, 0, 0, tempCanvas.width, tempCanvas.height);
 
         // Draw to target canvas
         targetCtx.drawImage(tempCanvas, x, y);
