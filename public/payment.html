@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="py-5 text-center">
+            <img class="d-block mx-auto mb-4" src="Images/TSA-Logo.png"
+                alt="" width="72" height="72">
+            <h2>Checkout</h2>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-4 order-md-2 mb-4">
+                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">Your cart</span>
+                    <span class="badge badge-secondary badge-pill">3</span>
+                </h4>
+                <ul class="list-group mb-3">
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0">Card 1</h6>
+                            <small class="text-muted">Brief description</small>
+                        </div>
+                        <span class="text-muted">200 credits</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0">Card 2</h6>
+                            <small class="text-muted">Brief description</small>
+                        </div>
+                        <span class="text-muted">100 credits</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0">Card 3</h6>
+                            <small class="text-muted">Brief description</small>
+                        </div>
+                        <span class="text-muted">100 credits</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Total</span>
+                        <strong>400 credits (£4.00)</strong>
+                    </li>
+                </ul>
+
+                <form class="card p-2">
+                    <div id="paypal-button-container"></div>
+                    <p id="result-message"></p>
+                </form>
+            </div>
+            
+        </div>
+    </div>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <!-- Initialize the JS-SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AdTDbApnyiJFvtVTjUJCHb0YbUOLEF_awqC8vYISaF7ql45ikBoLYPLaAt3Oup6f_IgCRPHRSjVMo8bI&buyer-country=GB&currency=GBP&components=buttons&enable-funding=venmo,paylater,card"
+    data-sdk-integration-source="developer-studio"
+    ></script>
+    <script type="module" src="Scripts/paypal_pay.js"></script>
+</body>
+
+
+</html>

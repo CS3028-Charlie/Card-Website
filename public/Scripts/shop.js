@@ -380,7 +380,7 @@ function openCardModal(cardIndex, images) {
 
             // Delay navigation to ensure data storage is complete
             setTimeout(() => {
-                window.location.href = 'Credit_Pay.html';
+                window.location.href = 'payment.html';
             }, 100);  // Delay 100ms to ensure sessionStorage storage is complete
         };
     }
