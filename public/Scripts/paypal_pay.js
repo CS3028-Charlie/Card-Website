@@ -2,6 +2,42 @@ import config from "./config.js"
 
 const API_URL = config.API_URL
 
+document.addEventListener("DOMContentLoaded", () => {
+    const paypalOption = document.getElementById("paypal-option");
+    const creditOption = document.getElementById("credits-option");
+    const paypalButtonContainer = document.getElementById("paypal-button-container");
+    const creditCheckoutButton = document.getElementById("credit-checkout-button");
+
+    const togglePaypalButton = () => {
+        paypalButtonContainer.style.display = paypalOption.checked ? "block" : "none";
+        creditCheckoutButton.style.display = creditOption.checked ? "block" : "none";
+    };
+
+    paypalOption.addEventListener("change", togglePaypalButton);
+    creditOption.addEventListener("change", togglePaypalButton);
+
+    togglePaypalButton();
+
+    const remainingCreditsElement = document.getElementById("remaining-credits");
+    const totalCreditsElement = document.querySelector(".list-group-item strong");
+
+    const checkCredits = () => {
+        const availableCredits = parseInt(remainingCreditsElement.textContent, 10);
+        const requiredCredits = parseInt(totalCreditsElement.textContent.split(" ")[0], 10);
+
+        if (availableCredits >= requiredCredits) {
+            remainingCreditsElement.style.color = "inherit";
+            creditCheckoutButton.disabled = false;
+        } else {
+            remainingCreditsElement.style.color = "red";
+            creditCheckoutButton.disabled = true;
+        }
+    };
+
+    checkCredits();
+
+});
+
 window.paypal
     .Buttons({
         style: {
@@ -12,7 +48,7 @@ window.paypal
         },
         message: {
             amount: 100,
-        } ,
+        },
 
         async createOrder() {
             try {
@@ -48,7 +84,7 @@ window.paypal
                 console.error(error);
                 // resultMessage(`Could not initiate PayPal Checkout...<br><br>${error}`);
             }
-        } ,
+        },
 
         async onApprove(data, actions) {
             try {
@@ -106,6 +142,6 @@ window.paypal
                     `Sorry, your transaction could not be processed...<br><br>${error}`
                 );
             }
-        } ,
+        },
     })
-    .render("#paypal-button-container"); 
+    .render("#paypal-button-container");
