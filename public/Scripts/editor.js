@@ -932,7 +932,6 @@ async function buyNow() {
     try {
         const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
 
-        // Create final canvas with the correct dimensions
         const finalCanvas = document.createElement('canvas');
         const ctx = finalCanvas.getContext('2d');
 
@@ -944,22 +943,22 @@ async function buyNow() {
             finalCanvas.height = 794 * 2;
         }
 
-        // Ensure all canvases are properly drawn before merging
-        const canvases = {
-            front: await createFullCanvasCopy('front-canvas'),
-            back: await createFullCanvasCopy('back-canvas'),
-            innerLeft: await createFullCanvasCopy('inner-left-canvas'),
-            innerRight: await createFullCanvasCopy('inner-right-canvas')
-        };
+        // Ensure all canvases are properly rendered before capturing them
+        await ensureAllTabsRendered();
 
+        // Capture the final composite image
         if (currentCardData.cardType === 'eCard') {
-            ctx.drawImage(canvases.front, 0, 0);
-            ctx.drawImage(canvases.innerRight, 567, 0);
+            await Promise.all([
+                createSecureCanvasCopy('front-canvas', ctx, 0, 0),
+                createSecureCanvasCopy('inner-right-canvas', ctx, 567, 0)
+            ]);
         } else {
-            ctx.drawImage(canvases.front, 0, 0);
-            ctx.drawImage(canvases.back, 567, 0);
-            ctx.drawImage(canvases.innerLeft, 0, 794);
-            ctx.drawImage(canvases.innerRight, 567, 794);
+            await Promise.all([
+                createSecureCanvasCopy('front-canvas', ctx, 0, 0),
+                createSecureCanvasCopy('back-canvas', ctx, 567, 0),
+                createSecureCanvasCopy('inner-left-canvas', ctx, 0, 794),
+                createSecureCanvasCopy('inner-right-canvas', ctx, 567, 794)
+            ]);
         }
 
         // Convert canvas to Blob
@@ -973,9 +972,7 @@ async function buyNow() {
         // Make purchase request
         const purchaseResponse = await fetch(`${API_URL}/api/cardPurchase/purchase`, {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            },
+            headers: { 'Authorization': `Bearer ${authToken}` },
             body: formData
         });
 
@@ -991,7 +988,7 @@ async function buyNow() {
             throw new Error(errorData.message || 'Purchase failed');
         }
 
-        // Download the card
+        // Download the final card
         const dataUrl = finalCanvas.toDataURL('image/png');
         const downloadLink = document.createElement('a');
         downloadLink.href = dataUrl;
@@ -1008,6 +1005,18 @@ async function buyNow() {
             alert('Insufficient credits. Please add more credits to your account.');
         } else {
             alert('Purchase failed. Please try again.');
+        }
+    }
+}
+
+// Function to switch tabs, render stickers, and ensure all canvases are updated
+async function ensureAllTabsRendered() {
+    const tabIds = ['front-tab', 'inner-left-tab', 'inner-right-tab', 'back-tab'];
+    for (let tabId of tabIds) {
+        const tabElement = document.getElementById(tabId);
+        if (tabElement) {
+            tabElement.click(); // Simulate tab switch
+            await new Promise(resolve => setTimeout(resolve, 300)); // Wait for rendering
         }
     }
 }
