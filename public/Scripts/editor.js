@@ -179,6 +179,7 @@ async function loadImagesIntoCanvases() {
             
             try {
                 const img = new Image();
+                img.crossOrigin = "anonymous"; // Add this line for CORS
                 img.onload = () => {
                     // Clear canvas
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -473,6 +474,7 @@ function redrawText(canvasId) {
     
     if (imageData) {
         const img = new Image();
+        img.crossOrigin = "anonymous"; // Add this line for CORS
         img.onload = function() {
             // Fill white background
             offscreenCtx.fillStyle = '#ffffff';
@@ -544,6 +546,7 @@ function redrawText(canvasId) {
 
             // Draw watermark last
             const watermark = new Image();
+            watermark.crossOrigin = "anonymous"; // Add this line for CORS
             watermark.src = 'Images/watermark.png';
             watermark.onload = function() {
                 const watermarkScale = Math.min(
@@ -923,11 +926,37 @@ function addToBasket() {
 
 // Download canvas as PNG
 function downloadCanvas() {
-    const canvas = document.getElementById(`${currentCardData.activeCanvas}-canvas`);
+ 
+    const totalWidth = 567 * 2; 
+    const totalHeight = 794 * 2; 
+    const mergedCanvas = document.createElement('canvas');
+    mergedCanvas.width = totalWidth;
+    mergedCanvas.height = totalHeight;
+    const mergedCtx = mergedCanvas.getContext('2d');
+
+    mergedCtx.fillStyle = '#ffffff';
+    mergedCtx.fillRect(0, 0, totalWidth, totalHeight);
+
+    const canvasPositions = [
+        { id: 'front-canvas', x: 0, y: 0 },         
+        { id: 'inner-left-canvas', x: 567, y: 0 },  
+        { id: 'inner-right-canvas', x: 0, y: 794 }, 
+        { id: 'back-canvas', x: 567, y: 794 }      
+    ];
+
+    
+    canvasPositions.forEach(pos => {
+        const canvas = document.getElementById(pos.id);
+        if (canvas) {
+            mergedCtx.drawImage(canvas, pos.x, pos.y);
+        }
+    });
+
     const link = document.createElement('a');
-    link.download = 'card.png';
-    link.href = canvas.toDataURL();
-    link.click();
+    link.download = 'merged-card.png'; // 
+    link.href = mergedCanvas.toDataURL('image/png'); 
+    link.click(); 
+    link.remove(); 
 }
 
 // Canvas keydown event to handle text input
@@ -994,6 +1023,7 @@ function handleStickerDrop(e) {
     
     // Create and load sticker image
     const tempImg = new Image();
+    tempImg.crossOrigin = "anonymous"; // Add this line for CORS
     tempImg.onload = () => {
         const aspectRatio = tempImg.width / tempImg.height;
         const baseSize = 200; // Base size in pixels
