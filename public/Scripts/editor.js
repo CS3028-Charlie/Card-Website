@@ -935,6 +935,7 @@ async function buyNow() {
         const finalCanvas = document.createElement('canvas');
         const ctx = finalCanvas.getContext('2d');
 
+        // Set canvas size
         if (currentCardData.cardType === 'eCard') {
             finalCanvas.width = 567 * 2;
             finalCanvas.height = 794;
@@ -946,19 +947,21 @@ async function buyNow() {
         // Ensure all canvases are properly rendered before capturing them
         await ensureAllTabsRendered();
 
-        // Capture the final composite image
+        // Capture each canvas as an image
+        const frontCanvas = await createSecureCanvasCopy('front-canvas');
+        const innerRightCanvas = await createSecureCanvasCopy('inner-right-canvas');
+        const backCanvas = await createSecureCanvasCopy('back-canvas');
+        const innerLeftCanvas = await createSecureCanvasCopy('inner-left-canvas');
+
+        // Composite the canvases onto the final canvas
         if (currentCardData.cardType === 'eCard') {
-            await Promise.all([
-                createSecureCanvasCopy('front-canvas', ctx, 0, 0),
-                createSecureCanvasCopy('inner-right-canvas', ctx, 567, 0)
-            ]);
+            ctx.drawImage(frontCanvas, 0, 0);
+            ctx.drawImage(innerRightCanvas, 567, 0);
         } else {
-            await Promise.all([
-                createSecureCanvasCopy('front-canvas', ctx, 0, 0),
-                createSecureCanvasCopy('back-canvas', ctx, 567, 0),
-                createSecureCanvasCopy('inner-left-canvas', ctx, 0, 794),
-                createSecureCanvasCopy('inner-right-canvas', ctx, 567, 794)
-            ]);
+            ctx.drawImage(frontCanvas, 0, 0);
+            ctx.drawImage(backCanvas, 567, 0);
+            ctx.drawImage(innerLeftCanvas, 0, 794);
+            ctx.drawImage(innerRightCanvas, 567, 794);
         }
 
         // Convert canvas to Blob
@@ -1016,7 +1019,7 @@ async function ensureAllTabsRendered() {
         const tabElement = document.getElementById(tabId);
         if (tabElement) {
             tabElement.click(); // Simulate tab switch
-            await new Promise(resolve => setTimeout(resolve, 300)); // Wait for rendering
+            await new Promise(resolve => setTimeout(resolve, 500)); // Allow time for stickers to render
         }
     }
 }
@@ -1024,81 +1027,67 @@ async function ensureAllTabsRendered() {
 // Helper function to create secure canvas copies 
 async function createSecureCanvasCopy(sourceId) {
     const sourceCanvas = document.getElementById(sourceId);
+    if (!sourceCanvas) return null;
+
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = sourceCanvas.width;
     tempCanvas.height = sourceCanvas.height;
     const tempCtx = tempCanvas.getContext('2d');
 
-    try {
-        // Fill with white background
-        tempCtx.fillStyle = '#ffffff';
-        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    // Fill with white background
+    tempCtx.fillStyle = '#ffffff';
+    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
 
-        // Draw the background image
-        const imgData = currentCardData.images[canvasIds.indexOf(sourceId)];
-        if (imgData) {
-            const img = new Image();
-            img.crossOrigin = "anonymous";
-            await new Promise((resolve, reject) => {
-                img.onload = () => {
-                    tempCtx.drawImage(img, imgData.x, imgData.y, imgData.width, imgData.height);
-                    resolve();
-                };
-                img.onerror = reject;
-                img.src = `${imgData.src}?t=${new Date().getTime()}`;
-            });
-        }
-
-        // Draw text and underlines
-        const canvasType = sourceId.replace('-canvas', '');
-        const texts = currentCardData.activeTexts[canvasType] || [];
-        texts.forEach(text => {
-            tempCtx.font = `${text.fontStyle} ${text.fontWeight} ${text.fontSize}px ${text.fontFamily}`;
-            tempCtx.fillStyle = text.color;
-            tempCtx.textAlign = 'center';
-            tempCtx.fillText(text.text, text.x, text.y);
-            
-            if (text.textDecoration === 'underline') {
-                const textWidth = tempCtx.measureText(text.text).width;
-                tempCtx.beginPath();
-                tempCtx.moveTo(text.x - textWidth / 2, text.y + 3);
-                tempCtx.lineTo(text.x + textWidth / 2, text.y + 3);
-                tempCtx.strokeStyle = text.color;
-                tempCtx.lineWidth = 2;
-                tempCtx.stroke();
-            }
+    // Draw the background image
+    const imgData = currentCardData.images[canvasIds.indexOf(sourceId)];
+    if (imgData) {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        await new Promise((resolve, reject) => {
+            img.onload = () => {
+                tempCtx.drawImage(img, imgData.x, imgData.y, imgData.width, imgData.height);
+                resolve();
+            };
+            img.onerror = reject;
+            img.src = `${imgData.src}?t=${new Date().getTime()}`;
         });
-
-        // Draw stickers
-        const stickers = currentCardData.stickers[canvasType] || [];
-        const containerRect = sourceCanvas.parentElement.getBoundingClientRect();
-        const scaleX = sourceCanvas.width / containerRect.width;
-        const scaleY = sourceCanvas.height / containerRect.height;
-
-        for (const sticker of stickers) {
-            const img = new Image();
-            img.crossOrigin = "anonymous";
-            await new Promise((resolve, reject) => {
-                img.onload = () => {
-                    const canvasX = (sticker.x - 50) * scaleX;
-                    const canvasY = sticker.y * scaleY;
-                    const canvasWidth = sticker.width * 2.5 * scaleX;
-                    const canvasHeight = sticker.height * scaleY;
-
-                    tempCtx.drawImage(img, canvasX, canvasY, canvasWidth, canvasHeight);
-                    resolve();
-                };
-                img.onerror = reject;
-                img.src = sticker.src;
-            });
-        }
-
-        return tempCanvas;
-
-    } catch (error) {
-        console.error(`Error in createFullCanvasCopy for ${sourceId}:`, error);
-        throw error;
     }
+
+    // Draw text
+    const canvasType = sourceId.replace('-canvas', '');
+    const texts = currentCardData.activeTexts[canvasType] || [];
+    texts.forEach(text => {
+        tempCtx.font = `${text.fontStyle} ${text.fontWeight} ${text.fontSize}px ${text.fontFamily}`;
+        tempCtx.fillStyle = text.color;
+        tempCtx.textAlign = 'center';
+        tempCtx.fillText(text.text, text.x, text.y);
+    });
+
+    // Draw stickers
+    const stickers = currentCardData.stickers[canvasType] || [];
+    const containerRect = sourceCanvas.parentElement.getBoundingClientRect();
+    const scaleX = sourceCanvas.width / containerRect.width;
+    const scaleY = sourceCanvas.height / containerRect.height;
+
+    for (const sticker of stickers) {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        await new Promise((resolve, reject) => {
+            img.onload = () => {
+                const canvasX = (sticker.x - 50) * scaleX;
+                const canvasY = sticker.y * scaleY;
+                const canvasWidth = sticker.width * 2.5 * scaleX;
+                const canvasHeight = sticker.height * scaleY;
+
+                tempCtx.drawImage(img, canvasX, canvasY, canvasWidth, canvasHeight);
+                resolve();
+            };
+            img.onerror = reject;
+            img.src = sticker.src;
+        });
+    }
+
+    return tempCanvas;
 }
 
 function createPreviewImage() {
