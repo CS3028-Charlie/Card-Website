@@ -1238,11 +1238,11 @@ function handleStickerDrop(e) {
         // Save sticker data
         currentCardData.stickers[canvasType].push({
             src: stickerSrc,
-            x: stickerX,
-            y: stickerY,
+            x: x - stickerWidth / 2,
+            y: y - stickerHeight / 2,
             width: stickerWidth,
             height: stickerHeight
-        });
+        });        
     };
     tempImg.src = stickerSrc;
 }
