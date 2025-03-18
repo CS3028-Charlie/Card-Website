@@ -274,7 +274,7 @@ function setupEventListeners() {
     // Action buttons
     document.getElementById('saveCustomizationBtn').addEventListener('click', saveCustomization);
     document.getElementById('addToBasketBtn').addEventListener('click', addToBasket);
-    document.getElementById('downloadCanvasBtn').addEventListener('click', downloadCanvas);
+    document.getElementById('buyNowBtn').addEventListener('click', buyNow);
     
     // Canvas click listeners for text selection
     canvasIds.forEach(canvasId => {
@@ -924,39 +924,251 @@ function addToBasket() {
     alert('Card added to basket!');
 }
 
-// Download canvas as PNG
-function downloadCanvas() {
- 
-    const totalWidth = 567 * 2; 
-    const totalHeight = 794 * 2; 
-    const mergedCanvas = document.createElement('canvas');
-    mergedCanvas.width = totalWidth;
-    mergedCanvas.height = totalHeight;
-    const mergedCtx = mergedCanvas.getContext('2d');
+async function buyNow() {
+    const authToken = localStorage.getItem('authToken');
+    if (!authToken) {
+        alert('You must be logged in to purchase a card.');
+        window.location.href = '/login.html';
+        return;
+    }
 
-    mergedCtx.fillStyle = '#ffffff';
-    mergedCtx.fillRect(0, 0, totalWidth, totalHeight);
+    try {
+        const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
 
-    const canvasPositions = [
-        { id: 'front-canvas', x: 0, y: 0 },         
-        { id: 'inner-left-canvas', x: 567, y: 0 },  
-        { id: 'inner-right-canvas', x: 0, y: 794 }, 
-        { id: 'back-canvas', x: 567, y: 794 }      
-    ];
+        const finalCanvas = document.createElement('canvas');
+        const ctx = finalCanvas.getContext('2d');
 
-    
-    canvasPositions.forEach(pos => {
-        const canvas = document.getElementById(pos.id);
-        if (canvas) {
-            mergedCtx.drawImage(canvas, pos.x, pos.y);
+        // Set canvas size
+        if (currentCardData.cardType === 'eCard') {
+            finalCanvas.width = 567 * 2;
+            finalCanvas.height = 794;
+        } else {
+            finalCanvas.width = 567 * 2;
+            finalCanvas.height = 794 * 2;
         }
-    });
 
-    const link = document.createElement('a');
-    link.download = 'merged-card.png'; // 
-    link.href = mergedCanvas.toDataURL('image/png'); 
-    link.click(); 
-    link.remove(); 
+        // Ensure all canvases are properly rendered before capturing them
+        await ensureAllTabsRendered();
+
+        // Capture each canvas as an image
+        const frontCanvas = await createSecureCanvasCopy('front-canvas');
+        const innerRightCanvas = await createSecureCanvasCopy('inner-right-canvas');
+        const backCanvas = await createSecureCanvasCopy('back-canvas');
+        const innerLeftCanvas = await createSecureCanvasCopy('inner-left-canvas');
+
+        // Composite the canvases onto the final canvas
+        if (currentCardData.cardType === 'eCard') {
+            ctx.drawImage(frontCanvas, 0, 0);
+            ctx.drawImage(innerRightCanvas, 567, 0);
+        } else {
+            ctx.drawImage(frontCanvas, 0, 0);
+            ctx.drawImage(backCanvas, 567, 0);
+            ctx.drawImage(innerLeftCanvas, 0, 794);
+            ctx.drawImage(innerRightCanvas, 567, 794);
+        }
+
+        // Convert canvas to Blob
+        const imageBlob = await new Promise(resolve => finalCanvas.toBlob(resolve, 'image/png'));
+
+        // Create FormData
+        const formData = new FormData();
+        formData.append('type', currentCardData.cardType);
+        formData.append('imageData', imageBlob, 'card.png');
+
+        // Make purchase request
+        const purchaseResponse = await fetch(`${API_URL}/api/cardPurchase/purchase`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${authToken}` },
+            body: formData
+        });
+
+        if (purchaseResponse.status === 401) {
+            localStorage.removeItem('authToken');
+            alert('Your session has expired. Please login again.');
+            window.location.href = '/login.html';
+            return;
+        }
+
+        if (!purchaseResponse.ok) {
+            const errorData = await purchaseResponse.json();
+            throw new Error(errorData.message || 'Purchase failed');
+        }
+
+        // Convert canvas to PDF if it's a printable
+        if (currentCardData.cardType === 'printable') {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({ unit: 'px', format: [finalCanvas.width, finalCanvas.height] });
+
+            // Draw the first page (Front & Back)
+            pdf.addImage(finalCanvas.toDataURL('image/png'), 'PNG', 0, 0, finalCanvas.width, finalCanvas.height);
+            
+            // Create the second page (Inner Left & Inner Right)
+            pdf.addPage();
+            const innerCanvas = document.createElement('canvas');
+            innerCanvas.width = finalCanvas.width;
+            innerCanvas.height = finalCanvas.height;
+            const innerCtx = innerCanvas.getContext('2d');
+
+            innerCtx.drawImage(innerLeftCanvas, 0, 0);
+            innerCtx.drawImage(innerRightCanvas, 567, 0);
+
+            pdf.addImage(innerCanvas.toDataURL('image/png'), 'PNG', 0, 0, finalCanvas.width, finalCanvas.height);
+
+            pdf.save(`${currentCardData.cardType}-${Date.now()}.pdf`);
+        } else {
+            // Save as PNG for eCards
+            const dataUrl = finalCanvas.toDataURL('image/png');
+            const downloadLink = document.createElement('a');
+            downloadLink.href = dataUrl;
+            downloadLink.download = `${currentCardData.cardType}-${Date.now()}.png`;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+
+        alert('Purchase successful! Your card has been downloaded.');
+
+    } catch (error) {
+        console.error('Purchase error:', error);
+        if (error.message.includes('Insufficient balance')) {
+            alert('Insufficient credits. Please add more credits to your account.');
+        } else {
+            alert('Purchase failed. Please try again.');
+        }
+    }
+}
+
+
+// Function to switch tabs, render stickers, and ensure all canvases are updated
+async function ensureAllTabsRendered() {
+    const tabIds = ['front-tab', 'inner-left-tab', 'inner-right-tab', 'back-tab'];
+    for (let tabId of tabIds) {
+        const tabElement = document.getElementById(tabId);
+        if (tabElement) {
+            tabElement.click(); // Simulate tab switch
+            await new Promise(resolve => setTimeout(resolve, 500)); // Allow time for stickers to render
+        }
+    }
+}
+
+// Helper function to create secure canvas copies 
+async function createSecureCanvasCopy(sourceId) {
+    const sourceCanvas = document.getElementById(sourceId);
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = sourceCanvas.width;
+    tempCanvas.height = sourceCanvas.height;
+    const tempCtx = tempCanvas.getContext('2d');
+
+    try {
+        // Fill background with white
+        tempCtx.fillStyle = '#ffffff';
+        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+        // Draw the background image
+        const imgData = currentCardData.images[canvasIds.indexOf(sourceId)];
+        if (imgData) {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            await new Promise((resolve, reject) => {
+                img.onload = () => {
+                    tempCtx.drawImage(img, imgData.x, imgData.y, imgData.width, imgData.height);
+                    resolve();
+                };
+                img.onerror = reject;
+                img.src = `${imgData.src}?t=${new Date().getTime()}`;
+            });
+        }
+
+        // Draw text
+        const canvasType = sourceId.replace('-canvas', '');
+        const texts = currentCardData.activeTexts[canvasType] || [];
+        texts.forEach(text => {
+            tempCtx.font = `${text.fontStyle} ${text.fontWeight} ${text.fontSize}px ${text.fontFamily}`;
+            tempCtx.fillStyle = text.color;
+            tempCtx.textAlign = 'center';
+            tempCtx.fillText(text.text, text.x, text.y);
+        });
+
+        // Draw stickers from saved data
+        const stickers = currentCardData.stickers[canvasType] || [];
+
+        await Promise.all(stickers.map(sticker => new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.onload = () => {
+            // Adjust for correct placement
+            const adjustedX = sticker.x * (tempCanvas.width / 567) - 205;
+            const adjustedY = sticker.y * (tempCanvas.height / 794) + 100;
+            const adjustedWidth = sticker.width * (tempCanvas.width / 567) * 1.5;
+            const adjustedHeight = sticker.height * (tempCanvas.height / 794) * 1.5;
+
+                tempCtx.drawImage(img, adjustedX, adjustedY, adjustedWidth, adjustedHeight);
+                resolve();
+            };
+            img.onerror = (err) => {
+                console.error("Sticker load error:", err, "Source:", img.src);
+                reject(err);
+            };
+            img.src = `${sticker.src}?t=${new Date().getTime()}`;
+        })));
+
+        return tempCanvas; // Return the processed canvas
+
+    } catch (error) {
+        console.error(`Error in createSecureCanvasCopy for ${sourceId}:`, error);
+        throw error;
+    }
+}
+
+
+function createPreviewImage() {
+    const finalCanvas = document.createElement('canvas');
+    const ctx = finalCanvas.getContext('2d');
+    
+    try {
+        if (currentCardData.cardType === 'eCard') {
+            finalCanvas.width = 567 * 2;
+            finalCanvas.height = 794;
+            
+            // Use a clean canvas for each panel
+            const frontCanvas = document.createElement('canvas');
+            const innerRightCanvas = document.createElement('canvas');
+            frontCanvas.width = innerRightCanvas.width = 567;
+            frontCanvas.height = innerRightCanvas.height = 794;
+            
+            // Copy the content from the original canvases
+            frontCanvas.getContext('2d').drawImage(document.getElementById('front-canvas'), 0, 0);
+            innerRightCanvas.getContext('2d').drawImage(document.getElementById('inner-right-canvas'), 0, 0);
+            
+            // Draw to final canvas
+            ctx.drawImage(frontCanvas, 0, 0);
+            ctx.drawImage(innerRightCanvas, 567, 0);
+        } else {
+            finalCanvas.width = 567 * 2;
+            finalCanvas.height = 794 * 2;
+            
+            // Use clean canvases for each panel
+            const panels = ['front', 'inner-left', 'inner-right', 'back'].map(id => {
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = 567;
+                tempCanvas.height = 794;
+                tempCanvas.getContext('2d').drawImage(document.getElementById(`${id}-canvas`), 0, 0);
+                return tempCanvas;
+            });
+            
+            // Draw to final canvas
+            ctx.drawImage(panels[0], 0, 0); // front
+            ctx.drawImage(panels[1], 567, 0); // inner-left
+            ctx.drawImage(panels[2], 0, 794); // inner-right
+            ctx.drawImage(panels[3], 567, 794); // back
+        }
+        
+        return finalCanvas.toDataURL('image/png');
+    } catch (error) {
+        console.error('Error creating preview:', error);
+        alert('Unable to create preview. Please try again.');
+        return null;
+    }
 }
 
 // Canvas keydown event to handle text input
@@ -1008,13 +1220,14 @@ function handleStickerDragOver(e) {
     e.preventDefault();
 }
 
-// Update handleStickerDrop to maintain aspect ratio
+// Update handleStickerDrop to use larger base size
 function handleStickerDrop(e) {
     e.preventDefault();
     const container = e.currentTarget;
     const stickerSrc = e.dataTransfer.getData('text/plain');
     const canvasId = container.querySelector('canvas').id;
     const canvasType = canvasId.replace('-canvas', '');
+    const canvas = document.getElementById(canvasId);
 
     // Calculate position relative to canvas container
     const rect = container.getBoundingClientRect();
@@ -1026,26 +1239,31 @@ function handleStickerDrop(e) {
     tempImg.crossOrigin = "anonymous"; // Add this line for CORS
     tempImg.onload = () => {
         const aspectRatio = tempImg.width / tempImg.height;
-        const baseSize = 200; // Base size in pixels
+        const baseSize = 150; // Increased base size for stickers
         
         const sticker = document.createElement('img');
         sticker.src = stickerSrc;
         sticker.classList.add('placed-sticker');
         
         // Set size maintaining aspect ratio
+        let stickerWidth, stickerHeight;
         if (aspectRatio > 1) {
-            sticker.style.width = `${baseSize}px`;
-            sticker.style.height = `${baseSize / aspectRatio}px`;
+            stickerWidth = baseSize;
+            stickerHeight = baseSize / aspectRatio;
         } else {
-            sticker.style.height = `${baseSize}px`;
-            sticker.style.width = `${baseSize * aspectRatio}px`;
+            stickerHeight = baseSize;
+            stickerWidth = baseSize * aspectRatio;
         }
         
+        sticker.style.width = `${stickerWidth}px`;
+        sticker.style.height = `${stickerHeight}px`;
+        
         // Center sticker on drop position
-        const stickerWidth = aspectRatio > 1 ? baseSize : baseSize * aspectRatio;
-        const stickerHeight = aspectRatio > 1 ? baseSize / aspectRatio : baseSize;
-        sticker.style.left = `${x - stickerWidth/2}px`;
-        sticker.style.top = `${y - stickerHeight/2}px`;
+        const stickerX = x - stickerWidth/2;
+        const stickerY = y - stickerHeight/2;
+        
+        sticker.style.left = `${stickerX}px`;
+        sticker.style.top = `${stickerY}px`;
         
         makeStickerDraggable(sticker);
         container.appendChild(sticker);
@@ -1053,11 +1271,11 @@ function handleStickerDrop(e) {
         // Save sticker data
         currentCardData.stickers[canvasType].push({
             src: stickerSrc,
-            x: x - stickerWidth/2,
-            y: y - stickerHeight/2,
+            x: x - stickerWidth / 2,
+            y: y - stickerHeight / 2,
             width: stickerWidth,
             height: stickerHeight
-        });
+        });        
     };
     tempImg.src = stickerSrc;
 }
