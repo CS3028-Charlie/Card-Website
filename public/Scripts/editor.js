@@ -993,6 +993,7 @@ async function buyNow() {
 
         // Convert canvas to PDF if it's a printable
         if (currentCardData.cardType === 'printable') {
+            const { jsPDF } = window.jspdf;
             const pdf = new jsPDF({ unit: 'px', format: [finalCanvas.width, finalCanvas.height] });
 
             // Draw the first page (Front & Back)
@@ -1094,7 +1095,7 @@ async function createSecureCanvasCopy(sourceId) {
             img.onload = () => {
             // Adjust for correct placement
             const adjustedX = sticker.x * (tempCanvas.width / 567) - 205;
-            const adjustedY = sticker.y * (tempCanvas.height / 794) + 125;
+            const adjustedY = sticker.y * (tempCanvas.height / 794) + 100;
             const adjustedWidth = sticker.width * (tempCanvas.width / 567) * 1.5;
             const adjustedHeight = sticker.height * (tempCanvas.height / 794) * 1.5;
 
