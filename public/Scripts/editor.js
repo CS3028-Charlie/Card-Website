@@ -991,14 +991,36 @@ async function buyNow() {
             throw new Error(errorData.message || 'Purchase failed');
         }
 
-        // Download the final card
-        const dataUrl = finalCanvas.toDataURL('image/png');
-        const downloadLink = document.createElement('a');
-        downloadLink.href = dataUrl;
-        downloadLink.download = `${currentCardData.cardType}-${Date.now()}.png`;
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
+        // Convert canvas to PDF if it's a printable
+        if (currentCardData.cardType === 'printable') {
+            const pdf = new jsPDF({ unit: 'px', format: [finalCanvas.width, finalCanvas.height] });
+
+            // Draw the first page (Front & Back)
+            pdf.addImage(finalCanvas.toDataURL('image/png'), 'PNG', 0, 0, finalCanvas.width, finalCanvas.height);
+            
+            // Create the second page (Inner Left & Inner Right)
+            pdf.addPage();
+            const innerCanvas = document.createElement('canvas');
+            innerCanvas.width = finalCanvas.width;
+            innerCanvas.height = finalCanvas.height;
+            const innerCtx = innerCanvas.getContext('2d');
+
+            innerCtx.drawImage(innerLeftCanvas, 0, 0);
+            innerCtx.drawImage(innerRightCanvas, 567, 0);
+
+            pdf.addImage(innerCanvas.toDataURL('image/png'), 'PNG', 0, 0, finalCanvas.width, finalCanvas.height);
+
+            pdf.save(`${currentCardData.cardType}-${Date.now()}.pdf`);
+        } else {
+            // Save as PNG for eCards
+            const dataUrl = finalCanvas.toDataURL('image/png');
+            const downloadLink = document.createElement('a');
+            downloadLink.href = dataUrl;
+            downloadLink.download = `${currentCardData.cardType}-${Date.now()}.png`;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
 
         alert('Purchase successful! Your card has been downloaded.');
 
@@ -1071,8 +1093,8 @@ async function createSecureCanvasCopy(sourceId) {
             img.crossOrigin = "anonymous";
             img.onload = () => {
             // Adjust for correct placement
-            const adjustedX = sticker.x * (tempCanvas.width / 567) - 200;
-            const adjustedY = sticker.y * (tempCanvas.height / 794) + 150;
+            const adjustedX = sticker.x * (tempCanvas.width / 567) - 205;
+            const adjustedY = sticker.y * (tempCanvas.height / 794) + 205;
             const adjustedWidth = sticker.width * (tempCanvas.width / 567) * 1.5;
             const adjustedHeight = sticker.height * (tempCanvas.height / 794) * 1.5;
 
