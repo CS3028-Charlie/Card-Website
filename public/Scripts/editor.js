@@ -179,6 +179,7 @@ async function loadImagesIntoCanvases() {
             
             try {
                 const img = new Image();
+                img.crossOrigin = "anonymous"; // Add this line for CORS
                 img.onload = () => {
                     // Clear canvas
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -473,6 +474,7 @@ function redrawText(canvasId) {
     
     if (imageData) {
         const img = new Image();
+        img.crossOrigin = "anonymous"; // Add this line for CORS
         img.onload = function() {
             // Fill white background
             offscreenCtx.fillStyle = '#ffffff';
@@ -544,6 +546,7 @@ function redrawText(canvasId) {
 
             // Draw watermark last
             const watermark = new Image();
+            watermark.crossOrigin = "anonymous"; // Add this line for CORS
             watermark.src = 'Images/watermark.png';
             watermark.onload = function() {
                 const watermarkScale = Math.min(
@@ -1233,6 +1236,7 @@ function handleStickerDrop(e) {
     
     // Create and load sticker image
     const tempImg = new Image();
+    tempImg.crossOrigin = "anonymous"; // Add this line for CORS
     tempImg.onload = () => {
         const aspectRatio = tempImg.width / tempImg.height;
         const baseSize = 150; // Increased base size for stickers
