@@ -1094,7 +1094,7 @@ async function createSecureCanvasCopy(sourceId) {
             img.onload = () => {
             // Adjust for correct placement
             const adjustedX = sticker.x * (tempCanvas.width / 567) - 205;
-            const adjustedY = sticker.y * (tempCanvas.height / 794) + 205;
+            const adjustedY = sticker.y * (tempCanvas.height / 794) + 125;
             const adjustedWidth = sticker.width * (tempCanvas.width / 567) * 1.5;
             const adjustedHeight = sticker.height * (tempCanvas.height / 794) * 1.5;
 
