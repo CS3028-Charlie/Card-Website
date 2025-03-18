@@ -1022,7 +1022,7 @@ async function ensureAllTabsRendered() {
 }
 
 // Helper function to create secure canvas copies 
-async function createFullCanvasCopy(sourceId) {
+async function createSecureCanvasCopy(sourceId) {
     const sourceCanvas = document.getElementById(sourceId);
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = sourceCanvas.width;
