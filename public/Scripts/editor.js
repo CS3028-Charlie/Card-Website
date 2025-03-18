@@ -1070,7 +1070,13 @@ async function createSecureCanvasCopy(sourceId) {
             const img = new Image();
             img.crossOrigin = "anonymous";
             img.onload = () => {
-                tempCtx.drawImage(img, sticker.x, sticker.y, sticker.width, sticker.height);
+            // Adjust for correct placement
+            const adjustedX = sticker.x * (tempCanvas.width / 567);
+            const adjustedY = sticker.y * (tempCanvas.height / 794);
+            const adjustedWidth = sticker.width * (tempCanvas.width / 567);
+            const adjustedHeight = sticker.height * (tempCanvas.height / 794);
+
+                tempCtx.drawImage(img, adjustedX, adjustedY, adjustedWidth, adjustedHeight);
                 resolve();
             };
             img.onerror = (err) => {
