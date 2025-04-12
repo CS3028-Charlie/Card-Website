@@ -821,7 +821,6 @@ function maintainTextSelection() {
     if (cursor) cursor.style.display = 'block';
 }
 
-// 替换现有的saveCustomization函数
 function saveCustomization() {
     // 创建保存草稿对话框
     const draftDialog = document.createElement('div');
@@ -870,12 +869,22 @@ function saveCustomization() {
             return;
         }
 
+        // 准备图片数据 - 确保只发送必要的信息，避免循环引用
+        const processedImages = currentCardData.images.map(img => {
+            if (typeof img === 'string') {
+                return img;
+            } else if (typeof img === 'object') {
+                return img.src; // 只发送图片URL
+            }
+            return null;
+        }).filter(img => img !== null);
+
         // 准备草稿数据
         const draftData = {
             name: draftName,
             cardIndex: currentCardData.cardIndex,
             cardType: currentCardData.cardType,
-            images: currentCardData.images,
+            images: processedImages,
             activeTexts: currentCardData.activeTexts,
             stickers: currentCardData.stickers
         };
@@ -903,7 +912,15 @@ function saveCustomization() {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to save draft');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to save draft');
+            }
+
+            const savedDraft = await response.json();
+
+            // 保存成功后更新sessionStorage中的draftId
+            if (!draftId) {
+                sessionStorage.setItem('draftId', savedDraft._id);
             }
 
             alert('Draft saved successfully!');
@@ -911,7 +928,7 @@ function saveCustomization() {
 
         } catch (error) {
             console.error('Error saving draft:', error);
-            alert('Failed to save draft. Please try again.');
+            alert(`Failed to save draft: ${error.message}`);
             draftDialog.remove();
         }
     });
@@ -1414,3 +1431,208 @@ function updateUIFromText(text) {
         }
     });
 }
+
+// 获取并显示用户的草稿列表
+async function loadUserDrafts() {
+    const authToken = localStorage.getItem('authToken');
+
+    if (!authToken) {
+        console.error('Authorization token not found');
+        return;
+    }
+
+    try {
+        const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
+        const response = await fetch(`${API_URL}/api/drafts`, {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to load drafts');
+        }
+
+        const drafts = await response.json();
+
+        // 创建草稿列表对话框
+        const draftsDialog = document.createElement('div');
+        draftsDialog.classList.add('drafts-dialog');
+
+        // 生成草稿列表HTML
+        let draftsHTML = `
+            <div class="drafts-dialog-content">
+                <div class="drafts-dialog-header">
+                    <h5>Your Drafts</h5>
+                    <button type="button" class="close" id="closeDraftsDialog">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="drafts-dialog-body">
+        `;
+
+        if (drafts.length === 0) {
+            draftsHTML += `<p>You don't have any saved drafts yet.</p>`;
+        } else {
+            draftsHTML += `<ul class="drafts-list">`;
+            drafts.forEach(draft => {
+                draftsHTML += `
+                    <li class="draft-item" data-draft-id="${draft._id}">
+                        <span class="draft-name">${draft.name}</span>
+                        <span class="draft-date">${new Date(draft.updatedAt).toLocaleDateString()}</span>
+                        <button class="btn btn-sm btn-primary load-draft-btn">Edit</button>
+                        <button class="btn btn-sm btn-danger delete-draft-btn">Delete</button>
+                    </li>
+                `;
+            });
+            draftsHTML += `</ul>`;
+        }
+
+        draftsHTML += `</div></div>`;
+        draftsDialog.innerHTML = draftsHTML;
+
+        document.body.appendChild(draftsDialog);
+
+        // 处理关闭对话框
+        document.getElementById('closeDraftsDialog').addEventListener('click', () => {
+            draftsDialog.remove();
+        });
+
+        // 处理加载草稿
+        const loadButtons = document.querySelectorAll('.load-draft-btn');
+        loadButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const draftId = e.target.closest('.draft-item').dataset.draftId;
+                sessionStorage.setItem('draftId', draftId);
+                draftsDialog.remove();
+                window.location.href = `/editor.html?draft=${draftId}`;
+            });
+        });
+
+        // 处理删除草稿
+        const deleteButtons = document.querySelectorAll('.delete-draft-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', async (e) => {
+                if (confirm('Are you sure you want to delete this draft?')) {
+                    const draftItem = e.target.closest('.draft-item');
+                    const draftId = draftItem.dataset.draftId;
+
+                    try {
+                        const deleteResponse = await fetch(`${API_URL}/api/drafts/${draftId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${authToken}`
+                            }
+                        });
+
+                        if (!deleteResponse.ok) {
+                            throw new Error('Failed to delete draft');
+                        }
+
+                        // 移除删除的草稿条目
+                        draftItem.remove();
+
+                        // 如果没有更多草稿，更新列表显示
+                        if (document.querySelectorAll('.draft-item').length === 0) {
+                            document.querySelector('.drafts-dialog-body').innerHTML = `<p>You don't have any saved drafts yet.</p>`;
+                        }
+
+                    } catch (error) {
+                        console.error('Error deleting draft:', error);
+                        alert('Failed to delete draft. Please try again.');
+                    }
+                }
+            });
+        });
+
+    } catch (error) {
+        console.error('Error loading drafts:', error);
+        alert('Failed to load drafts. Please try again.');
+    }
+}
+
+// 添加CSS样式
+const draftsDialogStyles = document.createElement('style');
+draftsDialogStyles.textContent = `
+    .drafts-dialog {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+    
+    .drafts-dialog-content {
+        background-color: white;
+        border-radius: 5px;
+        width: 80%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    
+    .drafts-dialog-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .drafts-dialog-body {
+        padding: 15px;
+    }
+    
+    .drafts-list {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .draft-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .draft-name {
+        font-weight: bold;
+        flex-grow: 1;
+    }
+    
+    .draft-date {
+        color: #666;
+        margin-right: 10px;
+    }
+    
+    .load-draft-btn, .delete-draft-btn {
+        margin-left: 5px;
+    }
+`;
+document.head.appendChild(draftsDialogStyles);
+
+// 添加按钮事件监听器
+document.addEventListener('DOMContentLoaded', () => {
+    // 检查是否在editor页面
+    if (window.location.pathname.includes('editor.html')) {
+        // 如果URL中包含draft参数，加载指定草稿
+        const urlParams = new URLSearchParams(window.location.search);
+        const draftId = urlParams.get('draft');
+        if (draftId) {
+            sessionStorage.setItem('draftId', draftId);
+        }
+    }
+
+    // 在shop页面添加草稿按钮事件监听
+    const draftsButton = document.querySelector('.drafts-btn');
+    if (draftsButton) {
+        draftsButton.addEventListener('click', loadUserDrafts);
+    }
+});
