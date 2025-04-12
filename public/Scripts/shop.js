@@ -543,3 +543,165 @@ function OpenPersonalisePreview() {
         closeBackdrop();
     }
 }
+
+
+// 添加悬浮草稿按钮点击事件
+document.addEventListener('DOMContentLoaded', function() {
+    // 查找悬浮草稿按钮
+    const draftsBtn = document.querySelector('.drafts-btn');
+
+    if (draftsBtn) {
+        draftsBtn.addEventListener('click', function() {
+            // 检查用户是否已登录
+            const authToken = localStorage.getItem('authToken');
+            if (!authToken) {
+                alert('You must be logged in to view drafts.');
+                return;
+            }
+
+            // 加载草稿列表
+            loadUserDraftsInShop();
+        });
+    }
+});
+
+// 在shop页面上加载用户草稿列表
+async function loadUserDraftsInShop() {
+    const authToken = localStorage.getItem('authToken');
+
+    if (!authToken) {
+        alert('You must be logged in to view drafts.');
+        return;
+    }
+
+    try {
+        const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
+        const response = await fetch(`${API_URL}/api/drafts`, {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to load drafts');
+        }
+
+        const drafts = await response.json();
+        console.log("Retrieved drafts:", drafts);
+
+        // 创建草稿列表对话框
+        const modal = document.createElement('div');
+        modal.className = 'modal fade show';
+        modal.style.display = 'block';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+        modal.tabIndex = -1;
+        modal.role = 'dialog';
+
+        let modalHTML = `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #e8468a; color: white;">
+                        <h5 class="modal-title">Your Drafts</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeModal">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+        `;
+
+        if (!drafts || drafts.length === 0) {
+            modalHTML += `<p>You don't have any saved drafts yet.</p>`;
+        } else {
+            modalHTML += `<ul class="list-group">`;
+            drafts.forEach(draft => {
+                const date = new Date(draft.updatedAt).toLocaleDateString();
+                modalHTML += `
+                    <li class="list-group-item d-flex justify-content-between align-items-center" data-draft-id="${draft._id}">
+                        <div>
+                            <strong>${draft.name}</strong>
+                            <br>
+                            <small class="text-muted">Last updated: ${date}</small>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-primary edit-draft-btn">Edit</button>
+                            <button class="btn btn-sm btn-danger delete-draft-btn">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+                `;
+            });
+            modalHTML += `</ul>`;
+        }
+
+        modalHTML += `
+                    </div>
+                </div>
+            </div>
+        `;
+
+        modal.innerHTML = modalHTML;
+        document.body.appendChild(modal);
+
+        // 关闭模态框
+        document.getElementById('closeModal').addEventListener('click', () => {
+            modal.remove();
+        });
+
+        // 点击模态框外部关闭
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.remove();
+            }
+        });
+
+        // 编辑草稿按钮
+        const editButtons = document.querySelectorAll('.edit-draft-btn');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const draftId = e.target.closest('.list-group-item').dataset.draftId;
+                window.location.href = `/editor.html?draft=${draftId}`;
+            });
+        });
+
+        // 删除草稿按钮
+        const deleteButtons = document.querySelectorAll('.delete-draft-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', async function(e) {
+                if (confirm('Are you sure you want to delete this draft?')) {
+                    const listItem = e.target.closest('.list-group-item');
+                    const draftId = listItem.dataset.draftId;
+
+                    try {
+                        const deleteResponse = await fetch(`${API_URL}/api/drafts/${draftId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${authToken}`
+                            }
+                        });
+
+                        if (!deleteResponse.ok) {
+                            throw new Error('Failed to delete draft');
+                        }
+
+                        // 从列表中移除
+                        listItem.remove();
+
+                        // 如果没有更多草稿，更新显示
+                        if (document.querySelectorAll('.list-group-item').length === 0) {
+                            document.querySelector('.modal-body').innerHTML = `<p>You don't have any saved drafts yet.</p>`;
+                        }
+
+                    } catch (error) {
+                        console.error('Error deleting draft:', error);
+                        alert('Failed to delete draft. Please try again.');
+                    }
+                }
+            });
+        });
+
+    } catch (error) {
+        console.error('Error loading drafts:', error);
+        alert('Failed to load drafts. Please try again.');
+    }
+}

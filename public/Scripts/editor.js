@@ -34,17 +34,27 @@ const cursorIds = ['front-cursor', 'inner-left-cursor', 'inner-right-cursor', 'b
 
 // Initialize the editor on window load
 window.onload = function() {
-    loadCardData();
-    setupCanvases();
-    setupEventListeners();
-    updateCardTypeView();
-    initializeStickerDragAndDrop();
+    console.log("Editor initializing...");
 
-    // 检查是否有草稿ID
-    const draftId = sessionStorage.getItem('draftId');
+    // 检查URL中是否有草稿ID
+    const urlParams = new URLSearchParams(window.location.search);
+    const draftId = urlParams.get('draft');
+
     if (draftId) {
+        console.log("Found draft ID in URL:", draftId);
+        sessionStorage.setItem('draftId', draftId);
+        setupCanvases();
+        setupEventListeners();
         loadDraft(draftId);
+    } else {
+        console.log("No draft ID found, loading normal editor");
+        loadCardData();
+        setupCanvases();
+        setupEventListeners();
+        updateCardTypeView();
     }
+
+    initializeStickerDragAndDrop();
 };
 
 // 添加加载草稿的函数
@@ -70,20 +80,67 @@ async function loadDraft(draftId) {
 
         const draft = await response.json();
 
+        // 清除当前状态
+        currentCardData = {
+            cardIndex: 0,
+            cardType: 'eCard',
+            images: [],
+            canvases: {},
+            contexts: {},
+            activeCanvas: 'front',
+            activeTexts: {
+                'front': [],
+                'inner-left': [],
+                'inner-right': [],
+                'back': []
+            },
+            activeTextIndex: -1,
+            fontSize: 20,
+            fontFamily: 'Arial',
+            fontColor: 'black',
+            fontStyle: 'normal',
+            fontWeight: 'normal',
+            textDecoration: 'none',
+            stickers: {
+                'front': [],
+                'inner-left': [],
+                'inner-right': [],
+                'back': []
+            }
+        };
+
         // 更新当前卡片数据
         currentCardData.cardIndex = draft.cardIndex;
-        currentCardData.cardType = draft.cardType;
-        currentCardData.images = draft.images;
-        currentCardData.activeTexts = draft.activeTexts;
-        currentCardData.stickers = draft.stickers;
+        currentCardData.cardType = draft.cardType || 'eCard';
+
+        // 确保图片数据正确
+        if (Array.isArray(draft.images)) {
+            currentCardData.images = draft.images;
+        }
+
+        // 确保文字数据正确
+        if (draft.activeTexts && typeof draft.activeTexts === 'object') {
+            // 合并而不是替换，确保所有必要的键都存在
+            for (const canvas in draft.activeTexts) {
+                currentCardData.activeTexts[canvas] = draft.activeTexts[canvas] || [];
+            }
+        }
+
+        // 确保贴纸数据正确
+        if (draft.stickers && typeof draft.stickers === 'object') {
+            // 合并而不是替换，确保所有必要的键都存在
+            for (const canvas in draft.stickers) {
+                currentCardData.stickers[canvas] = draft.stickers[canvas] || [];
+            }
+        }
 
         // 更新UI显示
-        document.getElementById('cardTypeDisplay').textContent = draft.cardType;
-        document.getElementById('priceDisplay').textContent = draft.cardType === 'eCard' ? '100 Credits' : '200 Credits';
-        document.getElementById('priceDisplay2').textContent = draft.cardType === 'eCard' ? '£0.99' : '£1.99';
+        document.getElementById('cardTypeDisplay').textContent = currentCardData.cardType;
+        document.getElementById('priceDisplay').textContent = currentCardData.cardType === 'eCard' ? '100 Credits' : '200 Credits';
+        document.getElementById('priceDisplay2').textContent = currentCardData.cardType === 'eCard' ? '£0.99' : '£1.99';
 
         // 选择相应的卡片类型按钮
-        if (draft.cardType === 'eCard') {
+        if (currentCardData.cardType === 'eCard') {
             document.getElementById('eCardBtn').classList.add('active');
             document.getElementById('printableBtn').classList.remove('active');
         } else {
@@ -91,14 +148,17 @@ async function loadDraft(draftId) {
             document.getElementById('printableBtn').classList.add('active');
         }
 
+        // 加载该草稿的图片
+        loadCardImages(currentCardData.cardIndex);
+
         // 更新卡片类型视图
         updateCardTypeView();
 
-        // 重新绘制所有画布
-        canvasIds.forEach(canvasId => {
-            const canvasType = canvasId.replace('-canvas', '');
-            redrawText(canvasId);
-        });
+        // 设置活动画布为front
+        setActiveCanvas('front');
+
+        console.log("成功加载草稿:", draft);
+        alert('Draft loaded successfully!');
 
     } catch (error) {
         console.error('Error loading draft:', error);
@@ -399,36 +459,36 @@ function setActiveCanvas(canvasType) {
 function addTextToActiveCanvas() {
     const activeCanvas = currentCardData.activeCanvas;
     const canvasId = `${activeCanvas}-canvas`;
-    console.log('Adding text to canvas type:', activeCanvas);
-    console.log('Canvas ID:', canvasId);
-    
+    console.log('Add Text to Canvas:', activeCanvas);
+
     const canvas = document.getElementById(canvasId);
     if (!canvas) {
-        console.error('Canvas element not found:', canvasId);
+        console.error('Cannot find the canva:', canvasId);
         return;
     }
-    
-    // Ensure the text array exists
+
+    // 确保文本数组存在
     if (!currentCardData.activeTexts[activeCanvas]) {
         currentCardData.activeTexts[activeCanvas] = [];
     }
-    
+
+    // 新增文本
     const newText = {
         text: 'Click to edit',
         x: canvas.width / 2,
         y: canvas.height / 2,
-        fontSize: currentCardData.fontSize,
-        fontFamily: currentCardData.fontFamily,
-        color: currentCardData.fontColor,
-        fontStyle: currentCardData.fontStyle,
-        fontWeight: currentCardData.fontWeight,
-        textDecoration: currentCardData.textDecoration
+        fontSize: currentCardData.fontSize || 20,
+        fontFamily: currentCardData.fontFamily || 'Arial',
+        color: currentCardData.fontColor || 'black',
+        fontStyle: currentCardData.fontStyle || 'normal',
+        fontWeight: currentCardData.fontWeight || 'normal',
+        textDecoration: currentCardData.textDecoration || 'none'
     };
-    
+
     currentCardData.activeTexts[activeCanvas].push(newText);
     currentCardData.activeTextIndex = currentCardData.activeTexts[activeCanvas].length - 1;
-    
-    console.log('Text array for canvas:', currentCardData.activeTexts[activeCanvas]);
+
+    console.log('Text arrays on the text:', currentCardData.activeTexts[activeCanvas]);
     
     redrawText(canvasId);
     showTextBox(canvasId);
@@ -869,15 +929,17 @@ function saveCustomization() {
             return;
         }
 
-        // 准备图片数据 - 确保只发送必要的信息，避免循环引用
-        const processedImages = currentCardData.images.map(img => {
-            if (typeof img === 'string') {
-                return img;
-            } else if (typeof img === 'object') {
-                return img.src; // 只发送图片URL
-            }
-            return null;
-        }).filter(img => img !== null);
+        // 准备简化的图片数据
+        const processedImages = [];
+        if (Array.isArray(currentCardData.images)) {
+            currentCardData.images.forEach(img => {
+                if (typeof img === 'string') {
+                    processedImages.push(img);
+                } else if (img && typeof img === 'object' && img.src) {
+                    processedImages.push(img.src);
+                }
+            });
+        }
 
         // 准备草稿数据
         const draftData = {
@@ -888,6 +950,8 @@ function saveCustomization() {
             activeTexts: currentCardData.activeTexts,
             stickers: currentCardData.stickers
         };
+
+        console.log("保存的草稿数据:", draftData);
 
         try {
             const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
@@ -919,9 +983,7 @@ function saveCustomization() {
             const savedDraft = await response.json();
 
             // 保存成功后更新sessionStorage中的draftId
-            if (!draftId) {
-                sessionStorage.setItem('draftId', savedDraft._id);
-            }
+            sessionStorage.setItem('draftId', savedDraft._id);
 
             alert('Draft saved successfully!');
             draftDialog.remove();
@@ -933,7 +995,6 @@ function saveCustomization() {
         }
     });
 }
-
 // Add to basket
 function addToBasket() {
     // Save the current card data to sessionStorage or send it to the server
@@ -1437,7 +1498,7 @@ async function loadUserDrafts() {
     const authToken = localStorage.getItem('authToken');
 
     if (!authToken) {
-        console.error('Authorization token not found');
+        alert('You must be logged in to view drafts.');
         return;
     }
 
@@ -1454,6 +1515,7 @@ async function loadUserDrafts() {
         }
 
         const drafts = await response.json();
+        console.log("Retrieved drafts:", drafts);
 
         // 创建草稿列表对话框
         const draftsDialog = document.createElement('div');
@@ -1471,17 +1533,24 @@ async function loadUserDrafts() {
                 <div class="drafts-dialog-body">
         `;
 
-        if (drafts.length === 0) {
+        if (!drafts || drafts.length === 0) {
             draftsHTML += `<p>You don't have any saved drafts yet.</p>`;
         } else {
             draftsHTML += `<ul class="drafts-list">`;
             drafts.forEach(draft => {
+                const date = new Date(draft.updatedAt).toLocaleDateString();
                 draftsHTML += `
                     <li class="draft-item" data-draft-id="${draft._id}">
-                        <span class="draft-name">${draft.name}</span>
-                        <span class="draft-date">${new Date(draft.updatedAt).toLocaleDateString()}</span>
-                        <button class="btn btn-sm btn-primary load-draft-btn">Edit</button>
-                        <button class="btn btn-sm btn-danger delete-draft-btn">Delete</button>
+                        <div class="draft-info">
+                            <span class="draft-name">${draft.name}</span>
+                            <span class="draft-date">Last updated: ${date}</span>
+                        </div>
+                        <div class="draft-actions">
+                            <button class="btn btn-sm btn-primary load-draft-btn">Edit</button>
+                            <button class="btn btn-sm btn-danger delete-draft-btn">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </li>
                 `;
             });
@@ -1504,8 +1573,15 @@ async function loadUserDrafts() {
             button.addEventListener('click', (e) => {
                 const draftId = e.target.closest('.draft-item').dataset.draftId;
                 sessionStorage.setItem('draftId', draftId);
-                draftsDialog.remove();
-                window.location.href = `/editor.html?draft=${draftId}`;
+
+                // 如果在editor页面，直接加载草稿
+                if (window.location.pathname.includes('editor.html')) {
+                    loadDraft(draftId);
+                    draftsDialog.remove();
+                } else {
+                    // 否则跳转到editor页面并携带草稿ID
+                    window.location.href = `/editor.html?draft=${draftId}`;
+                }
             });
         });
 
