@@ -92,6 +92,14 @@ async function loadDraftContent(draftId) {
         }
 
         const draft = await response.json();
+        // 更新卡片的基本信息（cardIndex 与 cardType）并同步到 sessionStorage
+        if (draft.cardIndex !== undefined && draft.cardType) {
+            currentCardData.cardIndex = draft.cardIndex;
+            currentCardData.cardType = draft.cardType;
+            sessionStorage.setItem('selectedCardIndex', draft.cardIndex);
+            sessionStorage.setItem('selectedCardType', draft.cardType);
+            updateCardTypeView();  // 更新 UI 展示，如价格、按钮状态等
+        }
         console.log("加载草稿内容:", draft);
 
         // 等待基本画布加载完成

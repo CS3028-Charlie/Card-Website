@@ -110,7 +110,8 @@ async function loadDrafts() {
             // 点击草稿项跳转到编辑器
             li.addEventListener('click', (e) => {
                 if (!e.target.classList.contains('draft-delete')) {
-                    openDraft(draft._id);
+                    // 使用 draft 对象的 _id、cardIndex 和 cardType 参数
+                    openDraft(draft._id, draft.cardIndex, draft.cardType);
                 }
             });
 
@@ -132,9 +133,9 @@ async function loadDrafts() {
 }
 
 // 打开草稿
-function openDraft(draftId) {
-    sessionStorage.setItem('draftId', draftId);
-    window.location.href = 'editor.html';
+function openDraft(draftId, cardIndex, cardType) {
+    // 直接通过 URL 参数传递草稿数据
+    window.location.href = `editor.html?draft=${draftId}&card=${cardIndex}&type=${cardType}`;
 }
 
 // 删除草稿
