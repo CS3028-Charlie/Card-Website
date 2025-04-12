@@ -545,14 +545,11 @@ function OpenPersonalisePreview() {
 }
 
 
-// 添加悬浮草稿按钮点击事件
+// 为悬浮草稿按钮添加点击事件
 document.addEventListener('DOMContentLoaded', function() {
-    // 查找悬浮草稿按钮
     const draftsBtn = document.querySelector('.drafts-btn');
-
     if (draftsBtn) {
         draftsBtn.addEventListener('click', function() {
-            // 检查用户是否已登录
             const authToken = localStorage.getItem('authToken');
             if (!authToken) {
                 alert('You must be logged in to view drafts.');
@@ -560,13 +557,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // 加载草稿列表
-            loadUserDraftsInShop();
+            loadShopDrafts();
         });
     }
 });
 
-// 在shop页面上加载用户草稿列表
-async function loadUserDraftsInShop() {
+// shop页面的草稿加载功能
+async function loadShopDrafts() {
     const authToken = localStorage.getItem('authToken');
 
     if (!authToken) {
@@ -587,46 +584,46 @@ async function loadUserDraftsInShop() {
         }
 
         const drafts = await response.json();
-        console.log("Retrieved drafts:", drafts);
+        console.log("Shop页面检索到的草稿:", drafts);
 
-        // 创建草稿列表对话框
+        // 创建模态对话框
         const modal = document.createElement('div');
-        modal.className = 'modal fade show';
-        modal.style.display = 'block';
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
         modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
-        modal.tabIndex = -1;
-        modal.role = 'dialog';
+        modal.style.display = 'flex';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        modal.style.zIndex = '1000';
 
         let modalHTML = `
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header" style="background-color: #e8468a; color: white;">
-                        <h5 class="modal-title">Your Drafts</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeModal">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
+            <div style="background-color: white; border-radius: 5px; width: 80%; max-width: 600px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background-color: #e8468a; color: white;">
+                    <h5 style="margin: 0;">Your Drafts</h5>
+                    <button type="button" style="background: none; border: none; color: white; font-size: 1.5rem;" id="closeShopDraftsModal">×</button>
+                </div>
+                <div style="padding: 15px; max-height: 60vh; overflow-y: auto;">
         `;
 
         if (!drafts || drafts.length === 0) {
             modalHTML += `<p>You don't have any saved drafts yet.</p>`;
         } else {
-            modalHTML += `<ul class="list-group">`;
+            modalHTML += `<ul style="list-style: none; padding: 0;">`;
             drafts.forEach(draft => {
                 const date = new Date(draft.updatedAt).toLocaleDateString();
                 modalHTML += `
-                    <li class="list-group-item d-flex justify-content-between align-items-center" data-draft-id="${draft._id}">
+                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee;" data-draft-id="${draft._id}" data-card-index="${draft.cardIndex}" data-card-type="${draft.cardType}">
                         <div>
-                            <strong>${draft.name}</strong>
+                            <span style="font-weight: bold;">${draft.name}</span>
                             <br>
-                            <small class="text-muted">Last updated: ${date}</small>
+                            <small style="color: #666;">Last updated: ${date}</small>
                         </div>
                         <div>
-                            <button class="btn btn-sm btn-primary edit-draft-btn">Edit</button>
-                            <button class="btn btn-sm btn-danger delete-draft-btn">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                            <button class="shop-edit-draft-btn" style="margin-right: 5px; padding: 5px 10px; background-color: #28a745; color: white; border: none; border-radius: 3px;">Edit</button>
+                            <button class="shop-delete-draft-btn" style="padding: 5px 10px; background-color: #dc3545; color: white; border: none; border-radius: 3px;">Delete</button>
                         </div>
                     </li>
                 `;
@@ -634,17 +631,13 @@ async function loadUserDraftsInShop() {
             modalHTML += `</ul>`;
         }
 
-        modalHTML += `
-                    </div>
-                </div>
-            </div>
-        `;
-
+        modalHTML += `</div></div>`;
         modal.innerHTML = modalHTML;
+
         document.body.appendChild(modal);
 
         // 关闭模态框
-        document.getElementById('closeModal').addEventListener('click', () => {
+        document.getElementById('closeShopDraftsModal').addEventListener('click', () => {
             modal.remove();
         });
 
@@ -655,21 +648,26 @@ async function loadUserDraftsInShop() {
             }
         });
 
-        // 编辑草稿按钮
-        const editButtons = document.querySelectorAll('.edit-draft-btn');
+        // 编辑草稿
+        const editButtons = document.querySelectorAll('.shop-edit-draft-btn');
         editButtons.forEach(button => {
             button.addEventListener('click', function(e) {
-                const draftId = e.target.closest('.list-group-item').dataset.draftId;
-                window.location.href = `/editor.html?draft=${draftId}`;
+                const listItem = e.target.closest('li');
+                const draftId = listItem.dataset.draftId;
+                const cardIndex = listItem.dataset.cardIndex;
+                const cardType = listItem.dataset.cardType;
+
+                // 跳转到编辑器页面并传递参数
+                window.location.href = `/editor.html?card=${cardIndex}&type=${cardType}&draft=${draftId}`;
             });
         });
 
-        // 删除草稿按钮
-        const deleteButtons = document.querySelectorAll('.delete-draft-btn');
+        // 删除草稿
+        const deleteButtons = document.querySelectorAll('.shop-delete-draft-btn');
         deleteButtons.forEach(button => {
             button.addEventListener('click', async function(e) {
                 if (confirm('Are you sure you want to delete this draft?')) {
-                    const listItem = e.target.closest('.list-group-item');
+                    const listItem = e.target.closest('li');
                     const draftId = listItem.dataset.draftId;
 
                     try {
@@ -688,9 +686,11 @@ async function loadUserDraftsInShop() {
                         listItem.remove();
 
                         // 如果没有更多草稿，更新显示
-                        if (document.querySelectorAll('.list-group-item').length === 0) {
-                            document.querySelector('.modal-body').innerHTML = `<p>You don't have any saved drafts yet.</p>`;
+                        if (document.querySelectorAll('[data-draft-id]').length === 0) {
+                            document.querySelector('div[style*="max-height: 60vh"]').innerHTML = `<p>You don't have any saved drafts yet.</p>`;
                         }
+
+                        alert('Draft deleted successfully!');
 
                     } catch (error) {
                         console.error('Error deleting draft:', error);

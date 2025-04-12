@@ -34,28 +34,126 @@ const cursorIds = ['front-cursor', 'inner-left-cursor', 'inner-right-cursor', 'b
 
 // Initialize the editor on window load
 window.onload = function() {
-    console.log("Editor initializing...");
+    console.log("编辑器初始化...");
 
-    // 检查URL中是否有草稿ID
+    // 检查URL中是否有草稿参数
     const urlParams = new URLSearchParams(window.location.search);
     const draftId = urlParams.get('draft');
+    const cardIndex = urlParams.get('card');
+    const cardType = urlParams.get('type');
 
     if (draftId) {
-        console.log("Found draft ID in URL:", draftId);
+        console.log("URL中发现草稿ID:", draftId);
         sessionStorage.setItem('draftId', draftId);
-        setupCanvases();
-        setupEventListeners();
-        loadDraft(draftId);
-    } else {
-        console.log("No draft ID found, loading normal editor");
-        loadCardData();
-        setupCanvases();
-        setupEventListeners();
-        updateCardTypeView();
     }
 
+    if (cardIndex) {
+        sessionStorage.setItem('selectedCardIndex', cardIndex);
+    }
+
+    if (cardType) {
+        sessionStorage.setItem('selectedCardType', cardType);
+    }
+
+    // 设置画布和事件监听器
+    setupCanvases();
+    setupEventListeners();
+
+    // 先加载基本卡片数据
+    loadCardData();
+    updateCardTypeView();
     initializeStickerDragAndDrop();
+
+    // 如果有草稿ID，则加载草稿内容
+    if (draftId) {
+        loadDraftContent(draftId);
+    }
 };
+
+// 新增函数：加载草稿内容
+async function loadDraftContent(draftId) {
+    const authToken = localStorage.getItem('authToken');
+
+    if (!authToken) {
+        alert('You must be logged in to load drafts.');
+        return;
+    }
+
+    try {
+        const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
+        const response = await fetch(`${API_URL}/api/drafts/${draftId}`, {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to load draft content');
+        }
+
+        const draft = await response.json();
+        console.log("加载草稿内容:", draft);
+
+        // 等待基本画布加载完成
+        setTimeout(() => {
+            // 应用文字内容
+            if (draft.activeTexts) {
+                currentCardData.activeTexts = draft.activeTexts;
+
+                // 重绘所有画布
+                canvasIds.forEach(canvasId => {
+                    const canvasType = canvasId.replace('-canvas', '');
+                    if (currentCardData.activeTexts[canvasType] &&
+                        currentCardData.activeTexts[canvasType].length > 0) {
+                        console.log(`为 ${canvasType} 加载 ${currentCardData.activeTexts[canvasType].length} 个文本`);
+                        redrawText(canvasId);
+                    }
+                });
+            }
+
+            // 应用贴纸内容
+            if (draft.stickers) {
+                currentCardData.stickers = draft.stickers;
+
+                // 为每个画布添加贴纸
+                for (const canvasType in draft.stickers) {
+                    const stickers = draft.stickers[canvasType];
+                    const canvasId = `${canvasType}-canvas`;
+                    const container = document.getElementById(canvasId)?.parentElement;
+
+                    if (container && stickers && stickers.length > 0) {
+                        console.log(`为 ${canvasType} 加载 ${stickers.length} 个贴纸`);
+
+                        // 清除现有贴纸
+                        container.querySelectorAll('.placed-sticker').forEach(el => el.remove());
+
+                        // 添加新贴纸
+                        stickers.forEach(stickerData => {
+                            const sticker = document.createElement('img');
+                            sticker.src = stickerData.src;
+                            sticker.classList.add('placed-sticker');
+                            sticker.style.position = 'absolute';
+                            sticker.style.left = `${stickerData.x}px`;
+                            sticker.style.top = `${stickerData.y}px`;
+                            sticker.style.width = `${stickerData.width}px`;
+                            sticker.style.height = `${stickerData.height}px`;
+                            sticker.style.zIndex = '10';
+
+                            makeStickerDraggable(sticker);
+                            container.appendChild(sticker);
+                        });
+                    }
+                }
+            }
+
+            alert('Draft loaded successfully!');
+        }, 1000); // 给画布加载一点时间
+
+    } catch (error) {
+        console.error('Error loading draft content:', error);
+        alert('Failed to load draft content. Please try again.');
+    }
+}
 
 // 添加加载草稿的函数
 async function loadDraft(draftId) {
@@ -79,86 +177,15 @@ async function loadDraft(draftId) {
         }
 
         const draft = await response.json();
+        console.log("加载的草稿数据:", draft);
 
-        // 清除当前状态
-        currentCardData = {
-            cardIndex: 0,
-            cardType: 'eCard',
-            images: [],
-            canvases: {},
-            contexts: {},
-            activeCanvas: 'front',
-            activeTexts: {
-                'front': [],
-                'inner-left': [],
-                'inner-right': [],
-                'back': []
-            },
-            activeTextIndex: -1,
-            fontSize: 20,
-            fontFamily: 'Arial',
-            fontColor: 'black',
-            fontStyle: 'normal',
-            fontWeight: 'normal',
-            textDecoration: 'none',
-            stickers: {
-                'front': [],
-                'inner-left': [],
-                'inner-right': [],
-                'back': []
-            }
-        };
+        // 先更新sessionStorage
+        sessionStorage.setItem('draftId', draft._id);
+        sessionStorage.setItem('selectedCardIndex', draft.cardIndex);
+        sessionStorage.setItem('selectedCardType', draft.cardType);
 
-        // 更新当前卡片数据
-        currentCardData.cardIndex = draft.cardIndex;
-        currentCardData.cardType = draft.cardType || 'eCard';
-
-        // 确保图片数据正确
-        if (Array.isArray(draft.images)) {
-            currentCardData.images = draft.images;
-        }
-
-        // 确保文字数据正确
-        if (draft.activeTexts && typeof draft.activeTexts === 'object') {
-            // 合并而不是替换，确保所有必要的键都存在
-            for (const canvas in draft.activeTexts) {
-                currentCardData.activeTexts[canvas] = draft.activeTexts[canvas] || [];
-            }
-        }
-
-        // 确保贴纸数据正确
-        if (draft.stickers && typeof draft.stickers === 'object') {
-            // 合并而不是替换，确保所有必要的键都存在
-            for (const canvas in draft.stickers) {
-                currentCardData.stickers[canvas] = draft.stickers[canvas] || [];
-            }
-        }
-
-        // 更新UI显示
-        document.getElementById('cardTypeDisplay').textContent = currentCardData.cardType;
-        document.getElementById('priceDisplay').textContent = currentCardData.cardType === 'eCard' ? '100 Credits' : '200 Credits';
-        document.getElementById('priceDisplay2').textContent = currentCardData.cardType === 'eCard' ? '£0.99' : '£1.99';
-
-        // 选择相应的卡片类型按钮
-        if (currentCardData.cardType === 'eCard') {
-            document.getElementById('eCardBtn').classList.add('active');
-            document.getElementById('printableBtn').classList.remove('active');
-        } else {
-            document.getElementById('eCardBtn').classList.remove('active');
-            document.getElementById('printableBtn').classList.add('active');
-        }
-
-        // 加载该草稿的图片
-        loadCardImages(currentCardData.cardIndex);
-
-        // 更新卡片类型视图
-        updateCardTypeView();
-
-        // 设置活动画布为front
-        setActiveCanvas('front');
-
-        console.log("成功加载草稿:", draft);
-        alert('Draft loaded successfully!');
+        // 然后重新初始化编辑器
+        window.location.href = `/editor.html?card=${draft.cardIndex}&type=${draft.cardType}&draft=${draft._id}`;
 
     } catch (error) {
         console.error('Error loading draft:', error);
@@ -929,7 +956,7 @@ function saveCustomization() {
             return;
         }
 
-        // 准备简化的图片数据
+        // 简化图片数据
         const processedImages = [];
         if (Array.isArray(currentCardData.images)) {
             currentCardData.images.forEach(img => {
@@ -941,6 +968,12 @@ function saveCustomization() {
             });
         }
 
+        // 确保stickers数据格式正确
+        const processedStickers = {};
+        for (const canvas in currentCardData.stickers) {
+            processedStickers[canvas] = currentCardData.stickers[canvas] || [];
+        }
+
         // 准备草稿数据
         const draftData = {
             name: draftName,
@@ -948,26 +981,17 @@ function saveCustomization() {
             cardType: currentCardData.cardType,
             images: processedImages,
             activeTexts: currentCardData.activeTexts,
-            stickers: currentCardData.stickers
+            stickers: processedStickers
         };
 
-        console.log("保存的草稿数据:", draftData);
+        console.log("保存草稿数据:", draftData);
 
         try {
             const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
 
-            // 检查是否是编辑现有草稿
-            const draftId = sessionStorage.getItem('draftId');
-            let url = `${API_URL}/api/drafts`;
-            let method = 'POST';
-
-            if (draftId) {
-                url = `${API_URL}/api/drafts/${draftId}`;
-                method = 'PUT';
-            }
-
-            const response = await fetch(url, {
-                method: method,
+            // 关键修改：每次保存时创建新草稿，不再更新现有草稿
+            const response = await fetch(`${API_URL}/api/drafts`, {
+                method: 'POST', // 始终使用POST创建新草稿
                 headers: {
                     'Authorization': `Bearer ${authToken}`,
                     'Content-Type': 'application/json'
@@ -982,9 +1006,10 @@ function saveCustomization() {
 
             const savedDraft = await response.json();
 
-            // 保存成功后更新sessionStorage中的draftId
+            // 更新sessionStorage中的draftId
             sessionStorage.setItem('draftId', savedDraft._id);
 
+            console.log("草稿已保存:", savedDraft);
             alert('Draft saved successfully!');
             draftDialog.remove();
 
@@ -995,6 +1020,8 @@ function saveCustomization() {
         }
     });
 }
+
+
 // Add to basket
 function addToBasket() {
     // Save the current card data to sessionStorage or send it to the server
@@ -1515,41 +1542,47 @@ async function loadUserDrafts() {
         }
 
         const drafts = await response.json();
-        console.log("Retrieved drafts:", drafts);
+        console.log("检索到的草稿数量:", drafts.length);
 
         // 创建草稿列表对话框
         const draftsDialog = document.createElement('div');
         draftsDialog.classList.add('drafts-dialog');
+        draftsDialog.style.position = 'fixed';
+        draftsDialog.style.top = '0';
+        draftsDialog.style.left = '0';
+        draftsDialog.style.width = '100%';
+        draftsDialog.style.height = '100%';
+        draftsDialog.style.backgroundColor = 'rgba(0,0,0,0.5)';
+        draftsDialog.style.display = 'flex';
+        draftsDialog.style.justifyContent = 'center';
+        draftsDialog.style.alignItems = 'center';
+        draftsDialog.style.zIndex = '1000';
 
-        // 生成草稿列表HTML
         let draftsHTML = `
-            <div class="drafts-dialog-content">
-                <div class="drafts-dialog-header">
-                    <h5>Your Drafts</h5>
-                    <button type="button" class="close" id="closeDraftsDialog">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+            <div style="background-color: white; border-radius: 5px; width: 80%; max-width: 600px; max-height: 80vh; overflow-y: auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background-color: #e8468a; color: white;">
+                    <h5 style="margin: 0;">Your Drafts</h5>
+                    <button type="button" style="background: none; border: none; color: white; font-size: 1.5rem;" id="closeDraftsDialog">×</button>
                 </div>
-                <div class="drafts-dialog-body">
+                <div style="padding: 15px;">
         `;
 
         if (!drafts || drafts.length === 0) {
             draftsHTML += `<p>You don't have any saved drafts yet.</p>`;
         } else {
-            draftsHTML += `<ul class="drafts-list">`;
+            draftsHTML += `<ul style="list-style: none; padding: 0;">`;
             drafts.forEach(draft => {
                 const date = new Date(draft.updatedAt).toLocaleDateString();
                 draftsHTML += `
-                    <li class="draft-item" data-draft-id="${draft._id}">
-                        <div class="draft-info">
-                            <span class="draft-name">${draft.name}</span>
-                            <span class="draft-date">Last updated: ${date}</span>
+                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee;" data-draft-id="${draft._id}" data-card-index="${draft.cardIndex}" data-card-type="${draft.cardType}">
+                        <div>
+                            <span style="font-weight: bold;">${draft.name}</span>
+                            <br>
+                            <small style="color: #666;">Last updated: ${date}</small>
                         </div>
-                        <div class="draft-actions">
-                            <button class="btn btn-sm btn-primary load-draft-btn">Edit</button>
-                            <button class="btn btn-sm btn-danger delete-draft-btn">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                        <div>
+                            <button class="load-draft-btn" style="margin-right: 5px; padding: 5px 10px; background-color: #28a745; color: white; border: none; border-radius: 3px;">Edit</button>
+                            <button class="delete-draft-btn" style="padding: 5px 10px; background-color: #dc3545; color: white; border: none; border-radius: 3px;">Delete</button>
                         </div>
                     </li>
                 `;
@@ -1571,17 +1604,16 @@ async function loadUserDrafts() {
         const loadButtons = document.querySelectorAll('.load-draft-btn');
         loadButtons.forEach(button => {
             button.addEventListener('click', (e) => {
-                const draftId = e.target.closest('.draft-item').dataset.draftId;
-                sessionStorage.setItem('draftId', draftId);
+                const listItem = e.target.closest('li');
+                const draftId = listItem.dataset.draftId;
+                const cardIndex = listItem.dataset.cardIndex;
+                const cardType = listItem.dataset.cardType;
 
-                // 如果在editor页面，直接加载草稿
-                if (window.location.pathname.includes('editor.html')) {
-                    loadDraft(draftId);
-                    draftsDialog.remove();
-                } else {
-                    // 否则跳转到editor页面并携带草稿ID
-                    window.location.href = `/editor.html?draft=${draftId}`;
-                }
+                // 关闭对话框
+                draftsDialog.remove();
+
+                // 使用新的加载方法
+                window.location.href = `/editor.html?card=${cardIndex}&type=${cardType}&draft=${draftId}`;
             });
         });
 
@@ -1590,7 +1622,7 @@ async function loadUserDrafts() {
         deleteButtons.forEach(button => {
             button.addEventListener('click', async (e) => {
                 if (confirm('Are you sure you want to delete this draft?')) {
-                    const draftItem = e.target.closest('.draft-item');
+                    const draftItem = e.target.closest('li');
                     const draftId = draftItem.dataset.draftId;
 
                     try {
@@ -1609,8 +1641,8 @@ async function loadUserDrafts() {
                         draftItem.remove();
 
                         // 如果没有更多草稿，更新列表显示
-                        if (document.querySelectorAll('.draft-item').length === 0) {
-                            document.querySelector('.drafts-dialog-body').innerHTML = `<p>You don't have any saved drafts yet.</p>`;
+                        if (document.querySelectorAll('[data-draft-id]').length === 0) {
+                            document.querySelector('.drafts-dialog > div > div:last-child').innerHTML = `<p>You don't have any saved drafts yet.</p>`;
                         }
 
                     } catch (error) {
@@ -1626,89 +1658,3 @@ async function loadUserDrafts() {
         alert('Failed to load drafts. Please try again.');
     }
 }
-
-// 添加CSS样式
-const draftsDialogStyles = document.createElement('style');
-draftsDialogStyles.textContent = `
-    .drafts-dialog {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    }
-    
-    .drafts-dialog-content {
-        background-color: white;
-        border-radius: 5px;
-        width: 80%;
-        max-width: 600px;
-        max-height: 80vh;
-        overflow-y: auto;
-    }
-    
-    .drafts-dialog-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 15px;
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #dee2e6;
-    }
-    
-    .drafts-dialog-body {
-        padding: 15px;
-    }
-    
-    .drafts-list {
-        list-style: none;
-        padding: 0;
-    }
-    
-    .draft-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
-        border-bottom: 1px solid #eee;
-    }
-    
-    .draft-name {
-        font-weight: bold;
-        flex-grow: 1;
-    }
-    
-    .draft-date {
-        color: #666;
-        margin-right: 10px;
-    }
-    
-    .load-draft-btn, .delete-draft-btn {
-        margin-left: 5px;
-    }
-`;
-document.head.appendChild(draftsDialogStyles);
-
-// 添加按钮事件监听器
-document.addEventListener('DOMContentLoaded', () => {
-    // 检查是否在editor页面
-    if (window.location.pathname.includes('editor.html')) {
-        // 如果URL中包含draft参数，加载指定草稿
-        const urlParams = new URLSearchParams(window.location.search);
-        const draftId = urlParams.get('draft');
-        if (draftId) {
-            sessionStorage.setItem('draftId', draftId);
-        }
-    }
-
-    // 在shop页面添加草稿按钮事件监听
-    const draftsButton = document.querySelector('.drafts-btn');
-    if (draftsButton) {
-        draftsButton.addEventListener('click', loadUserDrafts);
-    }
-});
