@@ -70,7 +70,6 @@ async function loadDrafts() {
     const draftsList = document.getElementById('draftsList');
     const authToken = localStorage.getItem('authToken');
 
-    // 清空现有列表
     draftsList.innerHTML = '';
 
     if (!authToken) {
@@ -99,6 +98,10 @@ async function loadDrafts() {
 
         drafts.forEach(draft => {
             const li = document.createElement('li');
+            li.dataset.id = draft._id;
+            li.dataset.cardIndex = draft.cardIndex;
+            li.dataset.cardType = draft.cardType;
+
             li.innerHTML = `
                 <div class="draft-info">
                     <div class="draft-name">${draft.name}</div>
@@ -106,14 +109,24 @@ async function loadDrafts() {
                 </div>
                 <i class="fas fa-trash draft-delete" data-id="${draft._id}"></i>
             `;
+
             draftsList.appendChild(li);
         });
 
-        // 只绑定一次，绑定在外面
+        // 关键修复：事件委托！！！
         draftsList.addEventListener('click', (e) => {
+            const li = e.target.closest('li');
+
+            if (!li) return;
+
             if (e.target.classList.contains('draft-delete')) {
                 e.stopPropagation();
                 deleteDraft(e.target.dataset.id);
+            } else {
+                const draftId = li.dataset.id;
+                const cardIndex = li.dataset.cardIndex;
+                const cardType = li.dataset.cardType;
+                openDraft(draftId, cardIndex, cardType);
             }
         });
 
