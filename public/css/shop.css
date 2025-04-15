@@ -532,6 +532,7 @@ select {
     color: #dc3545;
     cursor: pointer;
     margin-left: 10px;
+    pointer-events: auto;
 }
 
 .drafts-list .no-drafts {

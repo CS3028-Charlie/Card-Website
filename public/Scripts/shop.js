@@ -113,21 +113,22 @@ async function loadDrafts() {
             draftsList.appendChild(li);
         });
 
-        // 关键修复：事件委托！！！
         draftsList.addEventListener('click', (e) => {
-            const li = e.target.closest('li');
-
-            if (!li) return;
-
+            // 如果点击的是删除按钮，先处理并阻止跳转
             if (e.target.classList.contains('draft-delete')) {
                 e.stopPropagation();
                 deleteDraft(e.target.dataset.id);
-            } else {
-                const draftId = li.dataset.id;
-                const cardIndex = li.dataset.cardIndex;
-                const cardType = li.dataset.cardType;
-                openDraft(draftId, cardIndex, cardType);
+                return; // 关键！！阻止继续往下跳转
             }
+
+            // 否则处理点击整个草稿项跳转
+            const li = e.target.closest('li');
+            if (!li) return;
+
+            const draftId = li.dataset.id;
+            const cardIndex = li.dataset.cardIndex;
+            const cardType = li.dataset.cardType;
+            openDraft(draftId, cardIndex, cardType);
         });
 
     } catch (error) {
