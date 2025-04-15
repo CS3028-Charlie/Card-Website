@@ -106,24 +106,15 @@ async function loadDrafts() {
                 </div>
                 <i class="fas fa-trash draft-delete" data-id="${draft._id}"></i>
             `;
-
-            // 点击草稿项跳转到编辑器
-            li.addEventListener('click', (e) => {
-                if (!e.target.classList.contains('draft-delete')) {
-                    // 使用 draft 对象的 _id、cardIndex 和 cardType 参数
-                    openDraft(draft._id, draft.cardIndex, draft.cardType);
-                }
-            });
-
             draftsList.appendChild(li);
         });
 
-        // 添加删除草稿的事件监听器
-        document.querySelectorAll('.draft-delete').forEach(deleteBtn => {
-            deleteBtn.addEventListener('click', (e) => {
+        // 只绑定一次，绑定在外面
+        draftsList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('draft-delete')) {
                 e.stopPropagation();
                 deleteDraft(e.target.dataset.id);
-            });
+            }
         });
 
     } catch (error) {
@@ -131,6 +122,7 @@ async function loadDrafts() {
         draftsList.innerHTML = '<div class="no-drafts">Failed to load drafts. Please try again.</div>';
     }
 }
+
 
 // 打开草稿
 function openDraft(draftId, cardIndex, cardType) {
