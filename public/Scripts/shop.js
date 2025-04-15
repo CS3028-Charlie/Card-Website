@@ -70,7 +70,6 @@ async function loadDrafts() {
     const draftsList = document.getElementById('draftsList');
     const authToken = localStorage.getItem('authToken');
 
-    // 清空现有列表
     draftsList.innerHTML = '';
 
     if (!authToken) {
@@ -99,6 +98,10 @@ async function loadDrafts() {
 
         drafts.forEach(draft => {
             const li = document.createElement('li');
+            li.dataset.id = draft._id;
+            li.dataset.cardIndex = draft.cardIndex;
+            li.dataset.cardType = draft.cardType;
+
             li.innerHTML = `
                 <div class="draft-info">
                     <div class="draft-name">${draft.name}</div>
@@ -107,23 +110,26 @@ async function loadDrafts() {
                 <i class="fas fa-trash draft-delete" data-id="${draft._id}"></i>
             `;
 
-            // 点击草稿项跳转到编辑器
-            li.addEventListener('click', (e) => {
-                if (!e.target.classList.contains('draft-delete')) {
-                    // 使用 draft 对象的 _id、cardIndex 和 cardType 参数
-                    openDraft(draft._id, draft.cardIndex, draft.cardType);
-                }
-            });
-
             draftsList.appendChild(li);
         });
 
-        // 添加删除草稿的事件监听器
-        document.querySelectorAll('.draft-delete').forEach(deleteBtn => {
-            deleteBtn.addEventListener('click', (e) => {
+        draftsList.addEventListener('click', (e) => {
+            const deleteBtn = e.target.closest('.draft-delete');
+
+            if (deleteBtn) {
                 e.stopPropagation();
-                deleteDraft(e.target.dataset.id);
-            });
+                deleteDraft(deleteBtn.dataset.id);
+                return;
+            }
+
+            // 否则处理点击整个草稿项跳转
+            const li = e.target.closest('li');
+            if (!li) return;
+
+            const draftId = li.dataset.id;
+            const cardIndex = li.dataset.cardIndex;
+            const cardType = li.dataset.cardType;
+            openDraft(draftId, cardIndex, cardType);
         });
 
     } catch (error) {
@@ -131,6 +137,7 @@ async function loadDrafts() {
         draftsList.innerHTML = '<div class="no-drafts">Failed to load drafts. Please try again.</div>';
     }
 }
+
 
 // 打开草稿
 function openDraft(draftId, cardIndex, cardType) {
