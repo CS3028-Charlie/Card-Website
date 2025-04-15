@@ -114,11 +114,12 @@ async function loadDrafts() {
         });
 
         draftsList.addEventListener('click', (e) => {
-            // 如果点击的是删除按钮，先处理并阻止跳转
-            if (e.target.classList.contains('draft-delete')) {
+            const deleteBtn = e.target.closest('.draft-delete');
+
+            if (deleteBtn) {
                 e.stopPropagation();
-                deleteDraft(e.target.dataset.id);
-                return; // 关键！！阻止继续往下跳转
+                deleteDraft(deleteBtn.dataset.id);
+                return;
             }
 
             // 否则处理点击整个草稿项跳转
