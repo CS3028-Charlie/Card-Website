@@ -30,7 +30,7 @@ window.onload = async function() {
             row.innerHTML = '<div class="col-12 text-center"><p>No cards available at the moment.</p></div>';
         }
 
-        // 初始化草稿功能
+        // Initialize draft functionality
         initializeDrafts();
     } catch (error) {
         console.error('Error initializing cards:', error);
@@ -38,7 +38,7 @@ window.onload = async function() {
 
 };
 
-// 添加草稿功能初始化
+// Add draft functionality initialization
 function initializeDrafts() {
     const draftsIcon = document.getElementById('draftsIcon');
     const draftsModal = document.getElementById('draftsModal');
@@ -57,7 +57,7 @@ function initializeDrafts() {
         });
     }
 
-    // 点击模态框外部关闭
+    // Close modal when clicking outside
     window.addEventListener('click', (e) => {
         if (e.target === draftsModal) {
             draftsModal.style.display = 'none';
@@ -65,7 +65,7 @@ function initializeDrafts() {
     });
 }
 
-// 加载用户草稿列表
+// Load user drafts list
 async function loadDrafts() {
     const draftsList = document.getElementById('draftsList');
     const authToken = localStorage.getItem('authToken');
@@ -122,7 +122,7 @@ async function loadDrafts() {
                 return;
             }
 
-            // 否则处理点击整个草稿项跳转
+            // Otherwise handle clicking on entire draft item for navigation
             const li = e.target.closest('li');
             if (!li) return;
 
@@ -139,13 +139,13 @@ async function loadDrafts() {
 }
 
 
-// 打开草稿
+// Open draft
 function openDraft(draftId, cardIndex, cardType) {
-    // 直接通过 URL 参数传递草稿数据
+    // Directly pass draft data through URL parameters
     window.location.href = `editor.html?draft=${draftId}&card=${cardIndex}&type=${cardType}`;
 }
 
-// 删除草稿
+// Delete draft
 async function deleteDraft(draftId) {
     if (!confirm('Are you sure you want to delete this draft?')) {
         return;
@@ -171,7 +171,7 @@ async function deleteDraft(draftId) {
             throw new Error('Failed to delete draft');
         }
 
-        // 重新加载草稿列表
+        // Reload drafts list
         loadDrafts();
 
     } catch (error) {
@@ -553,7 +553,7 @@ function OpenPersonalisePreview() {
 }
 
 
-// 为悬浮草稿按钮添加点击事件
+// Add click event for floating drafts button
 document.addEventListener('DOMContentLoaded', function() {
     const draftsBtn = document.querySelector('.drafts-btn');
     if (draftsBtn) {
@@ -564,13 +564,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // 加载草稿列表
+            // Load drafts list
             loadShopDrafts();
         });
     }
 });
 
-// shop页面的草稿加载功能
+// Draft loading functionality for shop page
 async function loadShopDrafts() {
     const authToken = localStorage.getItem('authToken');
 
@@ -592,9 +592,9 @@ async function loadShopDrafts() {
         }
 
         const drafts = await response.json();
-        console.log("Shop页面检索到的草稿:", drafts);
+        console.log("Drafts retrieved in Shop page:", drafts);
 
-        // 创建模态对话框
+        // Create modal dialog
         const modal = document.createElement('div');
         modal.style.position = 'fixed';
         modal.style.top = '0';
@@ -644,19 +644,19 @@ async function loadShopDrafts() {
 
         document.body.appendChild(modal);
 
-        // 关闭模态框
+        // Close modal
         document.getElementById('closeShopDraftsModal').addEventListener('click', () => {
             modal.remove();
         });
 
-        // 点击模态框外部关闭
+        // Close when clicking outside the modal
         modal.addEventListener('click', function(event) {
             if (event.target === modal) {
                 modal.remove();
             }
         });
 
-        // 编辑草稿
+        // Edit draft
         const editButtons = document.querySelectorAll('.shop-edit-draft-btn');
         editButtons.forEach(button => {
             button.addEventListener('click', function(e) {
@@ -665,12 +665,12 @@ async function loadShopDrafts() {
                 const cardIndex = listItem.dataset.cardIndex;
                 const cardType = listItem.dataset.cardType;
 
-                // 跳转到编辑器页面并传递参数
+                // Navigate to editor page and pass parameters
                 window.location.href = `/editor.html?card=${cardIndex}&type=${cardType}&draft=${draftId}`;
             });
         });
 
-        // 删除草稿
+        // Delete draft
         const deleteButtons = document.querySelectorAll('.shop-delete-draft-btn');
         deleteButtons.forEach(button => {
             button.addEventListener('click', async function(e) {
@@ -690,10 +690,10 @@ async function loadShopDrafts() {
                             throw new Error('Failed to delete draft');
                         }
 
-                        // 从列表中移除
+                        // Remove from list
                         listItem.remove();
 
-                        // 如果没有更多草稿，更新显示
+                        // If no more drafts, update display
                         if (document.querySelectorAll('[data-draft-id]').length === 0) {
                             document.querySelector('div[style*="max-height: 60vh"]').innerHTML = `<p>You don't have any saved drafts yet.</p>`;
                         }

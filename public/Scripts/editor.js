@@ -34,16 +34,16 @@ const cursorIds = ['front-cursor', 'inner-left-cursor', 'inner-right-cursor', 'b
 
 // Initialize the editor on window load
 window.onload = function() {
-    console.log("编辑器初始化...");
+    console.log("Editor initializing...");
 
-    // 检查URL中是否有草稿参数
+    // Check if there is a draft parameter in the URL
     const urlParams = new URLSearchParams(window.location.search);
     const draftId = urlParams.get('draft');
     const cardIndex = urlParams.get('card');
     const cardType = urlParams.get('type');
 
     if (draftId) {
-        console.log("URL中发现草稿ID:", draftId);
+        console.log("Draft ID found in URL:", draftId);
         sessionStorage.setItem('draftId', draftId);
     }
 
@@ -55,22 +55,22 @@ window.onload = function() {
         sessionStorage.setItem('selectedCardType', cardType);
     }
 
-    // 设置画布和事件监听器
+    // Set up canvases and event listeners
     setupCanvases();
     setupEventListeners();
 
-    // 先加载基本卡片数据
+    // First load basic card data
     loadCardData();
     updateCardTypeView();
     initializeStickerDragAndDrop();
 
-    // 如果有草稿ID，则加载草稿内容
+    // If there is a draft ID, load the draft content
     if (draftId) {
         loadDraftContent(draftId);
     }
 };
 
-// 新增函数：加载草稿内容
+// New function: Load draft content
 async function loadDraftContent(draftId) {
     const authToken = localStorage.getItem('authToken');
 
@@ -92,50 +92,50 @@ async function loadDraftContent(draftId) {
         }
 
         const draft = await response.json();
-        // 更新卡片的基本信息（cardIndex 与 cardType）并同步到 sessionStorage
+        // Update the card's basic information (cardIndex and cardType) and sync to sessionStorage
         if (draft.cardIndex !== undefined && draft.cardType) {
             currentCardData.cardIndex = draft.cardIndex;
             currentCardData.cardType = draft.cardType;
             sessionStorage.setItem('selectedCardIndex', draft.cardIndex);
             sessionStorage.setItem('selectedCardType', draft.cardType);
-            updateCardTypeView();  // 更新 UI 展示，如价格、按钮状态等
+            updateCardTypeView();  // Update UI display, such as price, button status, etc.
         }
-        console.log("加载草稿内容:", draft);
+        console.log("Loading draft content:", draft);
 
-        // 等待基本画布加载完成
+        // Wait for the basic canvas to finish loading
         setTimeout(() => {
-            // 应用文字内容
+            // Apply text content
             if (draft.activeTexts) {
                 currentCardData.activeTexts = draft.activeTexts;
 
-                // 重绘所有画布
+                // Redraw all canvases
                 canvasIds.forEach(canvasId => {
                     const canvasType = canvasId.replace('-canvas', '');
                     if (currentCardData.activeTexts[canvasType] &&
                         currentCardData.activeTexts[canvasType].length > 0) {
-                        console.log(`为 ${canvasType} 加载 ${currentCardData.activeTexts[canvasType].length} 个文本`);
+                        console.log(`Loading ${currentCardData.activeTexts[canvasType].length} texts for ${canvasType}`);
                         redrawText(canvasId);
                     }
                 });
             }
 
-            // 应用贴纸内容
+            // Apply sticker content
             if (draft.stickers) {
                 currentCardData.stickers = draft.stickers;
 
-                // 为每个画布添加贴纸
+                // Add stickers for each canvas
                 for (const canvasType in draft.stickers) {
                     const stickers = draft.stickers[canvasType];
                     const canvasId = `${canvasType}-canvas`;
                     const container = document.getElementById(canvasId)?.parentElement;
 
                     if (container && stickers && stickers.length > 0) {
-                        console.log(`为 ${canvasType} 加载 ${stickers.length} 个贴纸`);
+                        console.log(`Loading ${stickers.length} stickers for ${canvasType}`);
 
-                        // 清除现有贴纸
+                        // Clear existing stickers
                         container.querySelectorAll('.placed-sticker').forEach(el => el.remove());
 
-                        // 添加新贴纸
+                        // Add new stickers
                         stickers.forEach(stickerData => {
                             const sticker = document.createElement('img');
                             sticker.src = stickerData.src;
@@ -155,7 +155,7 @@ async function loadDraftContent(draftId) {
             }
 
             alert('Draft loaded successfully!');
-        }, 1000); // 给画布加载一点时间
+        }, 1000); // Give the canvas some time to load
 
     } catch (error) {
         console.error('Error loading draft content:', error);
@@ -163,7 +163,7 @@ async function loadDraftContent(draftId) {
     }
 }
 
-// 添加加载草稿的函数
+// Add function to load draft
 async function loadDraft(draftId) {
     const authToken = localStorage.getItem('authToken');
 
@@ -185,14 +185,14 @@ async function loadDraft(draftId) {
         }
 
         const draft = await response.json();
-        console.log("加载的草稿数据:", draft);
+        console.log("Loaded draft data:", draft);
 
-        // 先更新sessionStorage
+        // First update sessionStorage
         sessionStorage.setItem('draftId', draft._id);
         sessionStorage.setItem('selectedCardIndex', draft.cardIndex);
         sessionStorage.setItem('selectedCardType', draft.cardType);
 
-        // 然后重新初始化编辑器
+        // Then reinitialize the editor
         window.location.href = `/editor.html?card=${draft.cardIndex}&type=${draft.cardType}&draft=${draft._id}`;
 
     } catch (error) {
@@ -502,12 +502,12 @@ function addTextToActiveCanvas() {
         return;
     }
 
-    // 确保文本数组存在
+    // Ensure text array exists
     if (!currentCardData.activeTexts[activeCanvas]) {
         currentCardData.activeTexts[activeCanvas] = [];
     }
 
-    // 新增文本
+    // Add new text
     const newText = {
         text: 'Click to edit',
         x: canvas.width / 2,
@@ -917,7 +917,7 @@ function maintainTextSelection() {
 }
 
 function saveCustomization() {
-    // 创建保存草稿对话框
+    // Create save draft dialog
     const draftDialog = document.createElement('div');
     draftDialog.classList.add('draft-dialog');
     draftDialog.innerHTML = `
@@ -942,16 +942,16 @@ function saveCustomization() {
 
     document.body.appendChild(draftDialog);
 
-    // 获取对话框元素
+    // Get dialog elements
     const closeDraftDialog = document.getElementById('closeDraftDialog');
     const saveDraftForm = document.getElementById('saveDraftForm');
 
-    // 关闭对话框
+    // Close dialog
     closeDraftDialog.addEventListener('click', () => {
         draftDialog.remove();
     });
 
-    // 提交表单
+    // Submit form
     saveDraftForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -964,7 +964,7 @@ function saveCustomization() {
             return;
         }
 
-        // 简化图片数据
+        // Simplify image data
         const processedImages = [];
         if (Array.isArray(currentCardData.images)) {
             currentCardData.images.forEach(img => {
@@ -976,13 +976,13 @@ function saveCustomization() {
             });
         }
 
-        // 确保stickers数据格式正确
+        // Ensure stickers data format is correct
         const processedStickers = {};
         for (const canvas in currentCardData.stickers) {
             processedStickers[canvas] = currentCardData.stickers[canvas] || [];
         }
 
-        // 准备草稿数据
+        // Prepare draft data
         const draftData = {
             name: draftName,
             cardIndex: currentCardData.cardIndex,
@@ -992,14 +992,14 @@ function saveCustomization() {
             stickers: processedStickers
         };
 
-        console.log("保存草稿数据:", draftData);
+        console.log("Saving draft data:", draftData);
 
         try {
             const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
 
-            // 关键修改：每次保存时创建新草稿，不再更新现有草稿
+            // Key change: Create a new draft each time when saving, no longer update existing drafts
             const response = await fetch(`${API_URL}/api/drafts`, {
-                method: 'POST', // 始终使用POST创建新草稿
+                method: 'POST', // Always use POST to create new drafts
                 headers: {
                     'Authorization': `Bearer ${authToken}`,
                     'Content-Type': 'application/json'
@@ -1014,10 +1014,10 @@ function saveCustomization() {
 
             const savedDraft = await response.json();
 
-            // 更新sessionStorage中的draftId
+            // Update draftId in sessionStorage
             sessionStorage.setItem('draftId', savedDraft._id);
 
-            console.log("草稿已保存:", savedDraft);
+            console.log("Draft saved:", savedDraft);
             alert('Draft saved successfully!');
             draftDialog.remove();
 
@@ -1528,7 +1528,7 @@ function updateUIFromText(text) {
     });
 }
 
-// 获取并显示用户的草稿列表
+// Get and display user's draft list
 async function loadUserDrafts() {
     const authToken = localStorage.getItem('authToken');
 
@@ -1550,9 +1550,9 @@ async function loadUserDrafts() {
         }
 
         const drafts = await response.json();
-        console.log("检索到的草稿数量:", drafts.length);
+        console.log("Retrieved drafts count:", drafts.length);
 
-        // 创建草稿列表对话框
+        // Create drafts list dialog
         const draftsDialog = document.createElement('div');
         draftsDialog.classList.add('drafts-dialog');
         draftsDialog.style.position = 'fixed';
@@ -1603,12 +1603,12 @@ async function loadUserDrafts() {
 
         document.body.appendChild(draftsDialog);
 
-        // 处理关闭对话框
+        // Handle closing dialog
         document.getElementById('closeDraftsDialog').addEventListener('click', () => {
             draftsDialog.remove();
         });
 
-        // 处理加载草稿
+        // Handle loading drafts
         const loadButtons = document.querySelectorAll('.load-draft-btn');
         loadButtons.forEach(button => {
             button.addEventListener('click', (e) => {
@@ -1617,15 +1617,15 @@ async function loadUserDrafts() {
                 const cardIndex = listItem.dataset.cardIndex;
                 const cardType = listItem.dataset.cardType;
 
-                // 关闭对话框
+                // Close dialog
                 draftsDialog.remove();
 
-                // 使用新的加载方法
+                // Use new loading method
                 window.location.href = `/editor.html?card=${cardIndex}&type=${cardType}&draft=${draftId}`;
             });
         });
 
-        // 处理删除草稿
+        // Handle deleting drafts
         const deleteButtons = document.querySelectorAll('.delete-draft-btn');
         deleteButtons.forEach(button => {
             button.addEventListener('click', async (e) => {
@@ -1645,10 +1645,10 @@ async function loadUserDrafts() {
                             throw new Error('Failed to delete draft');
                         }
 
-                        // 移除删除的草稿条目
+                        // Remove deleted draft entry
                         draftItem.remove();
 
-                        // 如果没有更多草稿，更新列表显示
+                        // If no more drafts, update list display
                         if (document.querySelectorAll('[data-draft-id]').length === 0) {
                             document.querySelector('.drafts-dialog > div > div:last-child').innerHTML = `<p>You don't have any saved drafts yet.</p>`;
                         }

@@ -1,20 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 查找悬浮草稿按钮并添加事件监听器
+    // Find the floating drafts button and add event listener
     const draftsFloatingBtn = document.querySelector('.drafts-floating-btn');
     if (draftsFloatingBtn) {
         draftsFloatingBtn.addEventListener('click', () => {
-            // 检查用户是否已登录
+            // Check if user is logged in
             const authToken = localStorage.getItem('authToken');
             if (!authToken) {
                 alert('You must be logged in to view drafts.');
                 return;
             }
 
-            // 动态加载草稿加载函数(如果函数不在当前作用域)
+            // Dynamically load drafts loading function (if function is not in current scope)
             if (typeof loadUserDrafts === 'function') {
                 loadUserDrafts();
             } else {
-                // 如果函数不可用，直接发起请求加载草稿
+                // If function is not available, directly make request to load drafts
                 fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/drafts', {
                     headers: {
                         'Authorization': `Bearer ${authToken}`
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return response.json();
                 })
                 .then(drafts => {
-                    // 显示草稿列表
+                    // Display drafts list
                     displayDraftsList(drafts);
                 })
                 .catch(error => {
@@ -39,9 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// 显示草稿列表的辅助函数
+// Helper function to display drafts list
 function displayDraftsList(drafts) {
-    // 创建草稿列表对话框
+    // Create drafts list dialog
     const draftsDialog = document.createElement('div');
     draftsDialog.classList.add('your-drafts-modal');
 
@@ -79,7 +79,7 @@ function displayDraftsList(drafts) {
 
     document.body.appendChild(draftsDialog);
 
-    // 添加事件监听器
+    // Add event listeners
     document.getElementById('closeYourDraftsModal').addEventListener('click', () => {
         draftsDialog.remove();
     });
@@ -126,7 +126,7 @@ function displayDraftsList(drafts) {
         });
     });
 
-    // 添加样式
+    // Add styles
     const modalStyles = document.createElement('style');
     modalStyles.textContent = `
         .your-drafts-modal {
