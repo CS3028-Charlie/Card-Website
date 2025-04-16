@@ -3,7 +3,7 @@
 An eco-friendly digital and printable greeting card platform supporting environmental education.
 
 ## Live Demo
-- Website: [https://charlie-card-frontend-2-267b7f36cb99.herokuapp.com/index.html/](https://charlie-card-frontend-2-267b7f36cb99.herokuapp.com/index.html/)
+- Website: [https://charlie-card-frontend-2-267b7f36cb99.herokuapp.com/](https://charlie-card-frontend-2-267b7f36cb99.herokuapp.com/)
 
 ### Sample Accounts
 - Teacher Account:
@@ -90,7 +90,7 @@ An eco-friendly digital and printable greeting card platform supporting environm
 ## Features
 - eCard and printable card creation
 - Drag-and-drop sticker placement
-- Text customization with multiple fonts
+- Text customisation with multiple fonts
 - 3D preview of cards
 - Classroom management system for teachers
 - Credit-based payment system
@@ -134,10 +134,10 @@ The application is deployed on Heroku with the following specifications:
 - XSS protection
 - CSRF protection
 - Rate limiting
-- Input sanitization
+- Input sanitisation
 
 ## Support
 For technical support or queries:
-- Email: support@sustainablesacademy.org
+- Email: info@sustainablesacademy.org
 - Twitter: [@sustainablesaca](https://x.com/sustainablesaca)
 - Facebook: [The Sustainables Academy](https://www.facebook.com/thesustainablesacademy/)
