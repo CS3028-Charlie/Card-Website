@@ -136,6 +136,150 @@ The application is deployed on Heroku with the following specifications:
 - Rate limiting
 - Input sanitisation
 
+## Testing
+
+### Setup Testing Environment
+```bash
+# Install required testing packages
+npm install mocha chai sinon jsdom node-fetch
+```
+
+### Run Tests
+```bash
+# Run all tests
+npx mocha tests/**/*.test.js
+
+# Run specific test file
+npx mocha tests/login.test.js
+npx mocha tests/classroom.test.js
+```
+
+### Test Files Structure
+```
+tests/
+├── login.test.js     # Authentication tests
+└── classroom.test.js # Classroom management tests
+```
+
+### Test Coverage
+Current test coverage includes:
+- Authentication System
+  - [x] Login functionality
+  - [x] Registration process
+  - [x] Sign out process
+  - [x] Session management
+
+- Classroom Management
+  - [x] Student listing
+  - [x] Adding students
+  - [x] Credit distribution
+  - [x] Student removal
+  - [x] Credit withdrawal
+
+### Manual Testing Checklist
+Before each deployment, verify:
+
+- Authentication
+  - [ ] All account types can log in
+  - [ ] Registration validates input
+  - [ ] Sign out clears session
+  - [ ] Invalid credentials handled
+
+- Card Editor
+  - [ ] Text tools work
+  - [ ] Sticker placement works
+  - [ ] 3D preview renders
+  - [ ] Changes save correctly
+
+- Payment Processing
+  - [ ] Credit purchases complete
+  - [ ] Balance updates correctly
+  - [ ] Payment errors handled
+  - [ ] Receipts generated
+
+- Classroom Features
+  - [ ] Students can be added
+  - [ ] Credits distribute correctly
+  - [ ] Student removal works
+  - [ ] Balance tracking accurate
+
+### Writing New Tests
+Example test structure:
+```javascript
+describe('Feature Name', () => {
+    beforeEach(() => {
+        // Setup test environment
+    });
+
+    it('should perform specific action', async () => {
+        // Test implementation
+    });
+
+    afterEach(() => {
+        // Clean up
+    });
+});
+```
+
+## Extensibility
+The system can be extended in the following ways:
+
+### New Features
+1. Additional Card Customisation
+   - More fonts and stickers
+   - Animation effects
+   - Audio messages
+   - QR code integration
+
+2. Enhanced Classroom Features
+   - Video tutorials
+   - Lesson planning tools
+   - Student progress tracking
+   - Group projects
+
+3. Payment Options
+   - Additional payment gateways
+   - Subscription models
+   - Group purchasing
+   - Reward programs
+
+### Technical Extensions
+1. API Improvements
+   - GraphQL implementation
+   - WebSocket real-time updates
+   - Enhanced caching
+   - API versioning
+
+2. Performance Optimisations
+   - Image compression
+   - Lazy loading
+   - Service Worker implementation
+   - Progressive Web App features
+
+3. Security Enhancements
+   - Two-factor authentication
+   - OAuth integration
+   - Enhanced audit logging
+   - Automated security scanning
+
+### Architecture Scalability
+1. Microservices Migration
+   - Separate card rendering service
+   - Dedicated authentication service
+   - Independent classroom management
+
+2. Cloud Services Integration
+   - AWS S3 for media storage
+   - CloudFront for CDN
+   - Lambda for serverless functions
+   - Container orchestration
+
+3. Monitoring and Analytics
+   - User behavior tracking
+   - Performance metrics
+   - Error tracking
+   - Usage analytics
+
 ## Support
 For technical support or queries:
 - Email: info@sustainablesacademy.org
