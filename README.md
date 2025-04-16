@@ -3,21 +3,21 @@
 An eco-friendly digital and printable greeting card platform supporting environmental education.
 
 ## Live Demo
-- Website: [https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/](https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/)
+- Website: [https://charlie-card-frontend-2-267b7f36cb99.herokuapp.com/index.html/](https://charlie-card-frontend-2-267b7f36cb99.herokuapp.com/index.html/)
 
 ### Sample Accounts
 - Teacher Account:
-  - Email: teacher@test.com
-  - Password: password123
+  - Email: teacher@evaluation.com
+  - Password: teacherEvaluation
 - Parent Account:
-  - Email: parent@test.com
-  - Password: password123
+  - Email: parent@evaluation.com
+  - Password: parentEvaluation
 - Student Account:
-  - Email: student@test.com
-  - Password: password123
+  - Email: student@evaluation.com
+  - Password: studentEvalaution
 - Admin Account:
-  - Email: admin@test.com
-  - Password: admin123
+  - Email: admin@evaluation.com
+  - Password: adminEvaluation
 
 ## Installation
 
@@ -53,7 +53,30 @@ An eco-friendly digital and printable greeting card platform supporting environm
 3. Configure environment variables:
    Create a `.env` file in the root directory with:
    ```
+   # API Endpoints
    API_URL=https://charlie-card-backend-fbbe5a6118ba.herokuapp.com
+   FRONTEND_URL=https://charlie-card-frontend-2-267b7f36cb99.herokuapp.com
+   
+   # PayPal Configuration
+   PAYPAL_CLIENT_ID=YOUR_PAYPAL_CLIENT_ID
+   PAYPAL_CLIENT_SECRET=YOUR_PAYPAL_SECRET
+   
+   # MongoDB Connection
+   MONGODB_URI=YOUR_MONGODB_CONNECTION_STRING
+   
+   # JWT Configuration
+   JWT_SECRET=YOUR_JWT_SECRET_KEY
+   JWT_EXPIRY=24h
+   
+   # Email Service (for notifications)
+   SMTP_HOST=smtp.example.com
+   SMTP_PORT=587
+   SMTP_USER=your_email@example.com
+   SMTP_PASS=your_email_password
+   
+   # Optional Configuration
+   NODE_ENV=development    # or 'production'
+   PORT=3000              # default port for local development
    ```
 
 4. Start the development server:

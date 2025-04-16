@@ -187,9 +187,21 @@ async function updateUserUI() {
         document.getElementById('userAccountSection').style.display = 'block';
         document.getElementById('loginForm').style.display = 'none';
         document.getElementById('signupForm').style.display = 'none';
-        document.getElementById('signOutFooter').style.display = 'block'; // Show sign out button
+        document.getElementById('signOutFooter').style.display = 'block';
 
-        // Balance display (for pupils)
+        // Add admin button to navbar if user is admin
+        if (role === 'admin') {
+            const navList = document.querySelector('.navbar-nav');
+            // Check if admin link already exists
+            if (!document.querySelector('.nav-item a[href="admin.html"]')) {
+                const adminLi = document.createElement('li');
+                adminLi.className = 'nav-item';
+                adminLi.innerHTML = '<a class="nav-link" href="admin.html"><i class="fas fa-cog"></i> Admin</a>';
+                navList.insertBefore(adminLi, document.querySelector('.nav-item:last-child'));
+            }
+        }
+
+        // Continue with existing balance display code...
         let balanceDisplay = document.getElementById('balanceDisplay');
         if (!balanceDisplay) {
             balanceDisplay = document.createElement('p');
