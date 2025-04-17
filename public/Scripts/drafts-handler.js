@@ -1,3 +1,7 @@
+import config from "./config.js"
+
+const API_URL = config.API_URL
+
 document.addEventListener('DOMContentLoaded', () => {
     // Find the floating drafts button and add event listener
     const draftsFloatingBtn = document.querySelector('.drafts-floating-btn');
@@ -15,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadUserDrafts();
             } else {
                 // If function is not available, directly make request to load drafts
-                fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/drafts', {
+                fetch(`${API_URL}/api/drafts`, {
                     headers: {
                         'Authorization': `Bearer ${authToken}`
                     }
@@ -101,7 +105,7 @@ function displayDraftsList(drafts) {
                 const authToken = localStorage.getItem('authToken');
 
                 try {
-                    const response = await fetch(`https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/drafts/${draftId}`, {
+                    const response = await fetch(`${API_URL}/api/drafts/${draftId}`, {
                         method: 'DELETE',
                         headers: {
                             'Authorization': `Bearer ${authToken}`

@@ -1,10 +1,14 @@
+import config from "./config.js"
+
+const API_URL = config.API_URL
+
 document.addEventListener('DOMContentLoaded', async () => {
     const authToken = localStorage.getItem('authToken');
     const balanceDisplay = document.getElementById('balanceDisplay');
 
     if (authToken) {
         try {
-            const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/users/balance', {
+            const response = await fetch(`${API_URL}/api/users/balance`, {
                 headers: { 'Authorization': `Bearer ${authToken}` }
             });
             const data = await response.json();
@@ -30,7 +34,7 @@ document.getElementById('topupForm').addEventListener('submit', async (e) => {
     }
 
     try {
-        const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/payments/topup', {
+        const response = await fetch(`${API_URL}/api/payments/topup`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${authToken}`,

@@ -1,5 +1,6 @@
-// const API_URL = "http://localhost:3000"
-const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com"
+import config from "./config.js"
+
+const API_URL = config.API_URL
 
 // image upload validation
 document.getElementById("uploadForm").addEventListener("submit", function (event) {
@@ -165,15 +166,17 @@ async function verifyAdmin() {
             return;
         }
 
-        user = await response.json()
+        let user = await response.json()
 
         if (user.role == "admin") {
             return
         } else {
+            window.alert("Insufficient permissions to access this page")
             window.location.href = '/'
         }
 
     } catch (error) {
+        window.alert(error.message)
         window.location.href = '/'
     }
 }
