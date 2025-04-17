@@ -2,7 +2,7 @@ import config from "./config.js"
 
 const API_URL = config.API_URL
 
-document.addEventListener('DOMContentLoaded', updateUserUI());
+document.addEventListener('DOMContentLoaded', updateUserUI);
 document.addEventListener('DOMContentLoaded', () => {
     const accountText = document.getElementById('accountText');
     const accountIcon = document.getElementById('accountIcon');
