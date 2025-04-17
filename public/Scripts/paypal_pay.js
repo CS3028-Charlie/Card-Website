@@ -2,7 +2,32 @@ import config from "./config.js"
 
 const API_URL = config.API_URL
 
-document.addEventListener("DOMContentLoaded", () => {
+async function fetchAndUpdateBalance() {
+    try {
+        const response = await fetch(`${API_URL}/api/auth/balance`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch balance");
+        }
+
+        const data = await response.json();
+        document.getElementById("remaining-credits").textContent = data.balance;
+        return data.balance;
+
+    } catch (error) {
+        console.error("Error fetching balance:", error);
+    }
+
+    return 0;
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
     const paypalOption = document.getElementById("paypal-option");
     const creditOption = document.getElementById("credits-option");
     const paypalButtonContainer = document.getElementById("paypal-button-container");
@@ -21,11 +46,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const remainingCreditsElement = document.getElementById("remaining-credits");
     const totalCreditsElement = document.querySelector(".list-group-item strong");
 
+    let balance = await fetchAndUpdateBalance();
+
     const checkCredits = () => {
-        const availableCredits = parseInt(remainingCreditsElement.textContent, 10);
         const requiredCredits = parseInt(totalCreditsElement.textContent.split(" ")[0], 10);
 
-        if (availableCredits >= requiredCredits) {
+        if (balance >= requiredCredits) {
             remainingCreditsElement.style.color = "inherit";
             creditCheckoutButton.disabled = false;
         } else {
