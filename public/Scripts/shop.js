@@ -30,7 +30,7 @@ window.onload = async function() {
             row.innerHTML = '<div class="col-12 text-center"><p>No cards available at the moment.</p></div>';
         }
 
-        // 初始化草稿功能
+        // Initialize draft functionality
         initializeDrafts();
     } catch (error) {
         console.error('Error initializing cards:', error);
@@ -38,7 +38,7 @@ window.onload = async function() {
 
 };
 
-// 添加草稿功能初始化
+// Add draft functionality initialization
 function initializeDrafts() {
     const draftsIcon = document.getElementById('draftsIcon');
     const draftsModal = document.getElementById('draftsModal');
@@ -57,7 +57,7 @@ function initializeDrafts() {
         });
     }
 
-    // 点击模态框外部关闭
+    // Close modal when clicking outside
     window.addEventListener('click', (e) => {
         if (e.target === draftsModal) {
             draftsModal.style.display = 'none';
@@ -65,12 +65,11 @@ function initializeDrafts() {
     });
 }
 
-// 加载用户草稿列表
+// Load user drafts list
 async function loadDrafts() {
     const draftsList = document.getElementById('draftsList');
     const authToken = localStorage.getItem('authToken');
 
-    // 清空现有列表
     draftsList.innerHTML = '';
 
     if (!authToken) {
@@ -99,6 +98,10 @@ async function loadDrafts() {
 
         drafts.forEach(draft => {
             const li = document.createElement('li');
+            li.dataset.id = draft._id;
+            li.dataset.cardIndex = draft.cardIndex;
+            li.dataset.cardType = draft.cardType;
+
             li.innerHTML = `
                 <div class="draft-info">
                     <div class="draft-name">${draft.name}</div>
@@ -107,22 +110,26 @@ async function loadDrafts() {
                 <i class="fas fa-trash draft-delete" data-id="${draft._id}"></i>
             `;
 
-            // 点击草稿项跳转到编辑器
-            li.addEventListener('click', (e) => {
-                if (!e.target.classList.contains('draft-delete')) {
-                    openDraft(draft._id);
-                }
-            });
-
             draftsList.appendChild(li);
         });
 
-        // 添加删除草稿的事件监听器
-        document.querySelectorAll('.draft-delete').forEach(deleteBtn => {
-            deleteBtn.addEventListener('click', (e) => {
+        draftsList.addEventListener('click', (e) => {
+            const deleteBtn = e.target.closest('.draft-delete');
+
+            if (deleteBtn) {
                 e.stopPropagation();
-                deleteDraft(e.target.dataset.id);
-            });
+                deleteDraft(deleteBtn.dataset.id);
+                return;
+            }
+
+            // Otherwise handle clicking on entire draft item for navigation
+            const li = e.target.closest('li');
+            if (!li) return;
+
+            const draftId = li.dataset.id;
+            const cardIndex = li.dataset.cardIndex;
+            const cardType = li.dataset.cardType;
+            openDraft(draftId, cardIndex, cardType);
         });
 
     } catch (error) {
@@ -131,13 +138,14 @@ async function loadDrafts() {
     }
 }
 
-// 打开草稿
-function openDraft(draftId) {
-    sessionStorage.setItem('draftId', draftId);
-    window.location.href = 'editor.html';
+
+// Open draft
+function openDraft(draftId, cardIndex, cardType) {
+    // Directly pass draft data through URL parameters
+    window.location.href = `editor.html?draft=${draftId}&card=${cardIndex}&type=${cardType}`;
 }
 
-// 删除草稿
+// Delete draft
 async function deleteDraft(draftId) {
     if (!confirm('Are you sure you want to delete this draft?')) {
         return;
@@ -163,7 +171,7 @@ async function deleteDraft(draftId) {
             throw new Error('Failed to delete draft');
         }
 
-        // 重新加载草稿列表
+        // Reload drafts list
         loadDrafts();
 
     } catch (error) {
@@ -541,5 +549,167 @@ function OpenPersonalisePreview() {
     function handleClosePersonalisePreview() {
         closePersonalisePreview();
         closeBackdrop();
+    }
+}
+
+
+// Add click event for floating drafts button
+document.addEventListener('DOMContentLoaded', function() {
+    const draftsBtn = document.querySelector('.drafts-btn');
+    if (draftsBtn) {
+        draftsBtn.addEventListener('click', function() {
+            const authToken = localStorage.getItem('authToken');
+            if (!authToken) {
+                alert('You must be logged in to view drafts.');
+                return;
+            }
+
+            // Load drafts list
+            loadShopDrafts();
+        });
+    }
+});
+
+// Draft loading functionality for shop page
+async function loadShopDrafts() {
+    const authToken = localStorage.getItem('authToken');
+
+    if (!authToken) {
+        alert('You must be logged in to view drafts.');
+        return;
+    }
+
+    try {
+        const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
+        const response = await fetch(`${API_URL}/api/drafts`, {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to load drafts');
+        }
+
+        const drafts = await response.json();
+        console.log("Drafts retrieved in Shop page:", drafts);
+
+        // Create modal dialog
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+        modal.style.display = 'flex';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        modal.style.zIndex = '1000';
+
+        let modalHTML = `
+            <div style="background-color: white; border-radius: 5px; width: 80%; max-width: 600px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background-color: #e8468a; color: white;">
+                    <h5 style="margin: 0;">Your Drafts</h5>
+                    <button type="button" style="background: none; border: none; color: white; font-size: 1.5rem;" id="closeShopDraftsModal">×</button>
+                </div>
+                <div style="padding: 15px; max-height: 60vh; overflow-y: auto;">
+        `;
+
+        if (!drafts || drafts.length === 0) {
+            modalHTML += `<p>You don't have any saved drafts yet.</p>`;
+        } else {
+            modalHTML += `<ul style="list-style: none; padding: 0;">`;
+            drafts.forEach(draft => {
+                const date = new Date(draft.updatedAt).toLocaleDateString();
+                modalHTML += `
+                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee;" data-draft-id="${draft._id}" data-card-index="${draft.cardIndex}" data-card-type="${draft.cardType}">
+                        <div>
+                            <span style="font-weight: bold;">${draft.name}</span>
+                            <br>
+                            <small style="color: #666;">Last updated: ${date}</small>
+                        </div>
+                        <div>
+                            <button class="shop-edit-draft-btn" style="margin-right: 5px; padding: 5px 10px; background-color: #28a745; color: white; border: none; border-radius: 3px;">Edit</button>
+                            <button class="shop-delete-draft-btn" style="padding: 5px 10px; background-color: #dc3545; color: white; border: none; border-radius: 3px;">Delete</button>
+                        </div>
+                    </li>
+                `;
+            });
+            modalHTML += `</ul>`;
+        }
+
+        modalHTML += `</div></div>`;
+        modal.innerHTML = modalHTML;
+
+        document.body.appendChild(modal);
+
+        // Close modal
+        document.getElementById('closeShopDraftsModal').addEventListener('click', () => {
+            modal.remove();
+        });
+
+        // Close when clicking outside the modal
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.remove();
+            }
+        });
+
+        // Edit draft
+        const editButtons = document.querySelectorAll('.shop-edit-draft-btn');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const listItem = e.target.closest('li');
+                const draftId = listItem.dataset.draftId;
+                const cardIndex = listItem.dataset.cardIndex;
+                const cardType = listItem.dataset.cardType;
+
+                // Navigate to editor page and pass parameters
+                window.location.href = `/editor.html?card=${cardIndex}&type=${cardType}&draft=${draftId}`;
+            });
+        });
+
+        // Delete draft
+        const deleteButtons = document.querySelectorAll('.shop-delete-draft-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', async function(e) {
+                if (confirm('Are you sure you want to delete this draft?')) {
+                    const listItem = e.target.closest('li');
+                    const draftId = listItem.dataset.draftId;
+
+                    try {
+                        const deleteResponse = await fetch(`${API_URL}/api/drafts/${draftId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${authToken}`
+                            }
+                        });
+
+                        if (!deleteResponse.ok) {
+                            throw new Error('Failed to delete draft');
+                        }
+
+                        // Remove from list
+                        listItem.remove();
+
+                        // If no more drafts, update display
+                        if (document.querySelectorAll('[data-draft-id]').length === 0) {
+                            document.querySelector('div[style*="max-height: 60vh"]').innerHTML = `<p>You don't have any saved drafts yet.</p>`;
+                        }
+
+                        alert('Draft deleted successfully!');
+
+                    } catch (error) {
+                        console.error('Error deleting draft:', error);
+                        alert('Failed to delete draft. Please try again.');
+                    }
+                }
+            });
+        });
+
+    } catch (error) {
+        console.error('Error loading drafts:', error);
+        alert('Failed to load drafts. Please try again.');
     }
 }

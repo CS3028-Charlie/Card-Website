@@ -532,6 +532,16 @@ select {
     color: #dc3545;
     cursor: pointer;
     margin-left: 10px;
+    pointer-events: auto;
+
+    padding: 10px;
+    font-size: 18px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.drafts-list li .draft-delete:hover {
+    background-color: rgba(220, 53, 69, 0.1);
 }
 
 .drafts-list .no-drafts {

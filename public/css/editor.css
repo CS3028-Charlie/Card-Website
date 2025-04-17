@@ -183,7 +183,7 @@ canvas {
     src: url('../fonts/Montserrat-Regular.ttf');
 }
 
-/* 草稿保存对话框样式 */
+
 .draft-dialog {
     position: fixed;
     top: 0;

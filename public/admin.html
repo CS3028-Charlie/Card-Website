@@ -13,34 +13,105 @@
 </head>
 <body>
     <script src="Scripts/login.js"></script>
-     <!-- Navigation Bar -->
-     <nav class="navbar navbar-expand-lg custom-navbar">
-        <a class="navbar-brand" href="#">
-            <img class="nav-logo" src="Images/TSA-Logo.png"> Admin Panel
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="index.html"><i class="fas fa-home"></i> Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="shop.html"><i class="fas fa-store"></i> Shop</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="about.html"><i class="fa-solid fa-circle-info"></i> About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="accountLink" data-toggle="modal" data-target="#accountModal">
-                        <i class="fas fa-user-circle" id="accountIcon"></i> <span id="accountText">Login</span>
-                    </a>
-                </li>
-            </ul>
+    
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg custom-navbar">
+    <a class="navbar-brand" href="#">
+        <img class="nav-logo" src="Images/TSA-Logo.png"> The Sustainables Academy
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="index.html"><i class="fas fa-home"></i> Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="shop.html"><i class="fas fa-store"></i> Shop</a>
+            </li>
+            <!-- <li class="nav-item">
+                <a class="nav-link" href="Card_Pay.html"><i class="fas fa-star"></i> Top Up</a>
+            </li> -->
+            <li class="nav-item">
+                <a class="nav-link" href="basket.html" id="viewBasketBtn">
+                    <i class="fas fa-shopping-cart"></i> Basket
+                </a>
+            <li class="nav-item">
+                <a class="nav-link" href="about.html"><i class="fa-solid fa-circle-info"></i> About</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" id="accountLink" data-toggle="modal" data-target="#accountModal">
+                    <i class="fas fa-user-circle" id="accountIcon"></i> <span id="accountText">Login</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Account Modal -->
+<div class="modal fade" id="accountModal" tabindex="-1" role="dialog" aria-labelledby="accountModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="accountModalLabel">Login / Sign Up</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Manage your account, view your balance, and access exclusive features.</p>
+                <!-- Login Form -->
+                <form id="loginForm" style="display: none;">
+                    <div class="form-group">
+                        <label for="loginEmail">Email address</label>
+                        <input type="email" class="form-control" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" class="form-control" id="loginPassword" required>
+                    </div>
+                    <button type="button" class="btn btn-success" onclick="handleLogin()">Login</button>
+                </form><br>
+                <!-- Signup Form -->
+                <form id="signupForm" style="display: none;">
+                    <h5>Don't have an account? Sign Up!</h5>
+                    <div class="form-group">
+                        <label for="signupUsername">Username</label>
+                        <input type="text" class="form-control" id="signupUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Email address</label>
+                        <input type="email" class="form-control" id="signupEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" class="form-control" id="signupPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupRole">Account Type</label>
+                        <select class="form-control" id="signupRole">
+                            <option value="parent">Parent</option>
+                            <option value="teacher">Teacher</option>
+                            <option value="pupil">Student</option>
+                        </select>
+                    </div>                        
+                    <button type="button" class="btn btn-success" onclick="handleSignup()">Sign Up</button>
+                </form>
+
+                <!-- User Account Section (after login) -->
+                <div id="userAccountSection" style="display: none;">
+                    <h5>Welcome, <span id="usernameDisplay"></span>!</h5>
+                </div>
+            </div>
+            <div class="modal-footer" id="signOutFooter" style="display: none;">
+                <button type="button" class="btn btn-danger" id="signOutButton" onclick="handleSignOut()">Sign Out</button>
+            </div>
         </div>
-    </nav>
+    </div>
+</div>
 
 <div class="container-grid">
     <div class="container-upload">
