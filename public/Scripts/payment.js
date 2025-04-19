@@ -51,12 +51,36 @@ function getTransactionDetails() {
     };
 }
 
+async function checkoutWithCredits() {
+    try {
+        const credits = 400; // todo get from localstorage basket system
+        const response = await fetch(`${API_URL}/api/auth/deduct`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("authToken")}`,
+            },
+            body: JSON.stringify({ amount: credits }),
+        });
+
+        if (response.ok) {
+            resultMessage(`Thank you for your purchase!<br><br>${credits} credits have been deducted from your account.<br><br>`);
+        } else {
+            const errorData = await response.json();
+            resultMessage(`Sorry, your transaction could not be processed...<br><br>${errorData.message}`);
+        }
+    } catch (error) {
+        console.error("Error fetching balance:", error);
+    }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     const paypalOption = document.getElementById("paypal-option");
     const creditOption = document.getElementById("credits-option");
     const paypalButtonContainer = document.getElementById("paypal-button-container");
     const creditCheckoutButton = document.getElementById("credit-checkout-button");
 
+    // toggle the visibility of the buttons based on the selected option
     const togglePaypalButton = () => {
         paypalButtonContainer.style.display = paypalOption.checked ? "block" : "none";
         creditCheckoutButton.style.display = creditOption.checked ? "block" : "none";
@@ -72,6 +96,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     let balance = await fetchAndUpdateBalance();
 
+    // update balance on page load
     const updateCredits = () => {
         const requiredCredits = parseInt(totalCreditsElement.textContent.split(" ")[0], 10);
 
@@ -83,8 +108,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             creditCheckoutButton.disabled = true;
         }
     };
-
     updateCredits();
+
+    // add event listener for credit checkout button
+    creditCheckoutButton.addEventListener("click", async function(event) {
+        event.preventDefault();
+        await checkoutWithCredits();
+        await fetchAndUpdateBalance(); // update balance after checkout
+    });
 
 });
 
