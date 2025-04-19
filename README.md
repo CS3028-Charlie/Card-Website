@@ -5,7 +5,7 @@ An eco-friendly digital and printable greeting card platform supporting environm
 ## Live Demo
 - Website: [https://charlie-card-frontend-2-267b7f36cb99.herokuapp.com/](https://charlie-card-frontend-2-267b7f36cb99.herokuapp.com/)
 
-### Sample Accounts
+### Sample Academy Accounts
 - Teacher Account:
   - Email: teacher@evaluation.com
   - Password: teacherEvaluation
@@ -18,6 +18,16 @@ An eco-friendly digital and printable greeting card platform supporting environm
 - Admin Account:
   - Email: admin@evaluation.com
   - Password: adminEvaluation
+
+### Sample Payment Accounts
+- Seller Account (use to verify successful transaction):
+   - Email: sb-zosus37484994@business.example.com
+   - Password: ap2w4YO!
+- Buyer Account (use to make payments on site):
+   - Email: sb-xjjoo37494395@personal.example.com
+   - Password: yM#BMS0f
+- Accounts can be viewed at the [PayPal sandbox site](https://www.sandbox.paypal.com/mep/dashboard)
+- **Accounts are for testing purposes only, all money involved is fake**
 
 ## Installation
 
