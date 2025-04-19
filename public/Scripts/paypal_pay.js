@@ -27,6 +27,30 @@ async function fetchAndUpdateBalance() {
     return 0;
 }
 
+function resultMessage(message) {
+    // use bootstrap modal for result message
+    const modalBody = document.getElementById("result-modal-body");
+    if (modalBody) {
+        modalBody.innerHTML = message;
+        $('#resultModal').modal({backdrop: 'static', keyboard: false});
+        const btn = document.getElementById("return-home-btn-modal");
+        if (btn) {
+            btn.onclick = () => window.location.href = "/";
+        }
+    } else {
+        alert(message); // fallback if modal not found
+    }
+}
+
+function getTransactionDetails() {
+    const credits = 400; // todo get from localstorage basket system
+    return {
+        amount: (credits/100).toFixed(2), // 100 credits = £1.00
+        currency: "GBP",
+        items: [], // add product ids and quantities optinally (basket system?)
+    };
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     const paypalOption = document.getElementById("paypal-option");
     const creditOption = document.getElementById("credits-option");
@@ -48,7 +72,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     let balance = await fetchAndUpdateBalance();
 
-    const checkCredits = () => {
+    const updateCredits = () => {
         const requiredCredits = parseInt(totalCreditsElement.textContent.split(" ")[0], 10);
 
         if (balance >= requiredCredits) {
@@ -60,7 +84,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     };
 
-    checkCredits();
+    updateCredits();
 
 });
 
@@ -73,7 +97,7 @@ window.paypal
             label: "paypal",
         },
         message: {
-            amount: 100,
+            amount: getTransactionDetails().amount,
         },
 
         async createOrder() {
@@ -83,15 +107,8 @@ window.paypal
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    // use the "body" param to optionally pass additional order information
-                    // like product ids and quantities
                     body: JSON.stringify({
-                        cart: [
-                            {
-                                id: "YOUR_PRODUCT_ID",
-                                quantity: "YOUR_PRODUCT_QUANTITY",
-                            },
-                        ],
+                        cart: getTransactionDetails()
                     }),
                 });
 
@@ -108,7 +125,7 @@ window.paypal
                 throw new Error(errorMessage);
             } catch (error) {
                 console.error(error);
-                // resultMessage(`Could not initiate PayPal Checkout...<br><br>${error}`);
+                resultMessage(`Could not initiate PayPal Checkout...<br><br>${error}`);
             }
         },
 
@@ -153,14 +170,16 @@ window.paypal
                         orderData?.purchase_units?.[0]?.payments
                             ?.authorizations?.[0];
                     resultMessage(
-                        `Transaction ${transaction.status}: ${transaction.id}<br>
-          <br>See console for all available details`
+                        `Thank you for your purchase!<br><br>
+                        Transaction ID: ${transaction.id}<br><br>`
                     );
                     console.log(
                         "Capture result",
                         orderData,
                         JSON.stringify(orderData, null, 2)
                     );
+
+                    // empty basket
                 }
             } catch (error) {
                 console.error(error);
