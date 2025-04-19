@@ -1,3 +1,7 @@
+import config from "./config.js"
+
+const API_URL = config.API_URL
+
 // Global variables
 let currentCardData = {
     cardIndex: 0,
@@ -80,7 +84,6 @@ async function loadDraftContent(draftId) {
     }
 
     try {
-        const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
         const response = await fetch(`${API_URL}/api/drafts/${draftId}`, {
             headers: {
                 'Authorization': `Bearer ${authToken}`
@@ -173,7 +176,6 @@ async function loadDraft(draftId) {
     }
 
     try {
-        const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
         const response = await fetch(`${API_URL}/api/drafts/${draftId}`, {
             headers: {
                 'Authorization': `Bearer ${authToken}`
@@ -236,7 +238,6 @@ function loadCardData() {
 
 // Load images for the selected card
 function loadCardImages(cardIndex) {
-    const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
     const positions = ["Front", "Inner-Left", "Inner-Right", "Back"];
     const folderIndex = `card-${cardIndex + 1}`;
     
@@ -995,8 +996,6 @@ function saveCustomization() {
         console.log("Saving draft data:", draftData);
 
         try {
-            const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
-
             // Key change: Create a new draft each time when saving, no longer update existing drafts
             const response = await fetch(`${API_URL}/api/drafts`, {
                 method: 'POST', // Always use POST to create new drafts
@@ -1041,13 +1040,11 @@ async function buyNow() {
     const authToken = localStorage.getItem('authToken');
     if (!authToken) {
         alert('You must be logged in to purchase a card.');
-        window.location.href = '/login.html';
+        window.location.href = '/';
         return;
     }
 
     try {
-        const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
-
         const finalCanvas = document.createElement('canvas');
         const ctx = finalCanvas.getContext('2d');
 
@@ -1098,7 +1095,7 @@ async function buyNow() {
         if (purchaseResponse.status === 401) {
             localStorage.removeItem('authToken');
             alert('Your session has expired. Please login again.');
-            window.location.href = '/login.html';
+            window.location.href = '/';
             return;
         }
 
@@ -1538,7 +1535,6 @@ async function loadUserDrafts() {
     }
 
     try {
-        const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
         const response = await fetch(`${API_URL}/api/drafts`, {
             headers: {
                 'Authorization': `Bearer ${authToken}`

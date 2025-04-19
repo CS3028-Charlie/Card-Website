@@ -1,3 +1,7 @@
+import config from "./config.js"
+
+const API_URL = config.API_URL
+
 document.addEventListener("DOMContentLoaded", async () => {
     const authToken = localStorage.getItem("authToken");
     const role = localStorage.getItem("role");
@@ -30,7 +34,7 @@ async function loadStudents() {
     console.log("Stored teacherId:", teacherId); // Debugging log
 
     try {
-        const response = await fetch("https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/classroom/students", {
+        const response = await fetch(`${API_URL}/api/classroom/students`, {
             method: "GET",
             headers: { "Authorization": `Bearer ${authToken}` }
         });
@@ -78,7 +82,7 @@ async function fetchAndUpdateTeacherBalance() {
     const authToken = localStorage.getItem("authToken");
 
     try {
-        const response = await fetch('https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/balance', { 
+        const response = await fetch(`${API_URL}/api/auth/balance`, { 
             method: 'GET',
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
@@ -112,7 +116,7 @@ async function addStudentToClass() {
     }
 
     try {
-        const response = await fetch("https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/classroom/add-student", {
+        const response = await fetch(`${API_URL}/api/classroom/add-student`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -144,7 +148,7 @@ async function addCreditsToSelected() {
     }
 
     try {
-        const response = await fetch("https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/classroom/add-credits", {
+        const response = await fetch(`${API_URL}/api/classroom/add-credits`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -179,7 +183,7 @@ async function removeSelectedStudents() {
     if (!confirm(`Are you sure you want to remove ${selectedStudents.length} students?`)) return;
 
     try {
-        const response = await fetch("https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/classroom/remove-students", {
+        const response = await fetch(`${API_URL}/api/classroom/remove-students`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -209,7 +213,7 @@ async function withdrawCreditsFromSelected() {
     }
 
     try {
-        const response = await fetch("https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/classroom/withdraw-credits", {
+        const response = await fetch(`${API_URL}/api/classroom/withdraw-credits`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

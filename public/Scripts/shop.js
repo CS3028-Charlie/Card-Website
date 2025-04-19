@@ -1,3 +1,7 @@
+import config from "./config.js"
+
+const API_URL = config.API_URL
+
 // PULL IMAGES AND GEN CARDS
 let sharedBackdrop = null;
 let cardPreview = null;
@@ -6,7 +10,6 @@ let personalisePreview = null;
 // Replace the hardcoded numCards with dynamic fetching
 async function getNumberOfCards() {
     try {
-        const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
         const response = await fetch(`${API_URL}/assets/templates/count`);
         if (!response.ok) {
             throw new Error('Failed to fetch card count');
@@ -78,7 +81,6 @@ async function loadDrafts() {
     }
 
     try {
-        const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
         const response = await fetch(`${API_URL}/api/drafts`, {
             headers: {
                 'Authorization': `Bearer ${authToken}`
@@ -159,7 +161,6 @@ async function deleteDraft(draftId) {
     }
 
     try {
-        const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
         const response = await fetch(`${API_URL}/api/drafts/${draftId}`, {
             method: 'DELETE',
             headers: {
@@ -231,7 +232,6 @@ function createBackdrop() {
 function pullTemplateImages(numCards) {
     // http://localhost:3000 for local
     // https://charlie-card-backend-fbbe5a6118ba.herokuapp.com for heroku
-    const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
     const positions = ["Front", "Inner-Left", "Inner-Right", "Back"];
     let cards = [];
 
@@ -388,7 +388,7 @@ function openCardModal(cardIndex, images) {
 
             // Delay navigation to ensure data storage is complete
             setTimeout(() => {
-                window.location.href = 'Credit_Pay.html';
+                window.location.href = 'payment.html';
             }, 100);  // Delay 100ms to ensure sessionStorage storage is complete
         };
     }
@@ -430,7 +430,7 @@ function openCardModal(cardIndex, images) {
 }
 
 // Function to handle card type selection
-function selectCardType(cardType, images) {
+window.selectCardType = function(cardType, images) {
     const isECard = cardType === 'eCard';
 
     // Get the eCard and Printable buttons
@@ -528,7 +528,7 @@ async function loadCarouselImages(images) {
 }
 
 // Open the customise modal for personalization
-function OpenPersonalisePreview() {
+window.OpenPersonalisePreview = function() {
     if (cardPreview) cardPreview.style.display = 'none'; // Ensure CardPreview is hidden
 
     personalisePreview = document.querySelector('.PersonalisePreview');
@@ -580,7 +580,6 @@ async function loadShopDrafts() {
     }
 
     try {
-        const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
         const response = await fetch(`${API_URL}/api/drafts`, {
             headers: {
                 'Authorization': `Bearer ${authToken}`

@@ -1,6 +1,9 @@
+import config from "./config.js"
+
+const API_URL = config.API_URL
+
 async function getNumberOfCards() {
     try {
-        const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
         const response = await fetch(`${API_URL}/assets/templates/count`);
         if (!response.ok) {
             throw new Error('Failed to fetch card count');
@@ -20,7 +23,6 @@ function getRandomCards(maxNumber, count = 3) {
 }
 
 async function loadFeaturedCards() {
-    const API_URL = "https://charlie-card-backend-fbbe5a6118ba.herokuapp.com";
     const container = document.querySelector('.featured-cards .row');
     
     try {

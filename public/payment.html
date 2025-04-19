@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="py-5 text-center">
+            <img class="d-block mx-auto mb-4" src="Images/TSA-Logo.png"
+                alt="" width="72" height="72">
+            <h2>Checkout</h2>
+        </div>
+        <div class="row">
+            <div class="col-md-4 order-md-1 mb-4">
+                <div class="col-md-8 order-md-1">
+                    <h4 class="mb-3">Pay Using</h4>
+                    <div class="d-block my-3">
+                        <div class="custom-control custom-radio">
+                            <input id="credits-option" name="paymentMethod" type="radio" class="custom-control-input" checked="" required="">
+                            <label class="custom-control-label" for="credits-option">Credits</label>
+                            <small class="text-muted d-block">Available credits: <span id="remaining-credits"></span></small>
+                        </div>
+                        <div class="custom-control custom-radio">
+                            <input id="paypal-option" name="paymentMethod" type="radio" class="custom-control-input" required="">
+                            <label class="custom-control-label" for="paypal-option">Paypal</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 order-md-2 mb-4">
+                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">Your cart</span>
+                    <span class="badge badge-secondary badge-pill">3</span>
+                </h4>
+                <ul class="list-group mb-3">
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0">Card 1</h6>
+                            <small class="text-muted">Brief description</small>
+                        </div>
+                        <span class="text-muted">200 credits</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0">Card 2</h6>
+                            <small class="text-muted">Brief description</small>
+                        </div>
+                        <span class="text-muted">100 credits</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <h6 class="my-0">Card 3</h6>
+                            <small class="text-muted">Brief description</small>
+                        </div>
+                        <span class="text-muted">100 credits</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Total</span>
+                        <strong>400 credits (£4.00)</strong>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-md-4 order-md-3 mb-4">
+                <form class="card p-2">
+                    <button id="credit-checkout-button" class="btn btn-primary btn-lg btn-block" type="submit" disabled>Checkout</button>
+                    <div id="paypal-button-container"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Message Modal -->
+    <div class="modal fade" id="resultModal" tabindex="-1" role="dialog" aria-labelledby="resultModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="resultModalLabel">Payment Status</h5>
+          </div>
+          <div class="modal-body" id="result-modal-body">
+            <!-- message insterted here -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="return-home-btn-modal">Return to Homepage</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- jQuery, Bootstrap, and Font Awesome JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <!-- Initialize the paypal JS-SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AdTDbApnyiJFvtVTjUJCHb0YbUOLEF_awqC8vYISaF7ql45ikBoLYPLaAt3Oup6f_IgCRPHRSjVMo8bI&buyer-country=GB&currency=GBP&components=buttons&enable-funding=venmo,paylater,card"
+    data-sdk-integration-source="developer-studio"
+    ></script>
+    <script type="module" src="Scripts/payment.js"></script>
+</body>
+
+
+</html>

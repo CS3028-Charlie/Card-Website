@@ -1,4 +1,8 @@
-document.addEventListener('DOMContentLoaded', updateUserUI());
+import config from "./config.js"
+
+const API_URL = config.API_URL
+
+document.addEventListener('DOMContentLoaded', updateUserUI);
 document.addEventListener('DOMContentLoaded', () => {
     const accountText = document.getElementById('accountText');
     const accountIcon = document.getElementById('accountIcon');
@@ -10,8 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
         accountText.textContent = username || 'Account';
         accountIcon.title = 'Sign Out'; // Change title to reflect action
         updateUserUI(); // Update the navbar to reflect the login state
-        updateNavBarForLogin(); // Update the navbar to reflect the login state
-        updateNavBarForAdmin(); // Update the navbar to include link to admin page
+        //updateNavBarForLogin(); // Update the navbar to reflect the login state - Removed?
+        //updateNavBarForAdmin(); // Update the navbar to include link to admin page
     } else {
         accountText.textContent = 'Login';
         accountIcon.title = 'Login';
@@ -31,8 +35,6 @@ function showLoginSignupModal() {
 
 // Show User Account Modal
 async function showUserAccountModal() {
-    console.log("showUserAccountModal() called"); // Debugging log
-
     $('#accountModal').modal('show');
 
     document.getElementById('loginForm').style.display = 'none';
@@ -44,12 +46,12 @@ async function showUserAccountModal() {
 }
 
 // Handle Login
-async function handleLogin() {
+window.handleLogin = async function() {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
 
     try {
-        const response = await fetch(`https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/login`, { // https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/login
+        const response = await fetch(`${API_URL}/api/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -78,7 +80,7 @@ async function handleLogin() {
     }
 }
 
-async function handleSignup() {
+window.handleSignup = async function() {
     const username = document.getElementById('signupUsername').value;
     const email = document.getElementById('signupEmail').value;
     const password = document.getElementById('signupPassword').value;
@@ -91,7 +93,7 @@ async function handleSignup() {
 
     try {
         // Register the user
-        const registerResponse = await fetch(`https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/register`, {
+        const registerResponse = await fetch(`${API_URL}/api/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, email, password, role }),
@@ -110,7 +112,7 @@ async function handleSignup() {
         localStorage.removeItem('authToken');
 
         // Automatically log in
-        const loginResponse = await fetch(`https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/login`, {
+        const loginResponse = await fetch(`${API_URL}/api/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
@@ -144,7 +146,7 @@ async function handleSignup() {
 }
 
 // Update Nav Bar after Sign Out
-function handleSignOut() {
+window.handleSignOut = function() {
     localStorage.removeItem('username');
     localStorage.removeItem('role');
     localStorage.removeItem('balance');
@@ -278,7 +280,7 @@ function updateTopupSection(role) {
         if (topupSection) {
             topupSection.style.display = 'none';
         }
-        classroomButton.remove();
+        //classroomButton.remove();
     }
 }
 
@@ -288,7 +290,7 @@ async function fetchAndUpdateBalance() {
 
     if (authToken && role === 'pupil') {
         try {
-            const response = await fetch(`https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/balance`, { 
+            const response = await fetch(`${API_URL}/api/auth/balance`, { 
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${authToken}` }
             });
@@ -332,7 +334,7 @@ async function handleTopup() {
     }
 
     try {
-        const response = await fetch(`https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/topup`, {
+        const response = await fetch(`${API_URL}/api/auth/topup`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -358,7 +360,7 @@ async function handleTopup() {
 // Update Nav Bar for Admin
 async function updateNavBarForAdmin() {
     try {
-        const response = await fetch(`https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/user`, {
+        const response = await fetch(`${API_URL}/api/auth/user`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -420,12 +422,12 @@ function showDeleteConfirmation() {
     $('#deleteConfirmModal').modal('show');
 }
 
-async function handleDeleteAccount() {
+window.handleDeleteAccount = async function() {
     const password = document.getElementById('deleteConfirmPassword').value;
     const authToken = localStorage.getItem('authToken');
 
     try {
-        const response = await fetch(`https://charlie-card-backend-fbbe5a6118ba.herokuapp.com/api/auth/delete-account`, {
+        const response = await fetch(`${API_URL}/api/auth/delete-account`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
