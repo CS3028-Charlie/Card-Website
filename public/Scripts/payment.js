@@ -2,6 +2,58 @@ import config from "./config.js"
 
 const API_URL = config.API_URL
 
+function getBasket() {
+    try {
+        const basket = JSON.parse(localStorage.getItem('basket'));
+        return Array.isArray(basket) ? basket : [];
+    } catch {
+        return [];
+    }
+}
+
+function renderCart() {
+    const cartList = document.getElementById('cart-list');
+    const cartCount = document.getElementById('cart-count');
+    cartList.innerHTML = '';
+    const basket = getBasket();
+    let totalPrice = 0;
+    let totalCredits = 0;
+
+    basket.forEach((item, idx) => {
+        totalPrice += Number(item.price);
+        totalCredits += Math.round(item.price) * 100; // £0.99 = 100 credits
+        const li = document.createElement('li');
+        li.className = "list-group-item d-flex justify-content-between lh-condensed";
+        li.innerHTML = `
+            <div>
+                <h6 class="my-0">${item.cardType || 'Card'}</h6>
+                <small class="text-muted">Images: ${item.images ? item.images.length : 0}</small>
+            </div>
+            <span class="text-muted">${Math.round(item.price) * 100} credits</span>
+        `;
+        cartList.appendChild(li);
+    });
+
+    // formatting
+    totalPrice = Number(totalPrice.toFixed(2));
+    totalCredits = Number(String(totalCredits));
+
+    // Add total row
+    const totalLi = document.createElement('li');
+    totalLi.className = "list-group-item d-flex justify-content-between";
+    totalLi.innerHTML = `
+        <span>Total</span>
+        <strong id="cart-total">${totalCredits} credits (£${totalPrice})</strong>
+    `;
+    cartList.appendChild(totalLi);
+
+    cartCount.textContent = basket.length;
+    return {
+        totalCredits,
+        totalPrice,
+    };
+}
+
 async function fetchAndUpdateBalance() {
     try {
         const response = await fetch(`${API_URL}/api/auth/balance`, {
@@ -49,17 +101,20 @@ function resultMessage(message) {
 }
 
 function getTransactionDetails() {
-    const credits = 400; // todo get from localstorage basket system
     return {
-        amount: (credits/100).toFixed(2), // 100 credits = £1.00
+        amount: renderCart().totalPrice.toFixed(2), // get total from basket
         currency: "GBP",
-        items: [], // add product ids and quantities optinally (basket system?)
+        items: getBasket().map(item => ({
+            cardType: item.cardType,
+            price: item.price,
+            images: item.images
+        })),
     };
 }
 
 async function checkoutWithCredits() {
     try {
-        const credits = 400; // todo get from localstorage basket system
+        const credits = renderCart().totalCredits; // get total from basket
         const response = await fetch(`${API_URL}/api/auth/deduct`, {
             method: "POST",
             headers: {
@@ -71,6 +126,8 @@ async function checkoutWithCredits() {
 
         if (response.ok) {
             resultMessage(`Thank you for your purchase!<br><br>${credits} credits have been deducted from your account.<br><br>`);
+            localStorage.setItem('basket', JSON.stringify([])); // empty basket
+            renderCart();
         } else {
             const errorData = await response.json();
             resultMessage(`Sorry, your transaction could not be processed...<br><br>${errorData.message}`);
@@ -98,13 +155,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     togglePaypalButton();
 
     const remainingCreditsElement = document.getElementById("remaining-credits");
-    const totalCreditsElement = document.querySelector(".list-group-item strong");
 
     let balance = await fetchAndUpdateBalance();
 
+    renderCart();
+
     // update balance on page load
     const updateCredits = () => {
-        const requiredCredits = parseInt(totalCreditsElement.textContent.split(" ")[0], 10);
+        const totalCreditsElement = document.getElementById("cart-total");
+        const requiredCredits = totalCreditsElement
+            ? parseInt(totalCreditsElement.textContent.split(" ")[0], 10)
+            : 0;
 
         if (balance >= requiredCredits) {
             remainingCreditsElement.style.color = "inherit";
@@ -216,7 +277,8 @@ window.paypal
                         JSON.stringify(orderData, null, 2)
                     );
 
-                    // empty basket
+                    localStorage.setItem('basket', JSON.stringify([])); // empty basket
+                    renderCart();
                 }
             } catch (error) {
                 console.error(error);
