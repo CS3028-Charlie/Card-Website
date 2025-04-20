@@ -29,6 +29,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Check if token still valid
 async function validateToken(token) {
+    if (!token) {
+        return false;
+    }
+    
     try {
         const response = await fetch(`${API_URL}/api/auth/balance`, { 
             method: 'GET',
