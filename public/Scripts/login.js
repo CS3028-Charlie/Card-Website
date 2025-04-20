@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const authToken = localStorage.getItem('authToken');
     const username = localStorage.getItem('username');
 
-    validToken = await validateToken(authToken);
+    let validToken = await validateToken(authToken);
 
     // If logged in, show username and update icon
     if (validToken) {
@@ -42,6 +42,7 @@ async function validateToken(token) {
             localStorage.removeItem('balance');
             localStorage.removeItem('authToken');
             return false;
+
         } else if (response.ok) {
             return true;
         }

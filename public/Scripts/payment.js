@@ -12,6 +12,12 @@ async function fetchAndUpdateBalance() {
             },
         });
 
+        if (response.status  === 401) {
+            // user is not logged in, redirect to login page
+            window.alert("Session expired, please log in again.");
+            window.location.href = "/";
+        }
+
         if (!response.ok) {
             throw new Error("Failed to fetch balance");
         }
