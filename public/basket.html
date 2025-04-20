@@ -28,7 +28,7 @@
             <h2>Your Basket</h2>
             <div id="basketContainer"></div>
             <ul id="basketList"></ul> <!-- List of basket items -->
-            <button id="checkoutBtn" onclick="window.location.href='payment.html'">Checkout</button>
+            <button id="checkoutBtn">Checkout</button>
         </div>
     </div>
 
@@ -114,6 +114,15 @@
                 const modal = document.getElementById('basketModal');
                 if (event.target === modal) {
                     closeBasketModal();
+                }
+            });
+
+            document.getElementById('checkoutBtn').addEventListener('click', () => {
+                if (localStorage.getItem("authToken")) {
+                    window.location.href = "payment.html";
+                } else {
+                    alert("Please log in to proceed to checkout.");
+                    window.location.href = "/";
                 }
             });
         });

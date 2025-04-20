@@ -76,6 +76,8 @@ function initializeBasketModal() {
 
 document.addEventListener('DOMContentLoaded', () => {
     const addToBasketBtn = document.getElementById('addToBasketBtn');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+
     if (addToBasketBtn) {
         addToBasketBtn.addEventListener('click', () => {
             const selectedCardType = sessionStorage.getItem('selectedCardType');
@@ -87,4 +89,5 @@ document.addEventListener('DOMContentLoaded', () => {
             // displayBasket();
         });
     }
+
 });
