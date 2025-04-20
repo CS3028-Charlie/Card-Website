@@ -3,14 +3,16 @@ import config from "./config.js"
 const API_URL = config.API_URL
 
 document.addEventListener('DOMContentLoaded', updateUserUI);
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const accountText = document.getElementById('accountText');
     const accountIcon = document.getElementById('accountIcon');
     const authToken = localStorage.getItem('authToken');
     const username = localStorage.getItem('username');
 
+    validToken = await validateToken(authToken);
+
     // If logged in, show username and update icon
-    if (authToken) {
+    if (validToken) {
         accountText.textContent = username || 'Account';
         accountIcon.title = 'Sign Out'; // Change title to reflect action
         updateUserUI(); // Update the navbar to reflect the login state
@@ -24,6 +26,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 });
+
+// Check if token still valid
+async function validateToken(token) {
+    try {
+        const response = await fetch(`${API_URL}/api/auth/balance`, { 
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.status === 401) {
+            // token is invalid or expired
+            localStorage.removeItem('username');
+            localStorage.removeItem('role');
+            localStorage.removeItem('balance');
+            localStorage.removeItem('authToken');
+            return false;
+        } else if (response.ok) {
+            return true;
+        }
+    } catch (error) {
+        console.error('Error validating token:', error);
+    }
+}
 
 // Show Login/Signup Modal
 function showLoginSignupModal() {
