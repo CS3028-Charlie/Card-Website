@@ -22,14 +22,29 @@ function renderCart() {
     basket.forEach((item, idx) => {
         totalPrice += Number(item.price);
         totalCredits += Math.round(item.price) * 100; // £0.99 = 100 credits
+
+        // generate images previews
+        let imagesHtml = '';
+        if (Array.isArray(item.images)) {
+            imagesHtml = `
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;">
+                    ${item.images.map(src =>
+                        `<img src="${src}" alt="preview" style="height:80px;width:auto;max-width:120px;object-fit:cover;border-radius:8px;border:1px solid #ccc;box-shadow:0 2px 6px #0001;">`
+                    ).join('')}
+                </div>
+            `;
+        }
+
         const li = document.createElement('li');
-        li.className = "list-group-item d-flex justify-content-between lh-condensed";
+        li.className = "list-group-item";
         li.innerHTML = `
-            <div>
-                <h6 class="my-0">${item.cardType || 'Card'}</h6>
-                <small class="text-muted">Images: ${item.images ? item.images.length : 0}</small>
+            <div class="d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="my-0">${item.cardType || 'Card'}</h6>
+                    <span class="text-muted" style="white-space:nowrap;">${Math.round(item.price) * 100} credits</span>
+                </div>
+                ${imagesHtml}
             </div>
-            <span class="text-muted">${Math.round(item.price) * 100} credits</span>
         `;
         cartList.appendChild(li);
     });
