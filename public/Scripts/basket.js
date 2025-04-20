@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addToBasket(selectedCardType, cardImages, priceDisplay2 );
 
             // Update basket display
-            displayBasket();
+            // displayBasket();
         });
     }
 });

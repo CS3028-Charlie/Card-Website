@@ -74,6 +74,12 @@ window.onload = function() {
     }
 };
 
+// expose function to get card images for basket
+window.getCurrentCardImages = function() {
+    const cardImages = currentCardData.images.map(image => image.src);
+    return cardImages;
+}
+
 // New function: Load draft content
 async function loadDraftContent(draftId) {
     const authToken = localStorage.getItem('authToken');
@@ -1033,7 +1039,6 @@ function saveCustomization() {
 function addToBasket() {
     // Save the current card data to sessionStorage or send it to the server
     sessionStorage.setItem('currentCardData', JSON.stringify(currentCardData));
-    alert('Card added to basket!');
 }
 
 async function buyNow() {
