@@ -289,7 +289,7 @@ The system can be extended in the following ways:
    - Usage analytics
 
 ## Support
-For technical support or queries:
+For client's support or queries:
 - Email: info@sustainablesacademy.org
 - Twitter: [@sustainablesaca](https://x.com/sustainablesaca)
 - Facebook: [The Sustainables Academy](https://www.facebook.com/thesustainablesacademy/)
