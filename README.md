@@ -1,4 +1,4 @@
-# The Sustainables Academy Card Website
+# The Sustainables Academy Card Website - MAINTENANCE MANUAL
 
 An eco-friendly digital and printable greeting card platform supporting environmental education.
 
@@ -54,16 +54,20 @@ An eco-friendly digital and printable greeting card platform supporting environm
    git clone https://github.com/yourusername/Card-Website.git
    cd Card-Website
    ```
+   ```bash
+   git clone https://github.com/yourusername/Backend.git
+   cd Card-Website
+   ```
 
 2. Install dependencies:
    ```bash
    npm install
    ```
 
-3. Configure environment variables:
-   Create a `.env` file in the root directory with:
+3. Configure environment variables (LOCAL ONLY - Please store secrets securely when deploying to a live site.):
+   Create a `.env` file in the root directory of the backend with:
    ```
-   # API Endpoints
+   # API Endpoints (Where the site is being hosted. Must host both frontend and backend. The links stated below are examples.)
    API_URL=https://charlie-card-backend-fbbe5a6118ba.herokuapp.com
    FRONTEND_URL=https://charlie-card-frontend-2-267b7f36cb99.herokuapp.com
    
@@ -78,12 +82,6 @@ An eco-friendly digital and printable greeting card platform supporting environm
    JWT_SECRET=YOUR_JWT_SECRET_KEY
    JWT_EXPIRY=24h
    
-   # Email Service (for notifications)
-   SMTP_HOST=smtp.example.com
-   SMTP_PORT=587
-   SMTP_USER=your_email@example.com
-   SMTP_PASS=your_email_password
-   
    # Optional Configuration
    NODE_ENV=development    # or 'production'
    PORT=3000              # default port for local development
@@ -95,7 +93,7 @@ An eco-friendly digital and printable greeting card platform supporting environm
    ```
 
 5. Access the website:
-   Open `http://localhost:3000` in your web browser
+   Open `http://localhost:3000` or `your hosting site` in your web browser
 
 ## Features
 - eCard and printable card creation
@@ -285,7 +283,7 @@ The system can be extended in the following ways:
    - Container orchestration
 
 3. Monitoring and Analytics
-   - User behavior tracking
+   - User behaviour tracking
    - Performance metrics
    - Error tracking
    - Usage analytics
