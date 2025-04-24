@@ -29,6 +29,9 @@ An eco-friendly digital and printable greeting card platform supporting environm
 - Accounts can be viewed at the [PayPal sandbox site](https://www.sandbox.paypal.com/mep/dashboard)
 - **Accounts are for testing purposes only, all money involved is fake**
 
+## Admin Accounts
+- Admin accounts are currently manually set within MongoDB. Role:'Admin'.
+
 ## Installation
 
 ### Prerequisites
