@@ -25,7 +25,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 });
 
-// Check if token still valid
+// Validates JWT token with server
+// Clears local storage if token is invalid or expired
 async function validateToken(token) {
     if (!token) {
         return false;
@@ -53,7 +54,8 @@ async function validateToken(token) {
     }
 }
 
-// Show Login/Signup Modal
+// Modal display handlers
+// Controls visibility of login/signup/account sections
 function showLoginSignupModal() {
     $('#accountModal').modal('show');
     document.getElementById('loginForm').style.display = 'block';
@@ -72,7 +74,8 @@ async function showUserAccountModal() {
     await fetchAndUpdateBalance();
 }
 
-// Handle Login
+// Authentication handlers
+// Manages login flow, stores user data in localStorage
 window.handleLogin = async function() {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
@@ -107,6 +110,8 @@ window.handleLogin = async function() {
     }
 }
 
+// Registration and auto-login handler
+// Creates account and automatically logs in the user
 window.handleSignup = async function() {
     const username = document.getElementById('signupUsername').value;
     const email = document.getElementById('signupEmail').value;
@@ -201,6 +206,8 @@ document.getElementById('accountLink').addEventListener('click', async (event) =
     }
 });
 
+// User interface updates
+// Updates UI elements based on user role and authentication status
 async function updateUserUI() {
     const username = localStorage.getItem('username');
     const role = localStorage.getItem('role');
@@ -260,6 +267,8 @@ async function updateUserUI() {
     }
 }
 
+// Role-specific UI updates
+// Shows/hides features based on user role (teacher/parent/pupil)
 function updateTopupSection(role) {  
     let topupSection = document.getElementById('topupSection');
     let classroomButton = document.getElementById('classroomButton');
@@ -311,6 +320,8 @@ function updateTopupSection(role) {
     }
 }
 
+// Balance management
+// Fetches and displays current credit balance for pupils
 async function fetchAndUpdateBalance() {
     const authToken = localStorage.getItem('authToken');
     const role = localStorage.getItem('role');
@@ -449,6 +460,8 @@ function showDeleteConfirmation() {
     $('#deleteConfirmModal').modal('show');
 }
 
+// Account deletion handler
+// Confirms user identity before permanent account removal
 window.handleDeleteAccount = async function() {
     const password = document.getElementById('deleteConfirmPassword').value;
     const authToken = localStorage.getItem('authToken');

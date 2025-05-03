@@ -2,6 +2,8 @@ import config from "./config.js"
 
 const API_URL = config.API_URL
 
+// Fetches total number of available cards from the server
+// Returns 0 if fetch fails to prevent errors
 async function getNumberOfCards() {
     try {
         const response = await fetch(`${API_URL}/assets/templates/count`);
@@ -16,12 +18,16 @@ async function getNumberOfCards() {
     }
 }
 
+// Generates an array of random unique card indices
+// maxNumber: total cards available, count: number of cards to select
 function getRandomCards(maxNumber, count = 3) {
     const numbers = Array.from({ length: maxNumber }, (_, i) => i + 1);
     const shuffled = numbers.sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count);
 }
 
+// Loads and displays random featured cards on the homepage
+// Creates card elements with images, titles and shop links
 async function loadFeaturedCards() {
     const container = document.querySelector('.featured-cards .row');
     
@@ -65,5 +71,5 @@ async function loadFeaturedCards() {
     }
 }
 
-// Load featured cards when the page loads
+// Initialize featured cards display when page loads
 window.addEventListener('load', loadFeaturedCards);

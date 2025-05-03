@@ -2,6 +2,9 @@ import config from "./config.js"
 
 const API_URL = config.API_URL
 
+// Event listener for drafts button
+// Checks authentication and loads drafts either through loadUserDrafts function
+// or direct API call if function isn't available
 document.addEventListener('DOMContentLoaded', () => {
     // Find the floating drafts button and add event listener
     const draftsFloatingBtn = document.querySelector('.drafts-floating-btn');
@@ -43,7 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Helper function to display drafts list
+// Creates and displays a modal dialog containing user's draft cards
+// Generates HTML for draft list with edit/delete functionality
+// Each draft item shows name and action buttons
 function displayDraftsList(drafts) {
     // Create drafts list dialog
     const draftsDialog = document.createElement('div');
@@ -83,7 +88,9 @@ function displayDraftsList(drafts) {
 
     document.body.appendChild(draftsDialog);
 
-    // Add event listeners
+    // Add event handlers for edit and delete operations
+    // Edit redirects to editor page with draft ID
+    // Delete removes draft after confirmation
     document.getElementById('closeYourDraftsModal').addEventListener('click', () => {
         draftsDialog.remove();
     });
@@ -130,7 +137,8 @@ function displayDraftsList(drafts) {
         });
     });
 
-    // Add styles
+    // Apply modal styling dynamically
+    // Ensures consistent appearance across different pages
     const modalStyles = document.createElement('style');
     modalStyles.textContent = `
         .your-drafts-modal {

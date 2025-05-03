@@ -2,34 +2,40 @@ import config from "./config.js"
 
 const API_URL = config.API_URL
 
-// image upload validation
+// Input Validation for Card Upload
 document.getElementById("uploadForm").addEventListener("submit", function (event) {
     const fileInput = document.getElementById("cardImages");
     const fileArray = [...fileInput.files];
 
+    // Feedback elements to display error messages.
     const countFeedback = document.getElementById("countFeedback");
     const labelFeedback = document.getElementById("labelFeedback");
 
+    // Validation checks are performed in sequence:
+    // 1. File count - ensures exactly 4 card faces are uploaded
+    // 2. File type - ensures consistency in image format
+    // 3. File naming - ensures card faces are correctly identified
     let valid = true;
 
     countFeedback.style.display = "none";
     filetypeFeedback.style.display = "none"
     labelFeedback.style.display = "none";
 
-    // prevent form submission if 4 files not uploaded
+    // Validation 1: check if exactly 4 files are selected
     if (fileArray.length != 4) {
         countFeedback.style.display = "inline-block";
         valid = false;
     }
 
-    // prevent form submission if files are not .png
+    // Validation 2: check if all files are .png format
     const allowedFiletypes = ["png"]
     if (!fileArray.every(e => allowedFiletypes.includes(e.name.split(".")[1].toLowerCase()))) {
         filetypeFeedback.style.display = "inline-block"
         valid = false;
     }
 
-    // prevent form submission if file names are not labelled correctly
+    // Convert FileList to array and verify each file matches required naming convention
+    // File names must be exactly: Front.png, Back.png, Inner-Left.png, Inner-Right.png
     const requiredLabels = ["Front", "Back", "Inner-Left", "Inner-Right"];
     if (!fileArray.every(e => requiredLabels.includes(e.name.split(".")[0]))) {
         labelFeedback.style.display = "inline-block";
@@ -46,7 +52,7 @@ document.getElementById("uploadForm").addEventListener("submit", function (event
     }
 });
 
-// card upload
+// Card upload
 function uploadCard(title, files) {
     const form = document.getElementById("uploadForm");
     const formData = new FormData();
@@ -69,7 +75,7 @@ function uploadCard(title, files) {
         .catch((err) => console.log("Error occured", err));
 }
 
-// card retrieval
+// Card retrieval
 async function fetchCardsPreview() {
     const response = await fetch(`${API_URL}/get_card_previews`)
     if (!response.ok) {
@@ -80,7 +86,10 @@ async function fetchCardsPreview() {
     return json.cards
 }
 
-// card display
+// Fetches and displays card previews in a grid layout
+// Each card is displayed with its images and controls in two sections:
+// Section 1: Title and delete button
+// Section 2: Preview images of all card faces
 function displayCardPreviews() {
     fetchCardsPreview()
     .then(cards => {
@@ -149,6 +158,9 @@ function deleteCard(card, element) {
         })
 }
 
+// Verify user has admin privileges
+// If verification fails, user is redirected to home page
+// Verification checks both token validity and user role
 async function verifyAdmin() {
     try {
         const response = await fetch(`${API_URL}/api/auth/user`, {
@@ -161,7 +173,7 @@ async function verifyAdmin() {
 
         if (!response.ok) {
             const errorData = await response.json();
-            alert(errorData.message); // Show error from backend
+            alert(errorData.message);
             window.location.href = '/'
             return;
         }
@@ -182,9 +194,9 @@ async function verifyAdmin() {
 }
 
 window.onload = () => {
-    // check user credentials, redirect if not admin
+    // Check user credentials, redirect if not admin
     verifyAdmin();
 
-    // load
+    // Load
     displayCardPreviews()
 }

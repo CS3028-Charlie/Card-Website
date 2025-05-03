@@ -7,7 +7,8 @@ let sharedBackdrop = null;
 let cardPreview = null;
 let personalisePreview = null;
 
-// Replace the hardcoded numCards with dynamic fetching
+// Fetches total number of available cards from server
+// Returns 0 if fetch fails to prevent errors
 async function getNumberOfCards() {
     try {
         const response = await fetch(`${API_URL}/assets/templates/count`);
@@ -140,7 +141,6 @@ async function loadDrafts() {
     }
 }
 
-
 // Open draft
 function openDraft(draftId, cardIndex, cardType) {
     // Directly pass draft data through URL parameters
@@ -248,7 +248,7 @@ function pullTemplateImages(numCards) {
     return cards;
 }
 
-// Function to standardize image size
+// Standardizes card images to consistent dimensions
 function standardizeImage(imageUrl) {
     return new Promise((resolve, reject) => {
         const canvas = document.createElement('canvas');
@@ -301,7 +301,8 @@ function standardizeImage(imageUrl) {
     });
 }
 
-// Function to generate cards
+// Creates card grid display
+// Handles image loading and click events
 async function generateCards(numCards) {
     const row = document.querySelector('.row');
     row.innerHTML = ''; // Clear existing content
@@ -333,7 +334,8 @@ async function generateCards(numCards) {
     }
 }
 
-// Function to open the card modal
+// Modal management for card preview
+// Handles card type selection and pricing updates
 function openCardModal(cardIndex, images) {
     loadCarouselImages(images);
 
@@ -460,31 +462,8 @@ window.selectCardType = function(cardType, images) {
 
 }
 
-
-
-/* Function to handle card type selection
-function selectCardType(cardType, images) {
-    let imagesToShow;
-
-    if (cardType === 'eCard') {
-        imagesToShow = [images[0], images[2]]; // Show only the first and third images
-        document.getElementById('priceDisplay').innerText = 'Credits Needed: 100';
-
-        // Set the third image as the one used in the canvas
-        img.src = images[2]; // Set the canvas image to the third image
-    } else if (cardType === 'printable') {
-        imagesToShow = images; // Show all images
-        document.getElementById('priceDisplay').innerText = 'Credits Needed: 200';
-    }
-
-    loadCarouselImages(imagesToShow);
-    img.onload = () => {
-        redrawCanvas(); // Ensure the canvas is redrawn with the new image
-    };
-}
-*/
-
-// Function to dynamically load carousel images
+// Loads card images into carousel
+// Creates indicators and handles image transitions
 async function loadCarouselImages(images) {
     const carouselImages = document.getElementById('carouselImages');
     const carouselIndicators = document.getElementById('carouselIndicators');
@@ -542,7 +521,6 @@ window.OpenPersonalisePreview = function() {
     }
 }
 
-
 // Add click event for floating drafts button
 document.addEventListener('DOMContentLoaded', function() {
     const draftsBtn = document.querySelector('.drafts-btn');
@@ -560,7 +538,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Draft loading functionality for shop page
+// Draft management functionality
+// Handles loading, editing, and deleting drafts
 async function loadShopDrafts() {
     const authToken = localStorage.getItem('authToken');
 

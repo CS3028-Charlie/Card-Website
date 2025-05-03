@@ -2,6 +2,8 @@ import config from "./config.js"
 
 const API_URL = config.API_URL
 
+// Initial page load handler
+// Verifies teacher credentials and sets up all necessary event listeners
 document.addEventListener("DOMContentLoaded", async () => {
     const authToken = localStorage.getItem("authToken");
     const role = localStorage.getItem("role");
@@ -27,7 +29,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("selectAll").addEventListener("change", toggleSelectAll);
 });
 
-// Fetch students in the teacher's class
+// Fetches and displays all students assigned to current teacher
+// Filters students by teacherId and creates table rows with checkboxes
 async function loadStudents() {
     const authToken = localStorage.getItem("authToken");
     const teacherId = localStorage.getItem("teacherId");
@@ -56,6 +59,8 @@ async function loadStudents() {
         const tableBody = document.getElementById("studentTableBody");
         tableBody.innerHTML = ""; // Clear table
 
+        // Create interactive table rows for each student
+        // Each row includes a checkbox for batch operations
         filteredStudents.forEach(student => {
             const row = document.createElement("tr");
             row.innerHTML = `
@@ -72,7 +77,8 @@ async function loadStudents() {
     }
 }
 
-// Fetch and update teacher's balance
+// Updates teacher's credit balance in UI
+// Fetches current balance from server and formats it for display
 async function fetchAndUpdateTeacherBalance() {
     const authToken = localStorage.getItem("authToken");
 
@@ -98,7 +104,8 @@ async function fetchAndUpdateTeacherBalance() {
     }
 }
 
-// Add a student to the class
+// Processes student addition to teacher's class
+// Validates email and sends request to backend
 async function addStudentToClass() {
     const studentEmail = document.getElementById("studentEmail").value.trim();
     const authToken = localStorage.getItem("authToken");
@@ -131,7 +138,8 @@ async function addStudentToClass() {
     }
 }
 
-// Add 100 credits to selected students
+// Bulk operation to add credits to selected students
+// Awards 100 credits to each selected student
 async function addCreditsToSelected() {
     const authToken = localStorage.getItem("authToken");
     const selectedStudents = [...document.querySelectorAll(".studentCheckbox:checked")].map(cb => cb.dataset.email);
@@ -164,7 +172,8 @@ async function addCreditsToSelected() {
     }
 }
 
-// Remove selected students
+// Bulk remove students from teacher's class
+// Includes confirmation dialog before deletion
 async function removeSelectedStudents() {
     const authToken = localStorage.getItem("authToken");
     const selectedStudents = [...document.querySelectorAll(".studentCheckbox:checked")].map(cb => cb.dataset.email);
@@ -196,7 +205,8 @@ async function removeSelectedStudents() {
     }
 }
 
-// Withdraw credits from selected students
+// Bulk withdrawal of credits from selected students
+// Updates both student and teacher balances after operation
 async function withdrawCreditsFromSelected() {
     const authToken = localStorage.getItem("authToken");
     const selectedStudents = [...document.querySelectorAll(".studentCheckbox:checked")].map(cb => cb.dataset.email);
@@ -236,7 +246,8 @@ function toggleSelectAll() {
     checkboxes.forEach(cb => cb.checked = document.getElementById("selectAll").checked);
 }
 
-// Log notifications
+// Utility function to display notifications
+// Supports both general notifications and status-specific messages
 function logNotification(message, statusId) {
     const notificationsPanel = document.getElementById("notificationsPanel");
     const notification = document.createElement("div");

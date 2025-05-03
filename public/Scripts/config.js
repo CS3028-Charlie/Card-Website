@@ -1,3 +1,6 @@
+// Configuration object containing API URLs for different environments
+// development: Local development server
+// production: Live deployment server on Heroku
 const config = {
     development: {
         API_URL: 'http://localhost:3000',
@@ -7,4 +10,6 @@ const config = {
     },
 };
 
+// Export development configuration by default
+// Change to 'production' when deploying to live server
 export default config['development'];

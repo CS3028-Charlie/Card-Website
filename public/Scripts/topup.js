@@ -2,6 +2,8 @@ import config from "./config.js"
 
 const API_URL = config.API_URL
 
+// Initializes balance display on page load
+// Fetches and shows current balance if user is authenticated
 document.addEventListener('DOMContentLoaded', async () => {
     const authToken = localStorage.getItem('authToken');
     const balanceDisplay = document.getElementById('balanceDisplay');
@@ -21,6 +23,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// Handles credit top-up form submission
+// Validates input and processes payment
 document.getElementById('topupForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
