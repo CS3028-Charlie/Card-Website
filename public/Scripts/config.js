@@ -12,4 +12,4 @@ const config = {
 
 // Export development configuration by default
 // Change to 'production' when deploying to live server
-export default config['development'];
+export default config['production'];
