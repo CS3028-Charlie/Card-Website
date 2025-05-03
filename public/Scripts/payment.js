@@ -286,11 +286,6 @@ window.paypal
                         `Thank you for your purchase!<br><br>
                         Transaction ID: ${transaction.id}<br><br>`
                     );
-                    console.log(
-                        "Capture result",
-                        orderData,
-                        JSON.stringify(orderData, null, 2)
-                    );
 
                     localStorage.setItem('basket', JSON.stringify([])); // empty basket
                     renderCart();

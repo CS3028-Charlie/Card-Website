@@ -1,14 +1,8 @@
 // Function to load saved card details
 function loadCardDetails() {
-    console.log("Loading card details...");
 
     const selectedCardType = sessionStorage.getItem('selectedCardType');
     const creditsRequired = sessionStorage.getItem('creditsRequired');
-
-    console.log("Retrieved from session storage:", {
-        selectedCardType,
-        creditsRequired
-    });
 
     // Update the display elements
     const cardTypeElement = document.getElementById('selectedCardType');

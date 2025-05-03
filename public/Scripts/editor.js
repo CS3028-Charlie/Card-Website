@@ -38,7 +38,6 @@ const cursorIds = ['front-cursor', 'inner-left-cursor', 'inner-right-cursor', 'b
 
 // Initialize the editor on window load
 window.onload = function() {
-    console.log("Editor initializing...");
 
     // Check if there is a draft parameter in the URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -47,7 +46,6 @@ window.onload = function() {
     const cardType = urlParams.get('type');
 
     if (draftId) {
-        console.log("Draft ID found in URL:", draftId);
         sessionStorage.setItem('draftId', draftId);
     }
 
@@ -109,7 +107,6 @@ async function loadDraftContent(draftId) {
             sessionStorage.setItem('selectedCardType', draft.cardType);
             updateCardTypeView();  // Update UI display, such as price, button status, etc.
         }
-        console.log("Loading draft content:", draft);
 
         // Wait for the basic canvas to finish loading
         setTimeout(() => {
@@ -122,7 +119,6 @@ async function loadDraftContent(draftId) {
                     const canvasType = canvasId.replace('-canvas', '');
                     if (currentCardData.activeTexts[canvasType] &&
                         currentCardData.activeTexts[canvasType].length > 0) {
-                        console.log(`Loading ${currentCardData.activeTexts[canvasType].length} texts for ${canvasType}`);
                         redrawText(canvasId);
                     }
                 });
@@ -139,7 +135,6 @@ async function loadDraftContent(draftId) {
                     const container = document.getElementById(canvasId)?.parentElement;
 
                     if (container && stickers && stickers.length > 0) {
-                        console.log(`Loading ${stickers.length} stickers for ${canvasType}`);
 
                         // Clear existing stickers
                         container.querySelectorAll('.placed-sticker').forEach(el => el.remove());
@@ -193,7 +188,6 @@ async function loadDraft(draftId) {
         }
 
         const draft = await response.json();
-        console.log("Loaded draft data:", draft);
 
         // First update sessionStorage
         sessionStorage.setItem('draftId', draft._id);
@@ -406,8 +400,6 @@ function setupEventListeners() {
             if (tabId === 'inner-left') canvasType = 'inner-left';
             if (tabId === 'inner-right') canvasType = 'inner-right';
             
-            console.log('Setting active canvas to:', canvasType);
-            
             // Update active canvas
             setActiveCanvas(canvasType);
             
@@ -458,7 +450,6 @@ function setActiveCanvas(canvasType) {
         .replace('inner-', 'inner-')  // Preserve 'inner-' prefix
         .trim();
     
-    console.log('Setting active canvas type:', canvasType);
     
     // Initialize text array if it doesn't exist
     if (!currentCardData.activeTexts[canvasType]) {
@@ -479,14 +470,12 @@ function setActiveCanvas(canvasType) {
     
     // Show and redraw the correct canvas
     const activeCanvasId = `${canvasType}-canvas`;
-    console.log('Looking for canvas:', activeCanvasId);
     
     canvasIds.forEach(id => {
         const canvas = document.getElementById(id);
         if (canvas) {
             if (id === activeCanvasId) {
                 canvas.style.display = 'block';
-                console.log('Found and showing canvas:', id);
                 redrawText(id);
             } else {
                 canvas.style.display = 'none';
@@ -501,7 +490,6 @@ function setActiveCanvas(canvasType) {
 function addTextToActiveCanvas() {
     const activeCanvas = currentCardData.activeCanvas;
     const canvasId = `${activeCanvas}-canvas`;
-    console.log('Add Text to Canvas:', activeCanvas);
 
     const canvas = document.getElementById(canvasId);
     if (!canvas) {
@@ -529,8 +517,6 @@ function addTextToActiveCanvas() {
 
     currentCardData.activeTexts[activeCanvas].push(newText);
     currentCardData.activeTextIndex = currentCardData.activeTexts[activeCanvas].length - 1;
-
-    console.log('Text arrays on the text:', currentCardData.activeTexts[activeCanvas]);
     
     redrawText(canvasId);
     showTextBox(canvasId);
@@ -676,8 +662,6 @@ function showTextBox(canvasId) {
         canvasId.split('-')[0];
     
     const textIndex = currentCardData.activeTextIndex;
-    
-    console.log('Showing text box for:', canvasType, 'index:', textIndex);
     
     const textBoxId = `${canvasType}-text-box`;
     const cursorId = `${canvasType}-cursor`;
@@ -999,8 +983,6 @@ function saveCustomization() {
             stickers: processedStickers
         };
 
-        console.log("Saving draft data:", draftData);
-
         try {
             // Key change: Create a new draft each time when saving, no longer update existing drafts
             const response = await fetch(`${API_URL}/api/drafts`, {
@@ -1022,7 +1004,6 @@ function saveCustomization() {
             // Update draftId in sessionStorage
             sessionStorage.setItem('draftId', savedDraft._id);
 
-            console.log("Draft saved:", savedDraft);
             alert('Draft saved successfully!');
             draftDialog.remove();
 
@@ -1551,7 +1532,6 @@ async function loadUserDrafts() {
         }
 
         const drafts = await response.json();
-        console.log("Retrieved drafts count:", drafts.length);
 
         // Create drafts list dialog
         const draftsDialog = document.createElement('div');

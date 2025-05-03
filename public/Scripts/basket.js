@@ -50,14 +50,12 @@ function removeFromBasket(index) {
 }
 
 function initializeBasketModal() {
-    console.log("Basket modal getting loaded");
     const basketModal = document.getElementById("basketModal");
     const viewBasketBtn = document.getElementById("viewBasketBtn");
     const closeBtn = document.getElementById("closeBtn");
 
     if (viewBasketBtn && basketModal) {
         viewBasketBtn.addEventListener("click", () => {
-            console.log("Basket button clicked");
             displayBasket(); 
             basketModal.classList.add("active"); 
         });

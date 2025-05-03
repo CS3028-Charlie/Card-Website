@@ -380,12 +380,6 @@ function openCardModal(cardIndex, images) {
             sessionStorage.setItem('creditsRequired', creditsRequired.toString());
             sessionStorage.setItem('priceRequired', priceRequired.toString());
 
-            console.log('Stored in session storage:', {
-                selectedCardType: sessionStorage.getItem('selectedCardType'),
-                creditsRequired: sessionStorage.getItem('creditsRequired'),
-                priceRequired: sessionStorage.getItem('priceRequired'),
-            });
-
             // Delay navigation to ensure data storage is complete
             setTimeout(() => {
                 window.location.href = 'payment.html';
@@ -464,10 +458,6 @@ window.selectCardType = function(cardType, images) {
     sessionStorage.setItem('selectedCardType', isECard ? 'eCard' : 'Printable');
     sessionStorage.setItem('priceRequired', isECard ? 0.99 : 1.99);
 
-    console.log('Stored in session storage:', {
-        selectedCardType: sessionStorage.getItem('selectedCardType'),
-        priceRequired: sessionStorage.getItem('priceRequired')
-    });
 }
 
 
@@ -591,7 +581,6 @@ async function loadShopDrafts() {
         }
 
         const drafts = await response.json();
-        console.log("Drafts retrieved in Shop page:", drafts);
 
         // Create modal dialog
         const modal = document.createElement('div');

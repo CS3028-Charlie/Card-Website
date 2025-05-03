@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function loadStudents() {
     const authToken = localStorage.getItem("authToken");
     const teacherId = localStorage.getItem("teacherId");
-    console.log("Stored teacherId:", teacherId); // Debugging log
 
     try {
         const response = await fetch(`${API_URL}/api/classroom/students`, {
@@ -44,11 +43,8 @@ async function loadStudents() {
         }
 
         const data = await response.json();
-        console.log("Fetched data:", data); // Debugging log
 
         const { students, teacherId: fetchedTeacherId } = data;
-        console.log("Fetched students:", students); // Debugging log
-        console.log("Fetched teacherId:", fetchedTeacherId); // Debugging log
 
         if (!Array.isArray(students)) {
             throw new Error("Invalid students data");
@@ -56,7 +52,6 @@ async function loadStudents() {
 
         // Filter students by teacherId
         const filteredStudents = students.filter(student => student.teacherId === fetchedTeacherId);
-        console.log("Filtered students:", filteredStudents); // Debugging log
 
         const tableBody = document.getElementById("studentTableBody");
         tableBody.innerHTML = ""; // Clear table
@@ -94,7 +89,6 @@ async function fetchAndUpdateTeacherBalance() {
         }
 
         const data = await response.json();
-        console.log("Fetched balance data:", data); // Debugging log
         const balance = data.balance;
 
         document.getElementById("teacherBalance").textContent = `Credits: ${parseFloat(balance).toFixed(0)}`;

@@ -71,7 +71,6 @@ async function showUserAccountModal() {
     document.getElementById('signupForm').style.display = 'none';
     document.getElementById('userAccountSection').style.display = 'block';
 
-    console.log("Fetching balance..."); // Debugging log
     await fetchAndUpdateBalance();
 }
 
