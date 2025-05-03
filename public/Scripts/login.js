@@ -16,8 +16,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         accountText.textContent = username || 'Account';
         accountIcon.title = 'Sign Out'; // Change title to reflect action
         updateUserUI(); // Update the navbar to reflect the login state
-        //updateNavBarForLogin(); // Update the navbar to reflect the login state - Removed?
-        //updateNavBarForAdmin(); // Update the navbar to include link to admin page
     } else {
         accountText.textContent = 'Login';
         accountIcon.title = 'Login';

@@ -1,3 +1,5 @@
+// Creates material from image URL
+// Returns a promise that resolves to a THREE.MeshBasicMaterial
 function createMaterialWithImage(imageUrl) {
     const textureLoader = new THREE.TextureLoader();
     return new Promise((resolve) => {
@@ -24,6 +26,8 @@ function createMaterialWithImage(imageUrl) {
     });
 }
 
+// Creates material from canvas element
+// Handles scaling and white background filling
 function createMaterialFromCanvas(canvasId) {
     const sourceCanvas = document.getElementById(canvasId);
     if (!sourceCanvas) return null;
@@ -59,6 +63,8 @@ function createMaterialFromCanvas(canvasId) {
     });
 }
 
+// Converts canvas to texture material
+// Uses blob URL for efficient memory handling
 function canvasToTexture(canvas) {
     return new Promise((resolve) => {
         // Convert canvas to blob
@@ -98,6 +104,7 @@ function canvasToTexture(canvas) {
     });
 }
 
+// Creates optimized texture from canvas
 function createTextureFromCanvas(canvas) {
     // Create a new canvas with power-of-2 dimensions
     const powerOfTwoCanvas = document.createElement('canvas');
@@ -128,6 +135,8 @@ function createTextureFromCanvas(canvas) {
     });
 }
 
+// Creates 3D card model with all pages
+// Sets up geometry, materials, and spine
 function createPrintableCard(scene) {
     const cardGroup = new THREE.Group();
     const width = 5;
@@ -166,7 +175,9 @@ function createPrintableCard(scene) {
     return cardGroup;
 }
 
-function render3DPreview() {
+// Main rendering function
+// Sets up Three.js scene, camera, lighting and animation
+window.render3DPreview = function() {
     const container = document.getElementById('3DPreviewContainer');
     if (!container) return;
     
@@ -219,7 +230,7 @@ function render3DPreview() {
     }
 }
 
-// Call render3DPreview when modal is shown
+// Initialize preview when modal opens
 document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('preview3DModal');
     if (modal) {
