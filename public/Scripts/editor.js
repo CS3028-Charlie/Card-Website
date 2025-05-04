@@ -352,6 +352,9 @@ function setupEventListeners() {
     document.getElementById('boldBtn').addEventListener('click', toggleBold);
     document.getElementById('italicBtn').addEventListener('click', toggleItalic);
     document.getElementById('underlineBtn').addEventListener('click', toggleUnderline);
+    document.getElementById('alignLeftBtn').addEventListener('click', () => alignText('justifyLeft'));
+    document.getElementById('alignCenterBtn').addEventListener('click', () => alignText('justifyCenter'));
+    document.getElementById('alignRightBtn').addEventListener('click', () => alignText('justifyRight'));
     
     // Font size buttons
     document.getElementById('increaseSizeBtn').addEventListener('click', increaseFontSize);
@@ -841,6 +844,14 @@ function toggleUnderline() {
     currentCardData.textDecoration = currentCardData.textDecoration === 'underline' ? 'none' : 'underline';
     updateTextStyle(text => {
         text.textDecoration = currentCardData.textDecoration;
+    });
+}
+
+// Toggle text alignment for the text
+function setTextAlignment(alignment) {
+    currentCardData.textAlign = alignment;
+    updateTextStyle(text => {
+        text.textAlign = alignment;
     });
 }
 
@@ -1495,6 +1506,10 @@ function updateUIFromText(text) {
     document.getElementById('boldBtn').classList.toggle('selected', text.fontWeight === 'bold');
     document.getElementById('italicBtn').classList.toggle('selected', text.fontStyle === 'italic');
     document.getElementById('underlineBtn').classList.toggle('selected', text.textDecoration === 'underline');
+    document.getElementById('alignLeftBtn').classList.toggle('selected', text.textAlign === 'left');
+    document.getElementById('alignCenterBtn').classList.toggle('selected', text.textAlign === 'center');
+    document.getElementById('alignRightBtn').classList.toggle('selected', text.textAlign === 'right');
+
 
     // Update color buttons
     const colorButtons = ['white', 'black', 'red', 'blue', 'green'];
