@@ -352,9 +352,9 @@ function setupEventListeners() {
     document.getElementById('boldBtn').addEventListener('click', toggleBold);
     document.getElementById('italicBtn').addEventListener('click', toggleItalic);
     document.getElementById('underlineBtn').addEventListener('click', toggleUnderline);
-    document.getElementById('alignLeftBtn').addEventListener('click', () => alignText('justifyLeft'));
-    document.getElementById('alignCenterBtn').addEventListener('click', () => alignText('justifyCenter'));
-    document.getElementById('alignRightBtn').addEventListener('click', () => alignText('justifyRight'));
+    document.getElementById('alignLeftBtn').addEventListener('click', () => setTextAlignment('left'));
+    document.getElementById('alignCenterBtn').addEventListener('click', () => setTextAlignment('center'));
+    document.getElementById('alignRightBtn').addEventListener('click', () => setTextAlignment('right'));
     
     // Font size buttons
     document.getElementById('increaseSizeBtn').addEventListener('click', increaseFontSize);
@@ -1192,7 +1192,7 @@ async function createSecureCanvasCopy(sourceId) {
         texts.forEach(text => {
             tempCtx.font = `${text.fontStyle} ${text.fontWeight} ${text.fontSize}px ${text.fontFamily}`;
             tempCtx.fillStyle = text.color;
-            tempCtx.textAlign = 'center';
+            tempCtx.textAlign = text.textAlign || 'center';
             tempCtx.fillText(text.text, text.x, text.y);
         });
 
