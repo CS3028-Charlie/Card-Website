@@ -579,14 +579,25 @@ function redrawText(canvasId) {
             texts.forEach(text => {
                 offscreenCtx.font = `${text.fontStyle} ${text.fontWeight} ${text.fontSize}px ${text.fontFamily}`;
                 offscreenCtx.fillStyle = text.color;
-                offscreenCtx.textAlign = 'center';
+                offscreenCtx.textAlign = text.textAlign || 'center';
                 offscreenCtx.fillText(text.text, text.x, text.y);
                 
                 if (text.textDecoration === 'underline') {
                     const textWidth = offscreenCtx.measureText(text.text).width;
+                    let startX; //Handles the diffrent alignments for the underline
+
+                    if (text.textAlign == 'left') {
+                        startX = text.x;
+                    } else if (text.textAlign === 'right') {
+                            startX = text.x - textWidth;
+                    } else {
+                            // This is to go back to default state which is centred text
+                            startX = text.x - textWidth / 2;
+                        }
+
                     offscreenCtx.beginPath();
-                    offscreenCtx.moveTo(text.x - textWidth / 2, text.y + 5);
-                    offscreenCtx.lineTo(text.x + textWidth / 2, text.y + 5);
+                    offscreenCtx.moveTo(startX, text.y + 5);
+                    offscreenCtx.lineTo(startX + textWidth, text.y + 5);
                     offscreenCtx.strokeStyle = text.color;
                     offscreenCtx.lineWidth = 1;
                     offscreenCtx.stroke();
